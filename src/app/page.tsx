@@ -1,26 +1,28 @@
 // import Image from "next/image";
-import Link from "next/link";
-import MainBoard from "@/components/Board";
+// import Link from "next/link";
+"use client";
+import MainBoard from "@/components/MainBoard";
+import useSWR from "swr";
 
 export default function Home() {
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+  const { data, error, isLoading } = useSWR(
+    "http://localhost:8000/blogs",
+    fetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
+
+  if (!data) {
+    return <div>Loading...</div>;
+  }
   return (
     <>
-      <div
-        className="flex flex-col ml-22 
-        justify-center text-3xl w-fit
-        h-full my-10"
-      >
-        <li className="hover:text-red-500 duration-300 hover:scale-105">
-          <Link href="/facebook">Facebook</Link>
-        </li>
-        <li className="hover:text-red-500 duration-300 hover:scale-105">
-          <Link href="/tiktok">Tiktok</Link>
-        </li>
-        <li className="hover:text-red-500 duration-300 hover:scale-105">
-          <Link href="instagram">Instagram</Link>
-        </li>
-      </div>
-      <MainBoard />
+      <MainBoard blogs={data} />
     </>
   );
 }
