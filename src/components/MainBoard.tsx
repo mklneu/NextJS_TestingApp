@@ -2,6 +2,9 @@
 // import { useEffect, useState } from "react";
 // import { EricData } from "@/data/dataType";
 import IBlog from "@/types/backend";
+import Button from "./Button";
+import CreateModal from "./CreateModal";
+import { useState } from "react";
 
 interface Iprops {
   blogs: IBlog[];
@@ -9,21 +12,30 @@ interface Iprops {
 
 const MainBoard = (props: Iprops) => {
   // const [data, setData] = useState<EricData[]>([]);
-
+  const [showModal, setShowModal] = useState<boolean>(false);
   const { blogs } = props;
   console.log("check data >>>", blogs);
 
   return (
-    <div className="flex flex-col items-center justify-center h-full p-8">
-      <h1 className="text-3xl font-bold mb-6">Main Board</h1>
+    <div className="flex flex-col items-center justify-center  p-8">
+      <div className="flex justify-between items-center w-11/12 mb-6">
+        <h1 className=" text-3xl font-bold ">Main Board</h1>
+        <Button
+          size="md"
+          className="bg-gray-500 hover:bg-gray-600"
+          onClick={() => setShowModal(true)}
+        >
+          Add New
+        </Button>
+      </div>
 
       <table
         className="border-collapse border w-11/12
       border-gray-300 rounded-lg overflow-hidden shadow-md"
       >
         <thead>
-          <tr className="bg-blue-500 text-white">
-            <th className="border border-gray-300 px-4 py-2">ID</th>
+          <tr className="bg-[#1579cb] text-white">
+            <th className="border border-gray-300 px-4 py-2">No</th>
             <th className="border border-gray-300 px-4 py-2 text-left">
               Author
             </th>
@@ -56,31 +68,21 @@ const MainBoard = (props: Iprops) => {
               </td>
               <td className="border border-gray-300 px-4 py-2">
                 <div className="flex gap-2">
-                  <button
-                    className="bg-blue-500 hover:bg-blue-600 cursor-pointer
-                  text-white px-3 py-1 rounded text-sm duration-200"
-                  >
+                  <Button variant="primary" size="sm" className="px-3">
                     View
-                  </button>
-                  <button
-                    className="bg-yellow-500 hover:bg-yellow-600 cursor-pointer
-                  text-white px-3 py-1 rounded text-sm duration-200"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="bg-red-500 hover:bg-red-600 cursor-pointer
-                  text-white px-3 py-1 rounded text-sm duration-200"
-                  >
-                    Delete
-                  </button>
+                  </Button>
+                  <Button variant="alarm">Edit</Button>
+                  <Button variant="danger">Delete</Button>
                 </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-
+      <CreateModal
+        show={showModal}
+        setShow={setShowModal}
+      ></CreateModal>
       <p className="text-lg mt-6 text-gray-600">Welcome to the main board!</p>
     </div>
   );

@@ -3,5 +3,4 @@ interface IBlog {
     author: string;
     content: string;
     title: string;
-
 }
