@@ -1,23 +1,42 @@
 import { useState } from "react";
-
 import Button from "./Button";
+import { toast } from "react-toastify";
+import { getAllBlogs, postBlog } from "@/services/BlogServices";
 
 interface ICreateModalProps {
   show?: boolean;
   setShow?: (value: boolean) => void;
+  setBlogs?: (value: IBlog[]) => void;
+  onSubmit?: () => void; // Callback function to handle submission
 }
 
 const CreateModal = (props: ICreateModalProps) => {
-  const { show, setShow } = props;
+  const { show, setShow, setBlogs, onSubmit } = props;
 
   const [title, setTitle] = useState<string>("");
   const [author, setAuthor] = useState<string>("");
   const [content, setContent] = useState<string>("");
 
-  const handleSubmit = () => {
-    // Handle form submission logic here
-    console.log("Submitted Data:", { title, author, content });
-    // setShow?.(false); // Close modal after submission
+  const handleSubmit = async () => {
+    if (!title || !author || !content) {
+      toast.error("Please fill in all fields!");
+      return;
+    }
+
+    try {
+      await postBlog(title, author, content);
+
+      // Refresh the blogs list
+      onSubmit?.(); // Call the onSubmit callback if provided
+
+      setTitle("");
+      setAuthor("");
+      setContent("");
+      setShow?.(false); // Close modal after submission
+    } catch (error) {
+      console.error("Error creating blog:", error);
+      // Error message đã được handle trong postBlog function
+    }
   };
 
   const handleClose = () => {
@@ -25,12 +44,13 @@ const CreateModal = (props: ICreateModalProps) => {
     setAuthor("");
     setContent("");
     setShow?.(false); // Close modal
-  }
+  };
 
   return (
     <>
       {show && (
         <form
+          onSubmit={(e) => e.preventDefault()}
           className={`flex justify-between bg-[rgba(0,0,0,0.4)] fixed
           items-center w-full min-h-screen mb-6 top-0 right-0 p-4 z-50`}
         >
@@ -90,11 +110,16 @@ const CreateModal = (props: ICreateModalProps) => {
               <Button
                 variant="secondary"
                 size="md"
-                onClick={() => handleClose()}
+                onClick={() => {
+                  handleClose();
+                  toast.success("Modal closed");
+                }}
               >
                 Close
               </Button>
-              <Button size="md" onClick={()=>handleSubmit()}>Save</Button>
+              <Button size="md" onClick={() => handleSubmit()}>
+                Save
+              </Button>
             </div>
           </div>
         </form>

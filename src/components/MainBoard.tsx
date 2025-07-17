@@ -5,16 +5,28 @@ import IBlog from "@/types/backend";
 import Button from "./Button";
 import CreateModal from "./CreateModal";
 import { useState } from "react";
+import { toast } from "react-toastify";
+import { getAllBlogs } from "@/services/BlogServices";
 
 interface Iprops {
   blogs: IBlog[];
+  setBlogs?: (value: IBlog[]) => void;
 }
 
 const MainBoard = (props: Iprops) => {
   // const [data, setData] = useState<EricData[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const { blogs } = props;
-  console.log("check data >>>", blogs);
+  const { blogs, setBlogs } = props;
+
+  const onsubmit = async () => {
+    try {
+      const response = await getAllBlogs();
+      setBlogs?.(response);
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+      toast.error("Failed to fetch blogs after submission.");
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center  p-8">
@@ -48,40 +60,50 @@ const MainBoard = (props: Iprops) => {
           </tr>
         </thead>
         <tbody>
-          {blogs?.map((row: IBlog, index: number) => (
-            <tr
-              key={row.id}
-              className={`${
-                index % 2 === 0 ? "bg-white" : "bg-gray-50"
-              } hover:bg-gray-100 text-black`}
-            >
-              <td className="border border-gray-300 px-4 py-2 text-center">
-                {row.id}
-              </td>
-              <td className="border border-gray-300 px-4 py-2 ">
-                {row.author}
-              </td>
-              <td className="border border-gray-300 px-4 py-2 ">
-                <span className={` px-2 py-1 rounded text-sm`}>
-                  {row.title}
-                </span>
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                <div className="flex gap-2">
-                  <Button variant="primary" size="sm" className="px-3">
-                    View
-                  </Button>
-                  <Button variant="alarm">Edit</Button>
-                  <Button variant="danger">Delete</Button>
-                </div>
-              </td>
-            </tr>
-          ))}
+          {blogs
+            ?.slice()
+            .reverse()
+            .map((row: IBlog, index: number) => (
+              <tr
+                key={row.id}
+                className={`${
+                  index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                } hover:bg-gray-100 text-black`}
+              >
+                <td className="border border-gray-300 px-4 py-2 text-center">
+                  {row.id}
+                </td>
+                <td className="border border-gray-300 px-4 py-2 ">
+                  {row.author}
+                </td>
+                <td className="border border-gray-300 px-4 py-2 ">
+                  <span className={` px-2 py-1 rounded text-sm`}>
+                    {row.title}
+                  </span>
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => setShowModal(true)}
+                      variant="primary"
+                      size="sm"
+                      className="px-3"
+                    >
+                      View
+                    </Button>
+                    <Button variant="alarm">Edit</Button>
+                    <Button variant="danger">Delete</Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
       <CreateModal
         show={showModal}
         setShow={setShowModal}
+        setBlogs={setBlogs}
+        onSubmit={onsubmit}
       ></CreateModal>
       <p className="text-lg mt-6 text-gray-600">Welcome to the main board!</p>
     </div>
