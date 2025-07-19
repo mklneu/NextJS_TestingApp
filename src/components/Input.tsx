@@ -2,6 +2,7 @@ interface IInputProps {
   type?: "text" | "email" | "password" | "textarea";
   placeholder?: string;
   value: string;
+  disabled?: boolean;
   onChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
@@ -13,6 +14,7 @@ const InputBar = ({
   type = "text",
   placeholder = "",
   value = "",
+  disabled = false,
   onChange,
   className = "",
   rows = 4,
@@ -30,6 +32,7 @@ const InputBar = ({
           placeholder={placeholder}
           required
           value={value}
+          disabled={disabled}
           onChange={onChange}
           rows={rows}
           className={`${textareaClasses} ${className}`}
@@ -45,6 +48,7 @@ const InputBar = ({
         placeholder={placeholder}
         required
         value={value}
+        disabled={disabled}
         onChange={onChange}
         className={`${baseClasses} ${className}`}
       />

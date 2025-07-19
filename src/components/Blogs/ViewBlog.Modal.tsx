@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
 import Button from "../Button";
 import { toast } from "react-toastify";
-import { getBlogById, updateBlog } from "@/services/BlogServices";
+import { getBlogById } from "@/services/BlogServices";
 import InputBar from "../Input";
 
 interface IUpdateModalProps {
   show: boolean;
   setShow: (value: boolean) => void;
-  onUpdate: () => void; // Callback function to handle submission
   blogId: number; // Optional blog ID for updating
   setBlogId: (value: number | null) => void; // Optional setter for blogId
 }
 
-const UpdateBlogModal = (props: IUpdateModalProps) => {
-  const { show, setShow, onUpdate, blogId, setBlogId } = props;
+const ViewBlogModal = (props: IUpdateModalProps) => {
+  const { show, setShow, blogId, setBlogId } = props;
 
   const [title, setTitle] = useState<string>("");
   const [author, setAuthor] = useState<string>("");
@@ -37,21 +36,6 @@ const UpdateBlogModal = (props: IUpdateModalProps) => {
     fetchBlogDetails();
   }, [blogId]);
 
-  const handleUpdate = async () => {
-    if (!title || !author || !content) {
-      toast.error("Please fill in all fields!");
-      return;
-    }
-    try {
-      await updateBlog(blogId, title, author, content);
-      // Refresh the blogs list
-      onUpdate(); // Call the onUpdate callback if provided
-    } catch (error) {
-      console.error("Error creating blog:", error);
-      // Error message đã được handle trong postBlog function
-    }
-  };
-
   const handleClose = () => {
     setBlogId(null); // Reset blogId when closing the modal
     setShow(false); // Close modal
@@ -71,7 +55,7 @@ const UpdateBlogModal = (props: IUpdateModalProps) => {
           w-196"
           >
             <h1 className="px-5 py-4 text-2xl">
-              Update Blog{" "}
+              Blog Details{" "}
               <span className="text-gray-600 font-bold text-sm">
                 no.{blogId}
               </span>
@@ -79,15 +63,18 @@ const UpdateBlogModal = (props: IUpdateModalProps) => {
             <hr className="mb-6 text-gray-200" />
             <InputBar
               value={title}
+              disabled={true}
               onChange={(e) => setTitle(e.target.value)}
             ></InputBar>
             <InputBar
               value={author}
+              disabled={true}
               onChange={(e) => setAuthor(e.target.value)}
             ></InputBar>
             <InputBar
               type="textarea"
               value={content}
+              disabled={true}
               onChange={(e) => setContent(e.target.value)}
             ></InputBar>
             <div className="flex justify-end mx-auto gap-2 mt-6 mb-8 w-11/12">
@@ -100,9 +87,6 @@ const UpdateBlogModal = (props: IUpdateModalProps) => {
               >
                 Close
               </Button>
-              <Button size="md" onClick={() => handleUpdate()}>
-                Update
-              </Button>
             </div>
           </div>
         </form>
@@ -111,4 +95,4 @@ const UpdateBlogModal = (props: IUpdateModalProps) => {
   );
 };
 
-export default UpdateBlogModal;
+export default ViewBlogModal;

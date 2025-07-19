@@ -1,12 +1,10 @@
-// import { tableData, TableRow } from "@/data/tableData";
-// import { useEffect, useState } from "react";
-// import { EricData } from "@/data/dataType";
 import Button from "./Button";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { getAllBlogs } from "@/services/BlogServices";
 import AddNewBlogModal from "./Blogs/AddBlog.Modal";
 import UpdateBlogModal from "./Blogs/UpdateBlog.Modal copy";
+import ViewBlogModal from "./Blogs/ViewBlog.Modal";
 
 interface Iprops {
   blogs: IBlog[];
@@ -17,8 +15,11 @@ const MainBoard = (props: Iprops) => {
   // const [data, setData] = useState<EricData[]>([]);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
+  const [showViewModal, setShowViewModal] = useState<boolean>(false);
 
-  const [blogId, setBlogId] = useState<number | null>(null);
+  const [viewBlogId, setViewBlogId] = useState<number | null>(null);
+  const [updateBlogId, setUpdateBlogId] = useState<number | null>(null);
+
   const { blogs, setBlogs } = props;
 
   const handleSubmit = async () => {
@@ -46,7 +47,7 @@ const MainBoard = (props: Iprops) => {
 
     // Đóng modal và reset blogId
     setShowUpdateModal(false);
-    setBlogId(null);
+    setUpdateBlogId(null);
   };
 
   return (
@@ -105,7 +106,10 @@ const MainBoard = (props: Iprops) => {
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="flex gap-2">
                     <Button
-                      // onClick={() => setShowAddModal(true)}
+                      onClick={() => {
+                        setShowViewModal(true);
+                        setViewBlogId(row.id);
+                      }}
                       variant="primary"
                       size="sm"
                       className="px-3"
@@ -115,7 +119,7 @@ const MainBoard = (props: Iprops) => {
                     <Button
                       onClick={() => {
                         setShowUpdateModal(true);
-                        setBlogId(row.id);
+                        setUpdateBlogId(row.id);
                       }}
                       variant="alarm"
                     >
@@ -133,13 +137,21 @@ const MainBoard = (props: Iprops) => {
         setShow={setShowAddModal}
         onSubmit={handleSubmit}
       ></AddNewBlogModal>
-      {blogId && (
+      {viewBlogId && (
+        <ViewBlogModal
+          show={showViewModal}
+          setShow={setShowViewModal}
+          blogId={viewBlogId}
+          setBlogId={setViewBlogId}
+        ></ViewBlogModal>
+      )}
+      {updateBlogId && (
         <UpdateBlogModal
           show={showUpdateModal}
           setShow={setShowUpdateModal}
           onUpdate={handleUpdate}
-          blogId={blogId}
-          setBlogId={setBlogId}
+          blogId={updateBlogId}
+          setBlogId={setUpdateBlogId}
         ></UpdateBlogModal>
       )}
       <p className="text-lg mt-6 text-gray-600">Welcome to the main board!</p>
