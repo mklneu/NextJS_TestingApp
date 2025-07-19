@@ -12,6 +12,16 @@ const getAllBlogs = async () => {
   }
 };
 
+const getBlogById = async (id: number) => {
+  try {
+    const response = await axiosInstance.get(`/blogs/${id}`);
+    return response.data.data || response.data;
+  } catch (error) {
+    console.error("❌ Error in getBlogById:", error);
+    toast.error("❌ Error while fetching blog by ID!");
+    throw error; // Re-throw để component handle được
+  }
+};
 
 const postBlog = async (title: string, author: string, content: string) => {
   try {
@@ -30,6 +40,25 @@ const postBlog = async (title: string, author: string, content: string) => {
   }
 };
 
-// const 
+const updateBlog = async (
+  id: number,
+  title: string,
+  author: string,
+  content: string
+) => {
+  try {
+    const response = await axiosInstance.put(`/blogs/${id}`, {
+      title,
+      author,
+      content,
+    });
+    toast.success(`${title} by ${author} has been updated successfully!`);
+    return response.data.data || response.data;
+  } catch (error) {
+    console.error("❌ Error in updateBlog:", error);
+    toast.error("❌ Error while updating blog!");
+    throw error; // Re-throw để component handle được
+  }
+};
 
-export { getAllBlogs, postBlog };
+export { getAllBlogs, postBlog, getBlogById, updateBlog };

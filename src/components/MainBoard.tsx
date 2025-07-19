@@ -1,12 +1,12 @@
 // import { tableData, TableRow } from "@/data/tableData";
 // import { useEffect, useState } from "react";
 // import { EricData } from "@/data/dataType";
-import IBlog from "@/types/backend";
 import Button from "./Button";
-import CreateModal from "./CreateModal";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { getAllBlogs } from "@/services/BlogServices";
+import AddNewBlogModal from "./Blogs/AddBlog.Modal";
+import UpdateBlogModal from "./Blogs/UpdateBlog.Modal copy";
 
 interface Iprops {
   blogs: IBlog[];
@@ -15,10 +15,13 @@ interface Iprops {
 
 const MainBoard = (props: Iprops) => {
   // const [data, setData] = useState<EricData[]>([]);
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showAddModal, setShowAddModal] = useState<boolean>(false);
+  const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
+
+  const [blogId, setBlogId] = useState<number | null>(null);
   const { blogs, setBlogs } = props;
 
-  const onsubmit = async () => {
+  const handleSubmit = async () => {
     try {
       const response = await getAllBlogs();
       setBlogs?.(response);
@@ -28,6 +31,24 @@ const MainBoard = (props: Iprops) => {
     }
   };
 
+  const handleUpdate = () => {
+    const onUpdate = async () => {
+      try {
+        const response = await getAllBlogs();
+        setBlogs?.(response);
+      } catch (error) {
+        console.error("Error fetching blogs:", error);
+        toast.error("Failed to fetch blogs after submission.");
+      }
+    };
+    // Refresh data sau khi update thành công
+    onUpdate();
+
+    // Đóng modal và reset blogId
+    setShowUpdateModal(false);
+    setBlogId(null);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center  p-8">
       <div className="flex justify-between items-center w-11/12 mb-6">
@@ -35,7 +56,7 @@ const MainBoard = (props: Iprops) => {
         <Button
           size="md"
           className="bg-gray-500 hover:bg-gray-600"
-          onClick={() => setShowModal(true)}
+          onClick={() => setShowAddModal(true)}
         >
           Add New
         </Button>
@@ -84,14 +105,22 @@ const MainBoard = (props: Iprops) => {
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="flex gap-2">
                     <Button
-                      onClick={() => setShowModal(true)}
+                      // onClick={() => setShowAddModal(true)}
                       variant="primary"
                       size="sm"
                       className="px-3"
                     >
                       View
                     </Button>
-                    <Button variant="alarm">Edit</Button>
+                    <Button
+                      onClick={() => {
+                        setShowUpdateModal(true);
+                        setBlogId(row.id);
+                      }}
+                      variant="alarm"
+                    >
+                      Edit
+                    </Button>
                     <Button variant="danger">Delete</Button>
                   </div>
                 </td>
@@ -99,12 +128,20 @@ const MainBoard = (props: Iprops) => {
             ))}
         </tbody>
       </table>
-      <CreateModal
-        show={showModal}
-        setShow={setShowModal}
-        setBlogs={setBlogs}
-        onSubmit={onsubmit}
-      ></CreateModal>
+      <AddNewBlogModal
+        show={showAddModal}
+        setShow={setShowAddModal}
+        onSubmit={handleSubmit}
+      ></AddNewBlogModal>
+      {blogId && (
+        <UpdateBlogModal
+          show={showUpdateModal}
+          setShow={setShowUpdateModal}
+          onUpdate={handleUpdate}
+          blogId={blogId}
+          setBlogId={setBlogId}
+        ></UpdateBlogModal>
+      )}
       <p className="text-lg mt-6 text-gray-600">Welcome to the main board!</p>
     </div>
   );
