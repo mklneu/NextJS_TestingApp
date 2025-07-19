@@ -1,5 +1,6 @@
 import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
+import Button from "@/components/Button";
 
 const getAllBlogs = async () => {
   try {
@@ -12,9 +13,9 @@ const getAllBlogs = async () => {
   }
 };
 
-const getBlogById = async (id: number) => {
+const getBlogById = async (blogId: number) => {
   try {
-    const response = await axiosInstance.get(`/blogs/${id}`);
+    const response = await axiosInstance.get(`/blogs/${blogId}`);
     return response.data.data || response.data;
   } catch (error) {
     console.error("❌ Error in getBlogById:", error);
@@ -41,13 +42,13 @@ const postBlog = async (title: string, author: string, content: string) => {
 };
 
 const updateBlog = async (
-  id: number,
+  blogId: number,
   title: string,
   author: string,
   content: string
 ) => {
   try {
-    const response = await axiosInstance.put(`/blogs/${id}`, {
+    const response = await axiosInstance.put(`/blogs/${blogId}`, {
       title,
       author,
       content,
@@ -61,4 +62,56 @@ const updateBlog = async (
   }
 };
 
-export { getAllBlogs, postBlog, getBlogById, updateBlog };
+const deleteBlogById = async (blogId: number, onDelete: () => void) => {
+  // Custom confirm toast
+  const confirmDelete = () => {
+    toast(
+      ({ closeToast }) => (
+        <div className="flex flex-col p-2 w-full">
+          <div className="flex items-center mb-3">
+            <span className="font-medium text-gray-800">
+              Are you sure to delete this blog?
+            </span>
+          </div>
+          <div className="flex justify-end space-x-2">
+            <Button
+              onClick={async () => {
+                closeToast();
+                try {
+                  await axiosInstance.delete(`/blogs/${blogId}`);
+                  onDelete();
+                  toast.success(`🗑️ Delete blog ${blogId} successfully!`);
+                } catch (error) {
+                  console.error("❌ Error in deleteBlog: ", error);
+                  toast.error("❌ Error while deleting blog!");
+                }
+              }}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
+            >
+              Delete
+            </Button>
+            <Button
+              onClick={closeToast}
+              className="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors font-medium"
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      ),
+      {
+        position: "top-right",
+        autoClose: false,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: false,
+        draggable: false,
+        className: "custom-confirm-toast",
+      }
+    );
+  };
+
+  confirmDelete();
+};
+
+export { getAllBlogs, postBlog, getBlogById, updateBlog, deleteBlogById };

@@ -1,7 +1,7 @@
 import Button from "./Button";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { getAllBlogs } from "@/services/BlogServices";
+import { deleteBlogById, getAllBlogs } from "@/services/BlogServices";
 import AddNewBlogModal from "./Blogs/AddBlog.Modal";
 import UpdateBlogModal from "./Blogs/UpdateBlog.Modal copy";
 import ViewBlogModal from "./Blogs/ViewBlog.Modal";
@@ -48,6 +48,12 @@ const MainBoard = (props: Iprops) => {
     // Đóng modal và reset blogId
     setShowUpdateModal(false);
     setUpdateBlogId(null);
+  };
+
+  const handleDelete = async () => {
+    // Refresh data sau khi delete
+    const response = await getAllBlogs();
+    setBlogs?.(response);
   };
 
   return (
@@ -125,7 +131,12 @@ const MainBoard = (props: Iprops) => {
                     >
                       Edit
                     </Button>
-                    <Button variant="danger">Delete</Button>
+                    <Button
+                      onClick={() => deleteBlogById(row.id, handleDelete)}
+                      variant="danger"
+                    >
+                      Delete
+                    </Button>
                   </div>
                 </td>
               </tr>
