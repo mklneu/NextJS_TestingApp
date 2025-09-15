@@ -1,10 +1,26 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DropDownMenu from "./DropDownMenu";
+import { logout, isAuthenticated } from "@/services/AuthServices";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Kiểm tra trạng thái đăng nhập khi component mount
+    setIsLoggedIn(isAuthenticated());
+  }, []);
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
+    logout();
+    setIsLoggedIn(false);
+    router.push("/login");
+  };
 
   const navLinks = [
     { id: 1, href: "/", label: "Home", scale: "hover:scale-110" },
@@ -34,6 +50,25 @@ const Header = () => {
                 {link.label}
               </Link>
             ))}
+
+            {/* Login/Logout based on authentication status */}
+            {isLoggedIn ? (
+              <a
+                href="#"
+                onClick={handleLogout}
+                className="inline-block mr-4 hover:scale-110 duration-300 cursor-pointer"
+              >
+                Logout
+              </a>
+            ) : (
+              <Link
+                href="/login"
+                className="inline-block mr-4 hover:scale-110 duration-300"
+              >
+                Login
+              </Link>
+            )}
+
             <DropDownMenu />
           </div>
 
@@ -61,6 +96,28 @@ const Header = () => {
                 {link.label}
               </Link>
             ))}
+
+            {/* Login/Logout for mobile */}
+            {isLoggedIn ? (
+              <a
+                href="#"
+                onClick={(e) => {
+                  handleLogout(e);
+                  setIsMenuOpen(false);
+                }}
+                className="block py-2 px-4 text-gray-800 hover:bg-blue-100 rounded transition-colors duration-200"
+              >
+                Logout
+              </a>
+            ) : (
+              <Link
+                href="/login"
+                className="block py-2 px-4 text-gray-800 hover:bg-blue-100 rounded transition-colors duration-200"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Login
+              </Link>
+            )}
           </div>
         )}
       </div>

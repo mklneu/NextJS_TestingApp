@@ -1,0 +1,129 @@
+import { toast } from "react-toastify";
+import axiosInstance from "./axiosInstance";
+import Button from "@/components/Button";
+
+const getAllUsers = async () => {
+  try {
+    const response = await axiosInstance.get("/users");
+
+    return response.data.data.data || [];
+  } catch (error) {
+    console.error("❌ Error in getAllUsers:", error);
+    // toast.error("Failed to fetch users");
+    throw error; // Re-throw để component handle được
+  }
+};
+
+const getUserById = async (userId: number) => {
+  try {
+    const response = await axiosInstance.get(`/users/${userId}`);
+    return response.data.data;
+  } catch (error) {
+    console.error("❌ Error in getUserById:", error);
+    toast.error("❌ Error while fetching user by ID!");
+    throw error; // Re-throw để component handle được
+  }
+};
+
+const postUser = async (
+  username: string,
+  email: string,
+  password: string,
+  gender: string,
+  address: string,
+  age: number
+) => {
+  try {
+    // Uncomment dòng dưới khi có backend
+    const response = await axiosInstance.post("/users", {
+      username,
+      email,
+      password,
+      gender,
+      address,
+      age,
+    });
+    toast.success(response.data.message);
+    return response.data.data;
+  } catch (error) {
+    console.error("❌ Error in postUser:", error);
+    toast.error(error?.response?.data?.error);
+    throw error; // Re-throw để component handle được
+  }
+};
+
+const updateUser = async (
+  userId: number,
+  username: string,
+  gender: string,
+  address: string,
+  age: number
+) => {
+  try {
+    const response = await axiosInstance.put(`/users/${userId}`, {
+      username,
+      gender,
+      address,
+      age,
+    });
+    toast.success(response.data.message);
+    return response.data.data;
+  } catch (error) {
+    console.error("❌ Error in updateUser:", error);
+    toast.error(error?.response?.data?.error);
+    throw error; // Re-throw để component handle được
+  }
+};
+
+const deleteUserById = async (userId: number, onDelete: () => void) => {
+  // Custom confirm toast
+  const confirmDelete = () => {
+    toast(
+      ({ closeToast }) => (
+        <div className="flex flex-col p-2 w-full">
+          <div className="flex items-center mb-3">
+            <span className="font-medium text-gray-800">
+              Are you sure to delete this user?
+            </span>
+          </div>
+          <div className="flex justify-end space-x-2">
+            <Button
+              onClick={async () => {
+                closeToast();
+                try {
+                  const response = await axiosInstance.delete(`/users/${userId}`);
+                  onDelete();
+                  toast.success(response.data.message);
+                } catch (error) {
+                  console.error("❌ Error in deleteUser: ", error);
+                  toast.error("❌ Error while deleting user!");
+                }
+              }}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
+            >
+              Delete
+            </Button>
+            <Button
+              onClick={closeToast}
+              className="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors font-medium"
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      ),
+      {
+        position: "top-right",
+        autoClose: false,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: false,
+        draggable: false,
+        className: "custom-confirm-toast",
+      }
+    );
+  };
+
+  confirmDelete();
+};
+export { getAllUsers, getUserById, postUser, updateUser, deleteUserById };

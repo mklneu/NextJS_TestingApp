@@ -1,14 +1,18 @@
 import Button from "./Button";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { deleteBlogById, getAllBlogs } from "@/services/BlogServices";
-import AddNewBlogModal from "./Blogs/AddBlog.Modal";
-import UpdateBlogModal from "./Blogs/UpdateBlog.Modal copy";
-import ViewBlogModal from "./Blogs/ViewBlog.Modal";
+import { deleteUserById, getAllUsers } from "@/services/UserServices";
+import AddNewUserModal from "./Users/AddUser.Modal";
+import ViewUserModal from "./Users/ViewUser.Modal";
+import UpdateUserModal from "./Users/UpdateUser.Modal";
 
+// interface Iprops {
+//   blogs: IBlog[];
+//   setBlogs?: (value: IBlog[]) => void;
+// }
 interface Iprops {
-  blogs: IBlog[];
-  setBlogs?: (value: IBlog[]) => void;
+  users: IUser[];
+  setUsers?: (value: IUser[]) => void;
 }
 
 const MainBoard = (props: Iprops) => {
@@ -17,29 +21,32 @@ const MainBoard = (props: Iprops) => {
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
   const [showViewModal, setShowViewModal] = useState<boolean>(false);
 
-  const [viewBlogId, setViewBlogId] = useState<number | null>(null);
-  const [updateBlogId, setUpdateBlogId] = useState<number | null>(null);
+  // const [viewBlogId, setViewBlogId] = useState<number | null>(null);
+  // const [updateBlogId, setUpdateBlogId] = useState<number | null>(null);
+  const [viewUserId, setViewUserId] = useState<number | null>(null);
+  const [updateUserId, setUpdateUserId] = useState<number | null>(null);
 
-  const { blogs, setBlogs } = props;
+  // const { blogs, setBlogs } = props;
+  const { users, setUsers } = props;
 
   const handleSubmit = async () => {
     try {
-      const response = await getAllBlogs();
-      setBlogs?.(response);
+      const response = await getAllUsers();
+      setUsers?.(response);
     } catch (error) {
-      console.error("Error fetching blogs:", error);
-      toast.error("Failed to fetch blogs after submission.");
+      console.error("Error fetching users:", error);
+      toast.error("Failed to fetch users after submission.");
     }
   };
 
   const handleUpdate = () => {
     const onUpdate = async () => {
       try {
-        const response = await getAllBlogs();
-        setBlogs?.(response);
+        const response = await getAllUsers();
+        setUsers?.(response);
       } catch (error) {
-        console.error("Error fetching blogs:", error);
-        toast.error("Failed to fetch blogs after submission.");
+        console.error("Error fetching users:", error);
+        toast.error("Failed to fetch users after submission.");
       }
     };
     // Refresh data sau khi update thành công
@@ -47,13 +54,13 @@ const MainBoard = (props: Iprops) => {
 
     // Đóng modal và reset blogId
     setShowUpdateModal(false);
-    setUpdateBlogId(null);
+    // setUpdateBlogId(null);
   };
 
   const handleDelete = async () => {
     // Refresh data sau khi delete
-    const response = await getAllBlogs();
-    setBlogs?.(response);
+    const response = await getAllUsers();
+    setUsers?.(response);
   };
 
   return (
@@ -65,7 +72,7 @@ const MainBoard = (props: Iprops) => {
           className="bg-gray-500 hover:bg-gray-600"
           onClick={() => setShowAddModal(true)}
         >
-          Add New
+          Add New User
         </Button>
       </div>
 
@@ -75,95 +82,107 @@ const MainBoard = (props: Iprops) => {
       >
         <thead>
           <tr className="bg-[#1579cb] text-white">
-            <th className="border border-gray-300 px-4 py-2">No</th>
+            <th className="border border-gray-300 px-4 py-2">Id</th>
             <th className="border border-gray-300 px-4 py-2 text-left">
-              Author
+              User name
             </th>
             <th className="border border-gray-300 px-4 py-2 text-left">
-              Title
+              Email
             </th>
+            <th className="border border-gray-300 px-4 py-2 text-left">Age</th>
+            <th className="border border-gray-300 px-4 py-2 text-left">
+              Address
+            </th>
+            <th className="border border-gray-300 px-4 py-2 text-left">
+              Gender
+            </th>
+
             <th className="border border-gray-300 px-4 py-2 text-left">
               Content
             </th>
           </tr>
         </thead>
         <tbody>
-          {blogs
-            ?.slice()
-            .reverse()
-            .map((row: IBlog, index: number) => (
-              <tr
-                key={row.id}
-                className={`${
-                  index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                } hover:bg-gray-100 text-black`}
-              >
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  {row.id}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 ">
-                  {row.author}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 ">
-                  <span className={` px-2 py-1 rounded text-sm`}>
-                    {row.title}
-                  </span>
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => {
-                        setShowViewModal(true);
-                        setViewBlogId(row.id);
-                      }}
-                      variant="primary"
-                      size="sm"
-                      className="px-3"
-                    >
-                      View
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setShowUpdateModal(true);
-                        setUpdateBlogId(row.id);
-                      }}
-                      variant="alarm"
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      onClick={() => deleteBlogById(row.id, handleDelete)}
-                      variant="danger"
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+          {users?.slice().map((row: IUser, index: number) => (
+            <tr
+              key={row.id}
+              className={`${
+                index % 2 === 0 ? "bg-white" : "bg-gray-50"
+              } hover:bg-gray-100 text-black`}
+            >
+              <td className="border border-gray-300 px-4 py-2 text-center">
+                {row.id}
+              </td>
+              <td className="border border-gray-300 px-4 py-2 ">
+                {row.username}
+              </td>
+              <td className="border border-gray-300 px-4 py-2 ">
+                <span className={` py-1 rounded `}>{row.email}</span>
+              </td>
+              <td className="border border-gray-300 px-4 py-2 ">
+                <span className={` py-1 rounded `}>{row.age}</span>
+              </td>
+              <td className="border border-gray-300 px-4 py-2 ">
+                <span className={` py-1 rounded `}>{row.address}</span>
+              </td>
+              <td className="border border-gray-300 px-4 py-2 ">
+                <span className={` py-1 rounded `}>{row.gender}</span>
+              </td>
+              <td className="border border-gray-300 px-4 py-2">
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => {
+                      setShowViewModal(true);
+                      setViewUserId(row.id);
+                    }}
+                    variant="primary"
+                    size="sm"
+                    className="px-3"
+                  >
+                    View
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setShowUpdateModal(true);
+                      setUpdateUserId(row.id);
+                    }}
+                    variant="alarm"
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    onClick={() => deleteUserById(row.id, handleDelete)}
+                    variant="danger"
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
-      <AddNewBlogModal
+      <AddNewUserModal
         show={showAddModal}
         setShow={setShowAddModal}
         onSubmit={handleSubmit}
-      ></AddNewBlogModal>
-      {viewBlogId && (
-        <ViewBlogModal
+      ></AddNewUserModal>
+      {viewUserId && (
+        <ViewUserModal
           show={showViewModal}
           setShow={setShowViewModal}
-          blogId={viewBlogId}
-          setBlogId={setViewBlogId}
-        ></ViewBlogModal>
+          userId={viewUserId}
+          setUserId={setViewUserId}
+        ></ViewUserModal>
       )}
-      {updateBlogId && (
-        <UpdateBlogModal
+      {updateUserId && (
+        <UpdateUserModal
           show={showUpdateModal}
           setShow={setShowUpdateModal}
           onUpdate={handleUpdate}
-          blogId={updateBlogId}
-          setBlogId={setUpdateBlogId}
-        ></UpdateBlogModal>
+          userId={updateUserId}
+          setUserId={setUpdateUserId}
+        ></UpdateUserModal>
       )}
       <p className="text-lg mt-6 text-gray-600">Welcome to the main board!</p>
     </div>
