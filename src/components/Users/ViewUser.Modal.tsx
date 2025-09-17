@@ -99,16 +99,10 @@ const ViewUserModal = (props: IUpdateModalProps) => {
               onChange={() => {}}
             ></InputBar>
             <InputBar
-              // type="select"
               value={currentUser.gender}
               placeholder="Gender"
               disabled={true}
               onChange={() => {}}
-              // options={[
-              //   { label: "Male", value: "MALE" },
-              //   { label: "Female", value: "FEMALE" },
-              //   { label: "Other", value: "OTHER" },
-              // ]}
             ></InputBar>
             <div className="flex justify-end mx-auto gap-2 mt-6 mb-8 w-11/12">
               <Button variant="secondary" size="md" onClick={handleClose}>
