@@ -7,25 +7,39 @@ import { getUserById } from "@/services/UserServices";
 interface IUpdateModalProps {
   show: boolean;
   setShow: (value: boolean) => void;
-  userId: number; // Optional blog ID for updating
-  setUserId: (value: number | null) => void; // Optional setter for blogId
+  userId: number; // User ID for viewing
+  setUserId: (value: number | null) => void;
+}
+
+// Define a User interface to properly type the currentUser
+interface User {
+  username: string;
+  email: string;
+  age: number;
+  address: string;
+  gender: string;
+  // [key: string]: any; // For any other properties
 }
 
 const ViewUserModal = (props: IUpdateModalProps) => {
   const { show, setShow, userId, setUserId } = props;
 
-  const [userName, setUserName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  // const [content, setContent] = useState<string>("");
+  // Use the User interface for proper typing
+  const [currentUser, setCurrentUser] = useState<User>({
+    username: "",
+    email: "",
+    age: 0,
+    address: "",
+    gender: "",
+  });
 
   useEffect(() => {
-    // Fetch the blog details if blogId is provided
+    // Fetch the user details if userId is provided
     const fetchUserDetails = async () => {
       if (userId) {
         try {
           const user = await getUserById(userId);
-          setUserName(user.username);
-          setEmail(user.email);
+          setCurrentUser(user);
         } catch (error) {
           console.error("Error fetching user details:", error);
           toast.error("Failed to fetch user details.");
@@ -36,7 +50,7 @@ const ViewUserModal = (props: IUpdateModalProps) => {
   }, [userId]);
 
   const handleClose = () => {
-    setUserId(null); // Reset blogId when closing the modal
+    setUserId(null); // Reset userId when closing the modal
     setShow(false); // Close modal
   };
 
@@ -61,23 +75,43 @@ const ViewUserModal = (props: IUpdateModalProps) => {
             </h1>
             <hr className="mb-6 text-gray-200" />
             <InputBar
-              value={userName}
+              value={currentUser.username}
+              placeholder="Username"
               disabled={true}
-              onChange={(e) => setUserName(e.target.value)}
+              onChange={() => {}}
             ></InputBar>
             <InputBar
-              value={email}
+              value={currentUser.email}
+              placeholder="Email"
               disabled={true}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={() => {}}
+            ></InputBar>
+            <InputBar
+              value={currentUser.age}
+              placeholder="Age"
+              disabled={true}
+              onChange={() => {}}
+            ></InputBar>
+            <InputBar
+              value={currentUser.address}
+              placeholder="Address"
+              disabled={true}
+              onChange={() => {}}
+            ></InputBar>
+            <InputBar
+              // type="select"
+              value={currentUser.gender}
+              placeholder="Gender"
+              disabled={true}
+              onChange={() => {}}
+              // options={[
+              //   { label: "Male", value: "MALE" },
+              //   { label: "Female", value: "FEMALE" },
+              //   { label: "Other", value: "OTHER" },
+              // ]}
             ></InputBar>
             <div className="flex justify-end mx-auto gap-2 mt-6 mb-8 w-11/12">
-              <Button
-                variant="secondary"
-                size="md"
-                onClick={() => {
-                  handleClose();
-                }}
-              >
+              <Button variant="secondary" size="md" onClick={handleClose}>
                 Close
               </Button>
             </div>
