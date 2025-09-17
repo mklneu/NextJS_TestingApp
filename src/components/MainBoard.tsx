@@ -84,19 +84,18 @@ const MainBoard = (props: Iprops) => {
           <tr className="bg-[#1579cb] text-white">
             <th className="border border-gray-300 px-4 py-2">Id</th>
             <th className="border border-gray-300 px-4 py-2 text-left">
-              User name
+              Tên tài khoản
             </th>
             <th className="border border-gray-300 px-4 py-2 text-left">
               Email
             </th>
-            <th className="border border-gray-300 px-4 py-2 text-left">Age</th>
+            <th className="border border-gray-300 px-4 py-2 text-left">Tuổi</th>
             <th className="border border-gray-300 px-4 py-2 text-left">
-              Address
+              Địa chỉ
             </th>
             <th className="border border-gray-300 px-4 py-2 text-left">
-              Gender
+              Giới tính
             </th>
-
             <th className="border border-gray-300 px-4 py-2 text-left">
               Content
             </th>
@@ -126,7 +125,15 @@ const MainBoard = (props: Iprops) => {
                 <span className={` py-1 rounded `}>{row.address}</span>
               </td>
               <td className="border border-gray-300 px-4 py-2 ">
-                <span className={` py-1 rounded `}>{row.gender}</span>
+                <span className={` py-1 rounded `}>
+                  {row.gender === "MALE"
+                    ? "Nam"
+                    : row.gender === "FEMALE"
+                    ? "Nữ"
+                    : row.gender === "OTHER"
+                    ? "Khác"
+                    : ""}
+                </span>
               </td>
               <td className="border border-gray-300 px-4 py-2">
                 <div className="flex gap-2">

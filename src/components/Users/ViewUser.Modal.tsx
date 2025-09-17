@@ -75,32 +75,45 @@ const ViewUserModal = (props: IUpdateModalProps) => {
             </h1>
             <hr className="mb-6 text-gray-200" />
             <InputBar
+              label="Tên tài khoản"
               value={currentUser.username}
-              placeholder="Username"
+              placeholder="Tên tài khoản"
               disabled={true}
               onChange={() => {}}
             ></InputBar>
             <InputBar
+              label="Email"
               value={currentUser.email}
               placeholder="Email"
               disabled={true}
               onChange={() => {}}
             ></InputBar>
             <InputBar
+              label="Tuổi"
               value={currentUser.age}
-              placeholder="Age"
+              placeholder="Tuổi"
               disabled={true}
               onChange={() => {}}
             ></InputBar>
             <InputBar
+              label="Địa chỉ"
               value={currentUser.address}
-              placeholder="Address"
+              placeholder="Địa chỉ"
               disabled={true}
               onChange={() => {}}
             ></InputBar>
             <InputBar
-              value={currentUser.gender}
-              placeholder="Gender"
+              label="Giới tính"
+              value={
+                currentUser.gender === "MALE"
+                  ? "Nam"
+                  : currentUser.gender === "FEMALE"
+                  ? "Nữ"
+                  : currentUser.gender === "OTHER"
+                  ? "Khác"
+                  : ""
+              }
+              placeholder="Giới tính"
               disabled={true}
               onChange={() => {}}
             ></InputBar>

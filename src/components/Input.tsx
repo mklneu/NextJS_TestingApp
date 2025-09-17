@@ -17,6 +17,7 @@ interface IInputProps {
   rows?: number; // Chỉ dùng cho textarea
   onClick?: () => void; // Chỉ dùng cho input bình thường
   options?: IOption[]; // Chỉ dùng cho type select
+  label?: string; // Chỉ dùng cho input bình thường
 }
 
 const InputBar = ({
@@ -29,6 +30,7 @@ const InputBar = ({
   rows = 4,
   options = [],
   onClick,
+  label,
 }: IInputProps) => {
   const baseClasses =
     "w-full h-full bg-transparent rounded-xl pl-5 pr-14 placeholder:text-gray-700 border border-cyan-950 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md placeholder-opacity-70 focus:placeholder-opacity-40";
@@ -42,6 +44,11 @@ const InputBar = ({
   if (type === "textarea") {
     return (
       <div className="flex w-11/12 mb-4 mx-auto">
+        {label && (
+          <label className="text-sm font-medium text-gray-700 px-1 absolute -top-[10.5px] left-3 bg-white">
+            {label}
+          </label>
+        )}
         <textarea
           placeholder={placeholder}
           required
@@ -57,12 +64,17 @@ const InputBar = ({
 
   if (type === "select") {
     return (
-      <div className="flex w-11/12 h-12 mb-4 mx-auto relative">
+      <div className="flex w-11/12 h-12 mb-4 mx-auto relative ">
+        {label && (
+          <label className="text-sm font-medium text-gray-700 px-1 absolute -top-[10.5px] left-3 bg-white">
+            {label}
+          </label>
+        )}
         <select
           value={value}
           disabled={disabled}
           onChange={onChange}
-          className={`${selectClasses} ${className} appearance-none`}
+          className={`${selectClasses} ${className} appearance-none `}
         >
           {placeholder && (
             <option value="" disabled>
@@ -73,7 +85,7 @@ const InputBar = ({
             <option
               key={option.value}
               value={option.value}
-              className="py-2 px-4 hover:bg-blue-100"
+              className="py-2 px-4 hover:bg-blue-100 "
             >
               {option.label}
             </option>
@@ -98,7 +110,12 @@ const InputBar = ({
   }
 
   return (
-    <div className="flex w-11/12 h-12 mb-4 mx-auto">
+    <div className="flex w-11/12 h-12 mb-4 mx-auto relative">
+      {label && (
+        <label className="text-sm font-medium text-gray-700 px-1 absolute -top-3 left-3 bg-white">
+          {label}
+        </label>
+      )}
       <input
         type={type}
         placeholder={placeholder}

@@ -75,42 +75,47 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
           w-196"
           >
             <h1 className="px-5 py-4 text-2xl">
-              Update User{" "}
+              Cập nhật người dùng{" "}
               <span className="text-gray-600 font-bold text-sm">
                 no.{userId}
               </span>
             </h1>
             <hr className="mb-6 text-gray-200" />
             <InputBar
+              label="Tên tài khoản"
               value={username}
-              placeholder="Username"
+              placeholder="Tên tài khoản"
               onChange={(e) => setUsername(e.target.value)}
             ></InputBar>
             <InputBar
+              label="Email"
               value={email}
               placeholder="Email"
               disabled={true}
               onChange={(e) => setEmail(e.target.value)}
             ></InputBar>
             <InputBar
+              label="Tuổi"
               value={age}
-              placeholder="Age"
+              placeholder="Tuổi"
               onChange={(e) => setAge(Number(e.target.value))}
             ></InputBar>
             <InputBar
+              label="Địa chỉ"
               value={address}
-              placeholder="Address"
+              placeholder="Địa chỉ"
               onChange={(e) => setAddress(e.target.value)}
             ></InputBar>
             <InputBar
+              label="Giới tính"
               type="select"
               value={gender}
-              placeholder="Select gender"
+              placeholder="Chọn giới tính"
               onChange={(e) => setGender(e.target.value)}
               options={[
-                { label: "Male", value: "MALE" },
-                { label: "Female", value: "FEMALE" },
-                { label: "Other", value: "OTHER" },
+                { label: "Nam", value: "MALE" },
+                { label: "Nữ", value: "FEMALE" },
+                { label: "Khác", value: "OTHER" },
               ]}
             ></InputBar>
 
