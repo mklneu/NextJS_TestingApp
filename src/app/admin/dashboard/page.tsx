@@ -472,7 +472,7 @@ const Dashboard = () => {
                     }`}
                   ></div>
                   <div className="flex-1">
-                    <h3 className="text-sm font-medium">
+                    <h3 className="text-sm font-medium text-gray-800">
                       {appointment.patient}
                     </h3>
                     <p className="text-xs text-gray-500">
@@ -480,7 +480,7 @@ const Dashboard = () => {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm">{appointment.date}</p>
+                    <p className="text-sm text-gray-800">{appointment.date}</p>
                     <p className="text-xs text-gray-500">{appointment.time}</p>
                   </div>
                 </div>
@@ -525,7 +525,7 @@ const Dashboard = () => {
                             <FaChartLine />
                           )}
                         </span>
-                        <p className="text-sm">{alert.message}</p>
+                        <p className="text-sm text-gray-500">{alert.message}</p>
                       </div>
                       <span className="text-xs text-gray-500">
                         {alert.time}

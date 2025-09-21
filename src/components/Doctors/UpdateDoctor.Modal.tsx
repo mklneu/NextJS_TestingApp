@@ -127,6 +127,7 @@ const UpdateDoctorModal = (props: IUpdateModalProps) => {
 
             <InputBar
               label="Email"
+              disabled
               type="email"
               value={email}
               placeholder="Nhập email"

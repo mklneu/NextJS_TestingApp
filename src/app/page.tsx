@@ -171,15 +171,40 @@ export default function Home() {
                 </Link>
               </div>
             </div>
+
+            {/* Homepage picture */}
             <div className="md:w-1/2 flex justify-center">
-              <div className="relative w-full max-w-md h-72">
-                <Image
-                  src="/images/hero-image.svg"
-                  alt="Healthcare dashboard illustration"
-                  fill
-                  className="object-contain"
-                  priority
-                />
+              <div className="relative w-full max-w-xl h-96 group">
+                {/* Hiệu ứng vòng tròn ánh sáng phía sau - làm to hơn */}
+                <div className="absolute w-80 h-80 bg-blue-300/30 rounded-full blur-3xl top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
+
+                {/* Thêm vòng tròn thứ hai để tạo hiệu ứng depth */}
+                <div className="absolute w-64 h-64 bg-indigo-300/20 rounded-full blur-2xl top-1/3 right-1/4 animate-pulse animation-delay-1000"></div>
+
+                {/* Khung ảnh với đường viền và bóng - tăng kích thước */}
+                <div className="absolute inset-0 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30 shadow-xl transform group-hover:scale-[1.02] transition-all duration-300"></div>
+
+                {/* Ảnh chính - tăng padding để ảnh hiển thị đẹp hơn */}
+                <div className="relative w-full h-full p-4">
+                  <Image
+                    src="/images/Healthcare.jpg"
+                    alt="Giao diện quản lý y tế SmartHealth"
+                    fill
+                    className="object-cover rounded-lg z-10 drop-shadow-lg"
+                    priority
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    style={{ objectPosition: "center" }}
+                  />
+                </div>
+
+                {/* Thêm nhiều điểm sáng trang trí hơn */}
+                <div className="absolute top-3 right-10 w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                <div className="absolute bottom-6 left-8 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <div className="absolute top-1/4 left-10 w-2 h-2 bg-purple-400 rounded-full animate-pulse animation-delay-700"></div>
+                <div className="absolute bottom-1/3 right-12 w-2.5 h-2.5 bg-yellow-400 rounded-full animate-pulse animation-delay-500"></div>
+
+                {/* Thêm lớp overlay hiệu ứng để nâng cao chiều sâu */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/10 to-transparent rounded-xl opacity-60"></div>
               </div>
             </div>
           </div>
@@ -225,7 +250,7 @@ export default function Home() {
               Người dùng gần đây
             </h2>
             <Link
-              href="/users"
+              href="/admin/users"
               className="text-blue-600 hover:text-blue-700 flex items-center gap-1"
             >
               Xem tất cả

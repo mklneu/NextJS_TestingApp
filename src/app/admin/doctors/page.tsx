@@ -13,6 +13,11 @@ import AddDoctorModal from "@/components/Doctors/AddDoctor.Modal";
 import UpdateDoctorModal from "@/components/Doctors/UpdateDoctor.Modal";
 import ViewDoctorModal from "@/components/Doctors/ViewDoctor.Modal";
 import {
+  translateSpecialty,
+  translateGender,
+  translateStatus,
+} from "@/utils/translateEnums";
+import {
   Doctor,
   getAllDoctors,
   deleteDoctorById,
@@ -39,49 +44,71 @@ export default function DoctorsPage() {
 
   // Danh sách chuyên khoa mẫu
   const specializations = [
-    "Nội khoa",
-    "Ngoại khoa",
-    "Sản khoa",
-    "Nhi khoa",
-    "Tim mạch",
-    "Thần kinh",
-    "Da liễu",
-    "Mắt",
+    "CARDIOLOGY",
+    "DERMATOLOGY",
+    "ENDOCRINOLOGY",
+    "GASTROENTEROLOGY",
+    "GENERAL_PRACTICE",
+    "HEMATOLOGY",
+    "NEUROLOGY",
+    "OBSTETRICS_GYNECOLOGY",
+    "ONCOLOGY",
+    "OPHTHALMOLOGY",
+    "ORTHOPEDICS",
+    "OTOLARYNGOLOGY",
+    "PEDIATRICS",
+    "PSYCHIATRY",
+    "PULMONOLOGY",
+    "RADIOLOGY",
+    "UROLOGY",
   ];
 
   // Tạo dữ liệu mẫu và cung cấp một hàm để làm mới dữ liệu
-  const fetchDoctors = () => {
+  //   const fetchDoctors = () => {
+  //     setLoading(true);
+
+  //     // Trong ứng dụng thực, bạn sẽ sử dụng getAllDoctors() từ DoctorServices
+  //     // Hiện tại dùng dữ liệu mẫu để demo
+  //     setTimeout(() => {
+  //       const mockDoctors: Doctor[] = Array.from({ length: 20 }, (_, i) => ({
+  //         id: i + 1,
+  //         name: `BS. ${
+  //           ["Nguyễn", "Trần", "Lê", "Phạm", "Hoàng"][
+  //             Math.floor(Math.random() * 5)
+  //           ]
+  //         } ${
+  //           ["Văn", "Thị", "Hải", "Quang", "Minh"][Math.floor(Math.random() * 5)]
+  //         } ${
+  //           ["A", "B", "C", "D", "E", "F", "G", "H"][
+  //             Math.floor(Math.random() * 8)
+  //           ]
+  //         }`,
+  //         specialization:
+  //           specializations[Math.floor(Math.random() * specializations.length)],
+  //         email: `doctor${i + 1}@smarthealth.com`,
+  //         phone: `09${Math.floor(10000000 + Math.random() * 90000000)}`,
+  //         experience: Math.floor(1 + Math.random() * 20),
+  //         gender: Math.random() > 0.4 ? "MALE" : "FEMALE",
+  //         status: Math.random() > 0.2 ? "ACTIVE" : "INACTIVE",
+  //       }));
+
+  //       setDoctors(mockDoctors);
+  //       setFilteredDoctors(mockDoctors);
+  //       setLoading(false);
+  //     }, 800);
+  //   };
+
+  const fetchDoctors = async () => {
     setLoading(true);
-
-    // Trong ứng dụng thực, bạn sẽ sử dụng getAllDoctors() từ DoctorServices
-    // Hiện tại dùng dữ liệu mẫu để demo
-    setTimeout(() => {
-      const mockDoctors: Doctor[] = Array.from({ length: 20 }, (_, i) => ({
-        id: i + 1,
-        name: `BS. ${
-          ["Nguyễn", "Trần", "Lê", "Phạm", "Hoàng"][
-            Math.floor(Math.random() * 5)
-          ]
-        } ${
-          ["Văn", "Thị", "Hải", "Quang", "Minh"][Math.floor(Math.random() * 5)]
-        } ${
-          ["A", "B", "C", "D", "E", "F", "G", "H"][
-            Math.floor(Math.random() * 8)
-          ]
-        }`,
-        specialization:
-          specializations[Math.floor(Math.random() * specializations.length)],
-        email: `doctor${i + 1}@smarthealth.com`,
-        phone: `09${Math.floor(10000000 + Math.random() * 90000000)}`,
-        experience: Math.floor(1 + Math.random() * 20),
-        gender: Math.random() > 0.4 ? "MALE" : "FEMALE",
-        status: Math.random() > 0.2 ? "ACTIVE" : "INACTIVE",
-      }));
-
-      setDoctors(mockDoctors);
-      setFilteredDoctors(mockDoctors);
+    try {
+      const data = await getAllDoctors();
+      setDoctors(data);
+      setFilteredDoctors(data);
+    } catch (error) {
+      toast.error("Lỗi khi tải dữ liệu bệnh nhân");
+    } finally {
       setLoading(false);
-    }, 800);
+    }
   };
 
   // Gọi fetchDoctors khi component được mount
@@ -93,13 +120,13 @@ export default function DoctorsPage() {
   useEffect(() => {
     const results = doctors.filter((doctor) => {
       const matchesSearch =
-        doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doctor.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         doctor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doctor.phone.includes(searchTerm);
+        doctor.phoneNumber.includes(searchTerm);
 
       const matchesSpecialization =
         filterSpecialization === "ALL" ||
-        doctor.specialization === filterSpecialization;
+        doctor.specialty === filterSpecialization;
 
       const matchesStatus =
         filterStatus === "ALL" || doctor.status === filterStatus;
@@ -192,7 +219,9 @@ export default function DoctorsPage() {
               </div>
               <input
                 type="text"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
+                className="bg-gray-50 border border-gray-300 outline-none
+                text-gray-900 text-sm rounded-lg focus:ring-blue-500
+                 focus:border-blue-500 block w-full pl-10 p-2.5"
                 placeholder="Tìm kiếm bác sĩ..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -205,14 +234,16 @@ export default function DoctorsPage() {
                 <div className="flex items-center">
                   <FaFilter className="text-gray-400 mr-2" />
                   <select
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                    className="bg-gray-50 border outline-none
+                    border-gray-300 text-gray-900 text-sm 
+                    rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
                     value={filterSpecialization}
                     onChange={(e) => setFilterSpecialization(e.target.value)}
                   >
                     <option value="ALL">Tất cả chuyên khoa</option>
                     {specializations.map((spec, index) => (
                       <option key={index} value={spec}>
-                        {spec}
+                        {translateSpecialty(spec)}
                       </option>
                     ))}
                   </select>
@@ -223,7 +254,9 @@ export default function DoctorsPage() {
               <div className="relative">
                 <div className="flex items-center">
                   <select
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                    className="bg-gray-50 border outline-none
+                    border-gray-300 text-gray-900 
+                    text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
                   >
@@ -279,19 +312,19 @@ export default function DoctorsPage() {
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Bác sĩ
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Chuyên khoa
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Liên hệ
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Kinh nghiệm
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Trạng thái
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Thao tác
                     </th>
                   </tr>
@@ -311,11 +344,11 @@ export default function DoctorsPage() {
                                 : "bg-pink-600"
                             }`}
                           >
-                            {doctor.name.split(" ").pop()?.charAt(0)}
+                            {doctor.fullName.split(" ").pop()?.charAt(0)}
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">
-                              {doctor.name}
+                              {doctor.fullName}
                             </div>
                             <div className="text-xs text-gray-500">
                               ID: {doctor.id}
@@ -324,53 +357,66 @@ export default function DoctorsPage() {
                         </div>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                          {doctor.specialization}
-                        </span>
+                        <div
+                          className="px-2 w-fit flex text-xs mx-auto 
+                        leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+                        >
+                          {translateSpecialty(doctor.specialty)}
+                        </div>
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
+                      <td className="px-4 py-4 whitespace-nowrap text-center">
                         <div className="text-sm text-gray-900">
                           {doctor.email}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {doctor.phone}
+                          {doctor.phoneNumber}
                         </div>
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {doctor.experience} năm
+                      <td
+                        className="px-4 py-4 whitespace-nowrap text-center
+                       text-sm text-gray-500"
+                      >
+                        {doctor.experienceYears} năm
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            doctor.status === "ACTIVE"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
+                        <div
+                          className={`px-2 flex mx-auto w-fit
+                            text-xs leading-5 font-semibold rounded-full ${
+                              doctor.status === "ACTIVE"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
                         >
                           {doctor.status === "ACTIVE"
                             ? "Đang hoạt động"
                             : "Tạm ngưng"}
-                        </span>
+                        </div>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-3">
+                        <div className="flex space-x-3 justify-center">
                           <button
                             onClick={() => handleView(doctor.id)}
-                            className="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 p-1.5 rounded-lg transition-colors"
+                            className="text-blue-600 cursor-pointer
+                            hover:text-blue-900 bg-blue-100 
+                            hover:bg-blue-200 p-1.5 rounded-lg transition-colors"
                             title="Xem chi tiết"
                           >
                             <FaEye />
                           </button>
                           <button
                             onClick={() => handleUpdate(doctor.id)}
-                            className="text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200 p-1.5 rounded-lg transition-colors"
+                            className="text-green-700 cursor-pointer
+                            hover:text-green-900 bg-green-200 
+                            hover:bg-green-300 p-1.5 rounded-lg transition-colors"
                             title="Chỉnh sửa"
                           >
                             <FaEdit />
                           </button>
                           <button
                             onClick={() => handleDelete(doctor.id)}
-                            className="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 p-1.5 rounded-lg transition-colors"
+                            className="text-red-600 cursor-pointer
+                            hover:text-red-900 bg-red-100 
+                            hover:bg-red-200 p-1.5 rounded-lg transition-colors"
                             title="Xóa"
                           >
                             <FaTrash />

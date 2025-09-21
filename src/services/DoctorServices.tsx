@@ -3,19 +3,22 @@ import axiosInstance from "./axiosInstance";
 
 export interface Doctor {
   id: number;
-  name: string;
-  specialization: string;
+  fullName: string;
   email: string;
-  phone: string;
-  experience: number;
+  phoneNumber: string;
+  age: number;
   gender: string;
+  specialty: string;
+  experienceYears: number;
+  address: string;
+  price: number;
   status: "ACTIVE" | "INACTIVE";
-  certifications?: string[];
-  education?: string;
-  scheduleDays?: string[];
-  scheduleHours?: string;
-  about?: string;
-  rating?: number;
+//   certifications?: string[];
+//   education?: string;
+//   scheduleDays?: string[];
+//   scheduleHours?: string;
+//   about?: string;
+//   rating?: number;
 }
 
 // Lấy tất cả bác sĩ
@@ -23,7 +26,7 @@ const getAllDoctors = async () => {
   try {
     // Trong dự án thực tế, bạn sẽ gọi API thực sự
     const response = await axiosInstance.get("/doctors");
-    return response.data.data;
+    return response.data.data.data;
   } catch (error: any) {
     console.error("❌ Error in getAllDoctors:", error);
 

@@ -53,7 +53,7 @@ const Header = () => {
     {
       id: 4,
       href: "/admin/users",
-      label: "Người dùng",
+      label: "Bệnh nhân",
       icon: <FaUsers className="mr-2" />,
     },
     {

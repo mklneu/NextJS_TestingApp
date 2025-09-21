@@ -40,7 +40,7 @@ export default function UsersPage() {
       setUsers(data);
       setFilteredUsers(data);
     } catch (error) {
-      toast.error("Lỗi khi tải dữ liệu người dùng");
+      toast.error("Lỗi khi tải dữ liệu bệnh nhân");
     } finally {
       setLoading(false);
     }
@@ -117,16 +117,16 @@ export default function UsersPage() {
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-6 mb-8 text-white shadow-lg">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
-              <h1 className="text-3xl font-bold">Quản lý người dùng</h1>
+              <h1 className="text-3xl font-bold">Quản lý bệnh nhân</h1>
               <p className="mt-2 text-blue-100">
-                Quản lý thông tin và quyền truy cập của người dùng hệ thống
+                Quản lý thông tin và quyền truy cập của bệnh nhân trong hệ thống
               </p>
             </div>
             <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 mt-4 md:mt-0">
               <div className="flex items-center">
                 <HiOutlineUserGroup className="text-3xl mr-3" />
                 <div>
-                  <p className="text-xs text-blue-100">Tổng số người dùng</p>
+                  <p className="text-xs text-blue-100">Tổng số bệnh nhân</p>
                   <p className="text-2xl font-bold">{users.length}</p>
                 </div>
               </div>
@@ -145,7 +145,7 @@ export default function UsersPage() {
               <input
                 type="text"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
-                placeholder="Tìm kiếm người dùng..."
+                placeholder="Tìm kiếm bệnh nhân..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -174,7 +174,7 @@ export default function UsersPage() {
                 onClick={() => setShowAddModal(true)}
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition-colors shadow-sm"
               >
-                <FaPlus /> Thêm người dùng
+                <FaPlus /> Thêm bệnh nhân
               </button>
             </div>
           </div>
@@ -183,16 +183,16 @@ export default function UsersPage() {
         {loading ? (
           <div className="bg-white rounded-xl shadow-md p-20 flex flex-col items-center justify-center">
             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mb-4"></div>
-            <p className="text-gray-500">Đang tải dữ liệu người dùng...</p>
+            <p className="text-gray-500">Đang tải dữ liệu bệnh nhân...</p>
           </div>
         ) : filteredUsers.length === 0 ? (
           <div className="bg-white rounded-xl shadow-md p-20 text-center">
             <div className="text-gray-400 text-5xl mb-4">🔍</div>
             <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              Không tìm thấy người dùng
+              Không tìm thấy bệnh nhân
             </h3>
             <p className="text-gray-500 mb-4">
-              Không có người dùng nào khớp với điều kiện tìm kiếm của bạn
+              Không có bệnh nhân nào khớp với điều kiện tìm kiếm của bạn
             </p>
             <button
               onClick={() => {
@@ -331,7 +331,7 @@ export default function UsersPage() {
                   </span>{" "}
                   trong{" "}
                   <span className="font-medium">{filteredUsers.length}</span>{" "}
-                  người dùng
+                  bệnh nhân
                 </div>
                 <nav className="flex space-x-1">
                   <button
