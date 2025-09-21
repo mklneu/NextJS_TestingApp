@@ -50,6 +50,7 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
       await updateUser(userId, username, gender, address, age);
       // Refresh the blogs list
       onUpdate(); // Call the onUpdate callback if provided
+      setShow(false); // Close modal after submission
     } catch (error) {
       console.error("Error creating blog:", error);
       // Error message đã được handle trong postBlog function

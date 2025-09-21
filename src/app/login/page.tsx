@@ -45,8 +45,8 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
             <InputBar
-              type="email"
-              placeholder="Email"
+              type="text"
+              placeholder="Username"
               value={username}
               className="placeholder:text-gray-400"
               onChange={(e) => setUsername(e.target.value)}
