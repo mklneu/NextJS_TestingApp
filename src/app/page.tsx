@@ -158,13 +158,13 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
-                  href="/users"
+                  href="/admin/users"
                   className="px-6 py-3 bg-white text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-all"
                 >
                   Xem người dùng
                 </Link>
                 <Link
-                  href="/dashboard"
+                  href="/admin/dashboard"
                   className="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg border border-blue-400 hover:bg-blue-600 transition-all"
                 >
                   Dashboard
