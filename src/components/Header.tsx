@@ -12,12 +12,14 @@ import {
   FaInfoCircle,
 } from "react-icons/fa";
 import { MdHealthAndSafety } from "react-icons/md";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const router = useRouter();
   const pathname = usePathname();
+
+  const { isLoggedIn, setIsLoggedIn, userName, setUserName } = useAuth();
 
   useEffect(() => {
     // Kiểm tra trạng thái đăng nhập khi component mount
@@ -26,8 +28,7 @@ const Header = () => {
 
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
-    logout();
-    setIsLoggedIn(false);
+    logout(setIsLoggedIn, setUserName);
     router.push("/login");
   };
 
@@ -102,16 +103,27 @@ const Header = () => {
 
             {/* Login/Logout based on authentication status */}
             {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                className="ml-2 px-4 py-2 bg-white text-blue-700 rounded-lg font-medium text-sm hover:bg-blue-50 transition-colors duration-200"
-              >
-                Đăng xuất
-              </button>
+              <>
+                <button
+                  onClick={handleLogout}
+                  className="ml-2 px-4 py-2 cursor-pointer
+                 bg-white text-blue-700 duration-300
+                 rounded-lg font-medium text-sm hover:bg-blue-100"
+                >
+                  Đăng xuất
+                </button>
+                <div className="ml-2 px-4 py-2 
+                 text-white rounded-lg 
+                font-medium text-sm transition-colors duration-200">
+                  Chào {userName}
+                </div>
+              </>
             ) : (
               <Link
                 href="/login"
-                className="ml-2 px-4 py-2 bg-white text-blue-700 rounded-lg font-medium text-sm hover:bg-blue-50 transition-colors duration-200"
+                className="ml-2 px-4 cursor-pointer
+                py-2 bg-white text-blue-700
+                 rounded-lg font-medium text-sm hover:bg-blue-50 transition-colors duration-200"
               >
                 Đăng nhập
               </Link>

@@ -5,6 +5,7 @@ import InputBar from "@/components/Input";
 import Button from "@/components/Button";
 import { toast } from "react-toastify";
 import { login } from "@/services/AuthServices";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -12,21 +13,23 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const { setIsLoggedIn, setUserName } = useAuth();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username || !password) {
-      toast.error("Please enter email and password");
+      toast.error("Please enter username and password");
       return;
     }
 
     setLoading(true);
     try {
-      await login(username, password);
+      await login(username, password, setIsLoggedIn, setUserName);
       toast.success("Login successful!");
       router.push("/"); // Redirect to home page after login
     } catch (error) {
       console.error("Login failed:", error);
-      toast.error("Invalid email or password");
+      toast.error("Invalid username or password");
     } finally {
       setLoading(false);
     }
