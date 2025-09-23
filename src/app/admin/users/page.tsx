@@ -32,6 +32,8 @@ export default function UsersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 6;
 
+  const genders = ["MALE", "FEMALE", "OTHER"];
+
   // Fetch all users
   const fetchUsers = async () => {
     setLoading(true);
@@ -144,7 +146,9 @@ export default function UsersPage() {
               </div>
               <input
                 type="text"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
+                className="bg-gray-50 border outline-none
+                border-gray-300 text-gray-900 text-sm
+                 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
                 placeholder="Tìm kiếm bệnh nhân..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -157,14 +161,18 @@ export default function UsersPage() {
                 <div className="flex items-center">
                   <FaFilter className="text-gray-400 mr-2" />
                   <select
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                    className="bg-gray-50 border outline-none
+                    border-gray-300 text-gray-900 text-sm 
+                    rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
                     value={filterGender}
                     onChange={(e) => setFilterGender(e.target.value)}
                   >
                     <option value="ALL">Tất cả</option>
-                    <option value="MALE">Nam</option>
-                    <option value="FEMALE">Nữ</option>
-                    <option value="OTHER">Khác</option>
+                    {genders.map((gender, index) => (
+                      <option key={index} value={gender}>
+                        {gender}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -237,16 +245,20 @@ export default function UsersPage() {
                       className="hover:bg-gray-50 transition-colors duration-200"
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div className="w-fit bg-blue-100 mx-auto
-                        text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                        <div
+                          className="w-fit bg-blue-100 mx-auto
+                        text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
+                        >
                           {user.id}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center justify-center mx-auto">
-                          <div className="flex-shrink-0 h-10 w-10
+                          <div
+                            className="flex-shrink-0 h-10 w-10
                           bg-blue-100 text-blue-600 rounded-full flex 
-                          items-center justify-center font-bold">
+                          items-center justify-center font-bold"
+                          >
                             {user.username.charAt(0).toUpperCase()}
                           </div>
                           <div className="ml-4">
@@ -256,16 +268,22 @@ export default function UsersPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-center
-                      whitespace-nowrap text-sm text-gray-500">
+                      <td
+                        className="px-6 py-4 text-center
+                      whitespace-nowrap text-sm text-gray-500"
+                      >
                         {user.email}
                       </td>
-                      <td className="px-6 py-4 text-center
-                      whitespace-nowrap text-sm text-gray-500">
+                      <td
+                        className="px-6 py-4 text-center
+                      whitespace-nowrap text-sm text-gray-500"
+                      >
                         {user.age}
                       </td>
-                      <td className="px-6 py-4 text-center
-                      whitespace-nowrap">
+                      <td
+                        className="px-6 py-4 text-center
+                      whitespace-nowrap"
+                      >
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                             user.gender === "MALE"

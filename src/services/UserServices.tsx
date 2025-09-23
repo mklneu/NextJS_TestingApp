@@ -44,6 +44,7 @@ const postUser = async (
       age,
     });
     toast.success(response.data.message);
+    console.log(">>>>>> data user", response.data);
     return response.data.data;
   } catch (error) {
     console.error("❌ Error in postUser:", error);
@@ -91,7 +92,9 @@ const deleteUserById = async (userId: number, onDelete: () => void) => {
               onClick={async () => {
                 closeToast();
                 try {
-                  const response = await axiosInstance.delete(`/users/${userId}`);
+                  const response = await axiosInstance.delete(
+                    `/users/${userId}`
+                  );
                   onDelete();
                   toast.success(response.data.message);
                 } catch (error) {
