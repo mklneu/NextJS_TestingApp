@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import DropDownMenu from "./DropDownMenu";
 import { logout, isAuthenticated } from "@/services/AuthServices";
 import {
   FaHome,
@@ -24,7 +23,7 @@ const Header = () => {
   useEffect(() => {
     // Kiểm tra trạng thái đăng nhập khi component mount
     setIsLoggedIn(isAuthenticated());
-  }, []);
+  }, [setIsLoggedIn]);
 
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();

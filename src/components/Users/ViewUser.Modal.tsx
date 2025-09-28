@@ -11,16 +11,6 @@ interface IUpdateModalProps {
   setUserId: (value: number | null) => void;
 }
 
-// Define a User interface to properly type the currentUser
-interface User {
-  username: string;
-  email: string;
-  age: number;
-  address: string;
-  gender: string;
-  // [key: string]: any; // For any other properties
-}
-
 const ViewUserModal = (props: IUpdateModalProps) => {
   const { show, setShow, userId, setUserId } = props;
 

@@ -1,16 +1,17 @@
 "use client";
-import { useEffect, useState } from "react";
-import { getAllUsers } from "@/services/UserServices";
 import {
   FaUserMd,
   FaChartLine,
   FaHeartbeat,
   FaCalendarCheck,
 } from "react-icons/fa";
-import { MdDashboard, MdHealthAndSafety } from "react-icons/md";
+import { MdHealthAndSafety } from "react-icons/md";
 import { IoMdStats } from "react-icons/io";
 import Link from "next/link";
 import Image from "next/image";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useState } from "react";
+import { getAllUsers } from "@/services/UserServices";
 
 interface StatCardProps {
   title: string;
@@ -62,8 +63,9 @@ const FeatureCard = ({
 };
 
 export default function Home() {
-  const [userData, setUserData] = useState<any[]>([]);
+  const [userData, setUserData] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { isLoggedIn } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,8 +78,10 @@ export default function Home() {
         setIsLoading(false);
       }
     };
-    fetchData();
-  }, []);
+    if (isLoggedIn) {
+      fetchData();
+    }
+  }, [isLoggedIn]);
 
   // Giả lập dữ liệu thống kê
   const stats = [
@@ -134,7 +138,7 @@ export default function Home() {
     },
   ];
 
-  if (isLoading) {
+  if (isLoading && isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
@@ -212,15 +216,17 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 px-4">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat, index) => (
-              <StatCard key={index} {...stat} />
-            ))}
+      {isLoggedIn && (
+        <section className="py-12 px-4">
+          <div className="container mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {stats.map((stat, index) => (
+                <StatCard key={index} {...stat} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Features Section */}
       <section className="py-16 px-4 bg-white">
@@ -243,7 +249,7 @@ export default function Home() {
       </section>
 
       {/* Recent Users Section */}
-      <section className="py-12 px-4">
+      {/* <section className="py-12 px-4">
         <div className="container mx-auto">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-bold text-gray-800">
@@ -313,7 +319,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Call to Action Section */}
       <section className="py-16 px-4 bg-gradient-to-r from-blue-50 to-blue-100">

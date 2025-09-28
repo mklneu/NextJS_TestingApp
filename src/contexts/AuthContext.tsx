@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useState, useContext, useEffect } from "react";
-import { isAuthenticated } from "@/services/AuthServices";
+import { getAccount, isAuthenticated } from "@/services/AuthServices";
 
 // Định nghĩa kiểu dữ liệu cho context
 type AuthContextType = {
@@ -37,8 +37,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoggedIn(isAuthenticated());
 
     // Lấy userName từ localStorage nếu đã đăng nhập
+    // if (isAuthenticated()) {
+    //   setUserName(localStorage.getItem("userName"));
+    // }
+
     if (isAuthenticated()) {
-      setUserName(localStorage.getItem("userName"));
+      // Lấy thông tin user thông qua API
+      const fetchUserInfo = async () => {
+        // Giả sử bạn có hàm getUserInfo trong AuthServices
+        const account = await getAccount();
+        setUserName(account?.user?.username || null);
+        // setUserName(userInfo?.username || null);
+      };
+      fetchUserInfo();
     }
   }, []);
 

@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get("refresh_token")?.value;
-  
+
   // Nếu đang ở trang login và đã có token -> redirect to homepage
   if (request.nextUrl.pathname === "/login") {
     if (token) {
@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
     }
     return NextResponse.next();
   }
-  
+
   // Nếu chưa đăng nhập và truy cập vào các route protected -> redirect to login
   if (!token) {
     const loginUrl = new URL("/login", request.url);
@@ -24,5 +24,5 @@ export function middleware(request: NextRequest) {
 
 // Chỉ áp dụng middleware cho các routes này
 export const config = {
-  matcher: ["/", "/blogs/:path*", "/profile/:path*"],
+  matcher: ["/blogs/:path*", "/profile/:path*", "/admin/:path*"],
 };

@@ -1,6 +1,7 @@
 import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
 import Button from "@/components/Button";
+import { AxiosError } from "axios";
 
 const getAllUsers = async () => {
   try {
@@ -47,8 +48,9 @@ const postUser = async (
     console.log(">>>>>> data user", response.data);
     return response.data.data;
   } catch (error) {
+    const err = error as AxiosError<ErrorResponse>;
     console.error("❌ Error in postUser:", error);
-    toast.error(error?.response?.data?.error);
+    toast.error(err?.response?.data?.error);
     throw error; // Re-throw để component handle được
   }
 };
@@ -70,8 +72,9 @@ const updateUser = async (
     toast.success(response.data.message);
     return response.data.data;
   } catch (error) {
+    const err = error as AxiosError<ErrorResponse>;
     console.error("❌ Error in updateUser:", error);
-    toast.error(error?.response?.data?.error);
+    toast.error(err?.response?.data?.error);
     throw error; // Re-throw để component handle được
   }
 };
