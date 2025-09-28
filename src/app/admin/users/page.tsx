@@ -14,9 +14,11 @@ import { toast } from "react-toastify";
 import AddNewUserModal from "@/components/Users/AddUser.Modal";
 import UpdateUserModal from "@/components/Users/UpdateUser.Modal";
 import ViewUserModal from "@/components/Users/ViewUser.Modal";
+import { AxiosError } from "axios";
+import { getAllHospitals } from "@/services/HospitalServices";
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -27,6 +29,8 @@ export default function UsersPage() {
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
   const [showViewModal, setShowViewModal] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+
+  const [hospitals, setHospitals] = useState<Hospital[]>([]);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -42,14 +46,37 @@ export default function UsersPage() {
       setUsers(data);
       setFilteredUsers(data);
     } catch (error) {
+      const err = error as AxiosError<ErrorResponse>;
       toast.error("Lỗi khi tải dữ liệu bệnh nhân");
+      console.error("Error fetching users:", err.message);
     } finally {
       setLoading(false);
     }
   };
 
+  //fetch hospitals
+  const fetchHospitals = async () => {
+    // setLoadingHospitals(true);
+    try {
+      const data = await getAllHospitals();
+      setHospitals(data);
+      console.log("Hospitals data:", data);
+    } catch (error) {
+      const err = error as AxiosError<ErrorResponse>;
+      toast.error("Lỗi khi tải dữ liệu bệnh viện");
+      console.error("Error fetching hospitals:", err.message);
+    }
+    // finally {
+    //   setLoadingHospitals(false);
+    // }
+  };
+
   useEffect(() => {
     fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    fetchHospitals();
   }, []);
 
   // Apply filters when search term or gender filter changes
@@ -89,10 +116,10 @@ export default function UsersPage() {
     setShowUpdateModal(true);
   };
 
-  const handleView = (userId: number) => {
-    setSelectedUserId(userId);
-    setShowViewModal(true);
-  };
+  // const handleView = (userId: number) => {
+  //   setSelectedUserId(userId);
+  //   setShowViewModal(true);
+  // };
 
   // Generate pagination items
   const paginationItems = [];
@@ -218,22 +245,28 @@ export default function UsersPage() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="w-1/6 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       ID
                     </th>
-                    <th className="w-1/6 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Tên
                     </th>
-                    <th className="w-1/6 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Email
                     </th>
-                    <th className="w-1/6 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Tuổi
                     </th>
-                    <th className="w-1/6 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Giới tính
                     </th>
-                    <th className="w-1/6 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Bệnh viện
+                    </th>
+                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Vai trò
+                    </th>
+                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Thao tác
                     </th>
                   </tr>
@@ -300,9 +333,21 @@ export default function UsersPage() {
                             : "Khác"}
                         </span>
                       </td>
+                      <td
+                        className="px-6 py-4 text-center
+                      whitespace-nowrap text-sm text-gray-500"
+                      >
+                        {user.company?.name || "N/A"}
+                      </td>
+                      <td
+                        className="px-6 py-4 text-center
+                      whitespace-nowrap text-sm text-gray-500"
+                      >
+                        {user.role?.name || "N/A"}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-3 justify-center">
-                          <button
+                          {/* <button
                             onClick={() => handleView(user.id)}
                             className="text-blue-600 cursor-pointer
                             hover:text-blue-900 bg-blue-100 
@@ -310,7 +355,7 @@ export default function UsersPage() {
                             title="Xem chi tiết"
                           >
                             <FaEye />
-                          </button>
+                          </button> */}
                           <button
                             onClick={() => handleUpdate(user.id)}
                             className="text-green-700 cursor-pointer
@@ -401,6 +446,15 @@ export default function UsersPage() {
           userId={selectedUserId}
           setUserId={setSelectedUserId}
           onUpdate={fetchUsers}
+          roleOptions={[
+            { label: "Admin", value: "1" },
+            { label: "Doctor", value: "2" },
+            { label: "User", value: "3" },
+          ]}
+          companyOptions={hospitals.map((h) => ({
+            label: h.name,
+            value: String(h.id),
+          }))}
         />
       )}
 

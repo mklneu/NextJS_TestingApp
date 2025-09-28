@@ -1,42 +1,41 @@
 import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
+import { AxiosError } from "axios";
 
 export interface Doctor {
   id: number;
   fullName: string;
   email: string;
-  phoneNumber: string;
-  age: number;
+  username: string;
   gender: string;
   specialty: string;
   experienceYears: number;
   address: string;
   price: number;
   status: "ACTIVE" | "INACTIVE";
-//   certifications?: string[];
-//   education?: string;
-//   scheduleDays?: string[];
-//   scheduleHours?: string;
-//   about?: string;
-//   rating?: number;
+  company: { id: number }[];
+  //   certifications?: string[];
+  //   education?: string;
+  //   scheduleDays?: string[];
+  //   scheduleHours?: string;
+  //   about?: string;
+  //   rating?: number;
 }
 
 // Lấy tất cả bác sĩ
 const getAllDoctors = async () => {
   try {
-    // Trong dự án thực tế, bạn sẽ gọi API thực sự
     const response = await axiosInstance.get("/doctors");
     return response.data.data.data;
-  } catch (error: any) {
-    console.error("❌ Error in getAllDoctors:", error);
+  } catch (error) {
+    const err = error as AxiosError<ErrorResponse>;
+    console.error("❌ Error in getAllDoctors:", err);
 
-    if (error.response?.data?.message) {
-      toast.error(error.response.data.message);
+    if (err.response?.data?.message) {
+      toast.error(err.response.data.message);
     } else {
       toast.error("❌ Không thể lấy danh sách bác sĩ!");
     }
-
-    // Trả về mảng rỗng nếu có lỗi
     return [];
   }
 };
@@ -46,16 +45,16 @@ const getDoctorById = async (doctorId: number) => {
   try {
     const response = await axiosInstance.get(`/doctors/${doctorId}`);
     return response.data.data;
-  } catch (error: any) {
-    console.error("❌ Error in getDoctorById:", error);
+  } catch (error) {
+    const err = error as AxiosError<ErrorResponse>;
+    console.error("❌ Error in getDoctorById:", err);
 
-    if (error.response?.data?.message) {
-      toast.error(error.response.data.message);
+    if (err.response?.data?.message) {
+      toast.error(err.response.data.message);
     } else {
       toast.error(`❌ Không thể lấy thông tin bác sĩ ID: ${doctorId}!`);
     }
-
-    throw error;
+    throw err;
   }
 };
 
@@ -65,16 +64,16 @@ const createDoctor = async (doctorData: Omit<Doctor, "id">) => {
     const response = await axiosInstance.post("/doctors", doctorData);
     toast.success("✅ Thêm bác sĩ thành công!");
     return response.data.data;
-  } catch (error: any) {
-    console.error("❌ Error in createDoctor:", error);
+  } catch (error) {
+    const err = error as AxiosError<ErrorResponse>;
+    console.error("❌ Error in createDoctor:", err);
 
-    if (error.response?.data?.message) {
-      toast.error(error.response.data.message);
+    if (err.response?.data?.message) {
+      toast.error(err.response.data.message);
     } else {
       toast.error("❌ Lỗi khi thêm bác sĩ!");
     }
-
-    throw error;
+    throw err;
   }
 };
 
@@ -90,16 +89,16 @@ const updateDoctor = async (
     );
     toast.success("✅ Cập nhật thông tin bác sĩ thành công!");
     return response.data.data;
-  } catch (error: any) {
-    console.error("❌ Error in updateDoctor:", error);
+  } catch (error) {
+    const err = error as AxiosError<ErrorResponse>;
+    console.error("❌ Error in updateDoctor:", err);
 
-    if (error.response?.data?.message) {
-      toast.error(error.response.data.message);
+    if (err.response?.data?.message) {
+      toast.error(err.response.data.message);
     } else {
       toast.error("❌ Lỗi khi cập nhật thông tin bác sĩ!");
     }
-
-    throw error;
+    throw err;
   }
 };
 
@@ -109,16 +108,16 @@ const deleteDoctor = async (doctorId: number) => {
     await axiosInstance.delete(`/doctors/${doctorId}`);
     toast.success("✅ Xóa bác sĩ thành công!");
     return true;
-  } catch (error: any) {
-    console.error("❌ Error in deleteDoctor:", error);
+  } catch (error) {
+    const err = error as AxiosError<ErrorResponse>;
+    console.error("❌ Error in deleteDoctor:", err);
 
-    if (error.response?.data?.message) {
-      toast.error(error.response.data.message);
+    if (err.response?.data?.message) {
+      toast.error(err.response.data.message);
     } else {
       toast.error("❌ Lỗi khi xóa bác sĩ!");
     }
-
-    throw error;
+    throw err;
   }
 };
 
@@ -137,16 +136,16 @@ const updateDoctorStatus = async (
       } tài khoản bác sĩ!`
     );
     return response.data.data;
-  } catch (error: any) {
-    console.error("❌ Error in updateDoctorStatus:", error);
+  } catch (error) {
+    const err = error as AxiosError<ErrorResponse>;
+    console.error("❌ Error in updateDoctorStatus:", err);
 
-    if (error.response?.data?.message) {
-      toast.error(error.response.data.message);
+    if (err.response?.data?.message) {
+      toast.error(err.response.data.message);
     } else {
       toast.error("❌ Lỗi khi cập nhật trạng thái bác sĩ!");
     }
-
-    throw error;
+    throw err;
   }
 };
 
@@ -154,9 +153,10 @@ const updateDoctorStatus = async (
 const deleteDoctorById = async (doctorId: number, callback: () => void) => {
   try {
     await deleteDoctor(doctorId);
-    callback(); // Gọi callback để cập nhật UI
+    callback();
   } catch (error) {
-    console.error("❌ Error in deleteDoctorById:", error);
+    const err = error as AxiosError<ErrorResponse>;
+    console.error("❌ Error in deleteDoctorById:", err);
   }
 };
 

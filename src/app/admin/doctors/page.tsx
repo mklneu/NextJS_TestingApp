@@ -14,14 +14,12 @@ import UpdateDoctorModal from "@/components/Doctors/UpdateDoctor.Modal";
 import ViewDoctorModal from "@/components/Doctors/ViewDoctor.Modal";
 import {
   translateSpecialty,
-  translateGender,
-  translateStatus,
 } from "@/utils/translateEnums";
 import {
   Doctor,
   getAllDoctors,
-  deleteDoctorById,
 } from "@/services/DoctorServices";
+import { AxiosError } from "axios";
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -105,7 +103,9 @@ export default function DoctorsPage() {
       setDoctors(data);
       setFilteredDoctors(data);
     } catch (error) {
+      const err = error as AxiosError<ErrorResponse>;
       toast.error("Lỗi khi tải dữ liệu bệnh nhân");
+      console.error("Error fetching doctors:", err.message);
     } finally {
       setLoading(false);
     }

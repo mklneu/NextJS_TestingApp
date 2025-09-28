@@ -12,6 +12,7 @@ import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { getAllUsers } from "@/services/UserServices";
+import { canAccessApi } from "@/constants/apiRoles";
 
 interface StatCardProps {
   title: string;
@@ -65,7 +66,8 @@ const FeatureCard = ({
 export default function Home() {
   const [userData, setUserData] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, setIsLoggedIn, userName, setUserName } = useAuth();
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -138,6 +140,15 @@ export default function Home() {
     },
   ];
 
+  // Demo phân quyền API
+  const [canAccess, setCanAccess] = useState(false);
+  // Giả lập role, thực tế lấy từ user context hoặc localStorage
+  const userRole: "ADMIN" | "DOCTOR" | "USER" = "DOCTOR";
+
+  useEffect(() => {
+    setCanAccess(canAccessApi("/api/users/123", userRole));
+  }, [userRole]);
+
   if (isLoading && isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -148,6 +159,22 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Demo phân quyền API */}
+      <div className="container mx-auto px-4 pt-6">
+        <div className="mb-6">
+          {canAccess ? (
+            <div className="text-green-600 font-semibold">
+              Bạn có quyền truy cập API <code>/api/users/123</code> với vai trò{" "}
+              <b>{userRole}</b>
+            </div>
+          ) : (
+            <div className="text-red-600 font-semibold">
+              Bạn <b>không có quyền</b> truy cập API <code>/api/users/123</code>{" "}
+              với vai trò <b>{userRole}</b>
+            </div>
+          )}
+        </div>
+      </div>
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
         <div className="container mx-auto px-4">

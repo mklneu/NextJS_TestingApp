@@ -93,6 +93,7 @@ export const logout = async (
         },
       }
     );
+    toast.success(res.data?.message || "Đăng xuất thành công!");
     console.log("✅ Logout successful:", res.data);
   } catch (error) {
     // Có thể log lỗi hoặc bỏ qua nếu logout phía server thất bại
@@ -108,8 +109,6 @@ export const logout = async (
   // Cập nhật state toàn cục nếu được cung cấp
   if (setIsLoggedIn) setIsLoggedIn(false);
   if (setUserName) setUserName(null);
-
-  toast.success("Đăng xuất thành công");
 };
 
 export const register = async (
@@ -146,7 +145,7 @@ export const getAccount = async () => {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
     });
-    console.log(">>>>>> data account", response.data.data);
+    // console.log(">>>>>> data account", response.data.data);
     return response.data.data;
   } catch (error) {
     console.error("❌ Error in getAccount:", error);

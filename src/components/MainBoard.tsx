@@ -189,6 +189,15 @@ const MainBoard = (props: Iprops) => {
           onUpdate={handleUpdate}
           userId={updateUserId}
           setUserId={setUpdateUserId}
+          roleOptions={[
+            { label: "Admin", value: "1" },
+            { label: "Doctor", value: "2" },
+            { label: "User", value: "3" },
+          ]}
+          companyOptions={[
+            { label: "Company A", value: "1" },
+            { label: "Company B", value: "2" },
+          ]}
         ></UpdateUserModal>
       )}
       <p className="text-lg mt-6 text-gray-600">Welcome to the main board!</p>

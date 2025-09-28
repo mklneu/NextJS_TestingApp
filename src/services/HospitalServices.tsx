@@ -3,95 +3,79 @@ import axiosInstance from "./axiosInstance";
 import Button from "@/components/Button";
 import { AxiosError } from "axios";
 
-const getAllUsers = async () => {
+// Lấy tất cả bệnh viện
+const getAllHospitals = async () => {
   try {
-    const response = await axiosInstance.get("/users");
-
+    const response = await axiosInstance.get("/companies");
     return response.data.data.data || [];
   } catch (error) {
-    console.error("❌ Error in getAllUsers:", error);
-    // toast.error("Failed to fetch users");
-    throw error; // Re-throw để component handle được
+    console.error("❌ Error in getAllHospitals:", error);
+    throw error;
   }
 };
 
-const getUserById = async (userId: number) => {
+// Lấy bệnh viện theo id
+const getHospitalById = async (hospitalId: number) => {
   try {
-    const response = await axiosInstance.get(`/users/${userId}`);
+    const response = await axiosInstance.get(`/companies/${hospitalId}`);
     return response.data.data;
   } catch (error) {
-    console.error("❌ Error in getUserById:", error);
-    toast.error("❌ Error while fetching user by ID!");
-    throw error; // Re-throw để component handle được
+    console.error("❌ Error in getHospitalById:", error);
+    toast.error("❌ Error while fetching hospital by ID!");
+    throw error;
   }
 };
 
-const postUser = async (
-  username: string,
-  email: string,
-  password: string,
-  gender: string,
-  address: string,
-  age: number
-) => {
+// Thêm bệnh viện mới
+const postHospital = async (name: string, address: string, phone: string) => {
   try {
-    // Uncomment dòng dưới khi có backend
-    const response = await axiosInstance.post("/users", {
-      username,
-      email,
-      password,
-      gender,
+    const response = await axiosInstance.post("/companies", {
+      name,
       address,
-      age,
-    });
-    toast.success(response.data.message);
-    console.log(">>>>>> data user", response.data);
-    return response.data.data;
-  } catch (error) {
-    const err = error as AxiosError<ErrorResponse>;
-    console.error("❌ Error in postUser:", error);
-    toast.error(err?.response?.data?.error);
-    throw error; // Re-throw để component handle được
-  }
-};
-
-const updateUser = async (
-  userId: number,
-  username: string,
-  gender: string,
-  address: string,
-  age: number,
-  company: { id: number },
-  role: { id: number }
-) => {
-  try {
-    const response = await axiosInstance.put(`/users/${userId}`, {
-      username,
-      gender,
-      address,
-      age,
-      company,
-      role,
+      phone,
     });
     toast.success(response.data.message);
     return response.data.data;
   } catch (error) {
     const err = error as AxiosError<ErrorResponse>;
-    console.error("❌ Error in updateUser:", error);
+    console.error("❌ Error in postHospital:", error);
     toast.error(err?.response?.data?.error);
-    throw error; // Re-throw để component handle được
+    throw error;
   }
 };
 
-const deleteUserById = async (userId: number, onDelete: () => void) => {
-  // Custom confirm toast
+// Cập nhật bệnh viện
+const updateHospital = async (
+  hospitalId: number,
+  name: string,
+  address: string,
+  phone: string
+) => {
+  try {
+    const response = await axiosInstance.put(`/companies/${hospitalId}`, {
+      name,
+      address,
+      phone,
+    });
+    toast.success(response.data.message);
+    return response.data.data;
+  } catch (error) {
+    const err = error as AxiosError<ErrorResponse>;
+    console.error("❌ Error in updateHospital:", error);
+    toast.error(err?.response?.data?.error);
+    throw error;
+  }
+};
+
+// Xóa bệnh viện
+const deleteHospitalById = async (hospitalId: number, onDelete: () => void) => {
   const confirmDelete = () => {
     toast(
       ({ closeToast }) => (
         <div className="flex flex-col p-2 w-full">
           <div className="flex items-center mb-3">
             <span className="font-medium text-gray-800">
-              Are you sure to delete this user?
+              Are you sure to delete this hospital?
             </span>
           </div>
           <div className="flex justify-end space-x-2">
@@ -100,13 +84,13 @@ const deleteUserById = async (userId: number, onDelete: () => void) => {
                 closeToast();
                 try {
                   const response = await axiosInstance.delete(
-                    `/users/${userId}`
+                    `/companies/${hospitalId}`
                   );
                   onDelete();
                   toast.success(response.data.message);
                 } catch (error) {
-                  console.error("❌ Error in deleteUser: ", error);
-                  toast.error("❌ Error while deleting user!");
+                  console.error("❌ Error in deleteHospital: ", error);
+                  toast.error("❌ Error while deleting hospital!");
                 }
               }}
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
@@ -136,4 +120,11 @@ const deleteUserById = async (userId: number, onDelete: () => void) => {
 
   confirmDelete();
 };
-export { getAllUsers, getUserById, postUser, updateUser, deleteUserById };
+
+export {
+  getAllHospitals,
+  getHospitalById,
+  postHospital,
+  updateHospital,
+  deleteHospitalById,
+};

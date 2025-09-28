@@ -4,25 +4,41 @@ import { toast } from "react-toastify";
 import InputBar from "../Input";
 import { getUserById, updateUser } from "@/services/UserServices";
 
+interface Option {
+  label: string;
+  value: string | number;
+}
+
 interface IUpdateModalProps {
   show: boolean;
   setShow: (value: boolean) => void;
-  onUpdate: () => void; // Callback function to handle submission
-  userId: number; // Optional user ID for updating
-  setUserId: (value: number | null) => void; // Optional setter for userId
+  onUpdate: () => void;
+  userId: number;
+  setUserId: (value: number | null) => void;
+  roleOptions: Option[]; // [{ label: "Admin", value: 1 }, ...]
+  companyOptions: Option[]; // [{ label: "Company A", value: 1 }, ...]
 }
 
 const UpdateUserModal = (props: IUpdateModalProps) => {
-  const { show, setShow, onUpdate, userId, setUserId } = props;
+  const {
+    show,
+    setShow,
+    onUpdate,
+    userId,
+    setUserId,
+    roleOptions,
+    companyOptions,
+  } = props;
 
   const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [age, setAge] = useState<number>(0);
   const [address, setAddress] = useState<string>("");
   const [gender, setGender] = useState<string>("");
+  const [role, setRole] = useState<number | string>("");
+  const [company, setCompany] = useState<number | string>("");
 
   useEffect(() => {
-    // Fetch the user details if userId is provided
     const fetchUserDetails = async () => {
       if (userId) {
         try {
@@ -32,6 +48,8 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
           setAge(user.age);
           setAddress(user.address);
           setGender(user.gender);
+          setRole(user.role?.id || "");
+          setCompany(user.company?.id || "");
         } catch (error) {
           console.error("Error fetching user details:", error);
           toast.error("Failed to fetch user details.");
@@ -42,24 +60,30 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
   }, [userId]);
 
   const handleUpdate = async () => {
-    if (!username || !email) {
+    if (!username || !email || !role || !company) {
       toast.error("Please fill in all fields!");
       return;
     }
     try {
-      await updateUser(userId, username, gender, address, age);
-      // Refresh the blogs list
-      onUpdate(); // Call the onUpdate callback if provided
-      setShow(false); // Close modal after submission
+      await updateUser(
+        userId,
+        username,
+        gender,
+        address,
+        age,
+        { id: Number(company) }, // Sửa ở đây: truyền object { id }
+        { id: Number(role) }
+      );
+      onUpdate();
+      setShow(false);
     } catch (error) {
-      console.error("Error creating blog:", error);
-      // Error message đã được handle trong postBlog function
+      console.error("Error updating user:", error);
     }
   };
 
   const handleClose = () => {
-    setUserId(null); // Reset userId when closing the modal
-    setShow(false); // Close modal
+    setUserId(null);
+    setShow(false);
   };
 
   return (
@@ -67,14 +91,10 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
       {show && (
         <form
           onSubmit={(e) => e.preventDefault()}
-          className={`flex justify-between bg-[rgba(0,0,0,0.4)] fixed
-          items-center w-full min-h-screen mb-6 top-0 right-0 p-4 z-50`}
+          className="flex justify-center items-center bg-[rgba(0,0,0,0.4)] fixed w-full min-h-screen top-0 right-0 p-4 z-50"
         >
-          <div
-            className="mx-auto bg-white text-black 
-          rounded-lg shadow-2xl border border-gray-400
-          w-196"
-          >
+          <div className="mx-auto bg-white text-black 
+          rounded-lg shadow-2xl border border-gray-400 w-[65%]">
             <h1 className="px-5 py-4 text-2xl">
               Cập nhật người dùng{" "}
               <span className="text-gray-600 font-bold text-sm">
@@ -82,55 +102,81 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
               </span>
             </h1>
             <hr className="mb-6 text-gray-200" />
-            <InputBar
-              label="Tên tài khoản"
-              value={username}
-              placeholder="Tên tài khoản"
-              onChange={(e) => setUsername(e.target.value)}
-            ></InputBar>
-            <InputBar
-              label="Email"
-              value={email}
-              placeholder="Email"
-              disabled={true}
-              onChange={(e) => setEmail(e.target.value)}
-            ></InputBar>
-            <InputBar
-              label="Tuổi"
-              value={age}
-              placeholder="Tuổi"
-              onChange={(e) => setAge(Number(e.target.value))}
-            ></InputBar>
-            <InputBar
-              label="Địa chỉ"
-              value={address}
-              placeholder="Địa chỉ"
-              onChange={(e) => setAddress(e.target.value)}
-            ></InputBar>
-            <InputBar
-              label="Giới tính"
-              type="select"
-              value={gender}
-              placeholder="Chọn giới tính"
-              onChange={(e) => setGender(e.target.value)}
-              options={[
-                { label: "Nam", value: "MALE" },
-                { label: "Nữ", value: "FEMALE" },
-                { label: "Khác", value: "OTHER" },
-              ]}
-            ></InputBar>
-
-            <div className="flex justify-end mx-auto gap-2 mt-6 mb-8 w-11/12">
-              <Button
-                variant="secondary"
-                size="md"
-                onClick={() => {
-                  handleClose();
-                }}
-              >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-8">
+              {/* Cột 1 */}
+              <div className="flex flex-col gap-4 min-w-0">
+                <InputBar
+                  label="Tên tài khoản"
+                  value={username}
+                  placeholder="Tên tài khoản"
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+                <InputBar
+                  label="Email"
+                  value={email}
+                  placeholder="Email"
+                  disabled={true}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <InputBar
+                  label="Tuổi"
+                  value={age}
+                  placeholder="Tuổi"
+                  onChange={(e) => setAge(Number(e.target.value))}
+                />
+              </div>
+              {/* Cột 2 */}
+              <div className="flex flex-col gap-4 min-w-0">
+                <InputBar
+                  label="Địa chỉ"
+                  value={address}
+                  placeholder="Địa chỉ"
+                  onChange={(e) => setAddress(e.target.value)}
+                />
+                <InputBar
+                  label="Giới tính"
+                  type="select"
+                  value={gender}
+                  placeholder="Chọn giới tính"
+                  onChange={(e) => setGender(e.target.value)}
+                  options={[
+                    { label: "Nam", value: "MALE" },
+                    { label: "Nữ", value: "FEMALE" },
+                    { label: "Khác", value: "OTHER" },
+                  ]}
+                />
+              </div>
+              {/* Cột 3 */}
+              <div className="flex flex-col gap-4 min-w-0">
+                <InputBar
+                  label="Vai trò"
+                  type="select"
+                  value={role}
+                  placeholder="Chọn vai trò"
+                  onChange={(e) => setRole(e.target.value)}
+                  options={roleOptions.map((opt) => ({
+                    ...opt,
+                    value: String(opt.value),
+                  }))}
+                />
+                <InputBar
+                  label="Bệnh viện"
+                  type="select"
+                  value={company}
+                  placeholder="Chọn bệnh viện"
+                  onChange={(e) => setCompany(e.target.value)}
+                  options={companyOptions.map((opt) => ({
+                    ...opt,
+                    value: String(opt.value),
+                  }))}
+                />
+              </div>
+            </div>
+            <div className="flex justify-end mx-auto gap-2 mt-8 mb-8 w-11/12">
+              <Button variant="secondary" size="md" onClick={handleClose}>
                 Close
               </Button>
-              <Button size="md" onClick={() => handleUpdate()}>
+              <Button size="md" onClick={handleUpdate}>
                 Update
               </Button>
             </div>
