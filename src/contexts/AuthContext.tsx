@@ -11,6 +11,8 @@ type AuthContextType = {
   setUserName: React.Dispatch<React.SetStateAction<string | null>>;
   userRole: string | null;
   setUserRole: React.Dispatch<React.SetStateAction<string | null>>;
+  userId: number | null;
+  setUserId: React.Dispatch<React.SetStateAction<number | null>>;
 };
 
 // Tạo context với giá trị mặc định
@@ -34,6 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
 
   // Kiểm tra trạng thái đăng nhập khi component mount
   useEffect(() => {
@@ -51,6 +54,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const account = await getAccount();
         setUserName(account?.user?.username || null);
         setUserRole(account.user.role?.name || null);
+        setUserId(account?.user?.id || null);
+        console.log(">>> user id", account?.user?.id);
         console.log(">>> account in AuthContext", account.user.role?.name);
         // setUserName(userInfo?.username || null);
       };
@@ -60,7 +65,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, setIsLoggedIn, userName, setUserName, userRole, setUserRole }}
+      value={{
+        isLoggedIn,
+        setIsLoggedIn,
+        userName,
+        setUserName,
+        userRole,
+        setUserRole,
+        userId,
+        setUserId,
+      }}
     >
       {children}
     </AuthContext.Provider>

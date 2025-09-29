@@ -66,7 +66,7 @@ const FeatureCard = ({
 export default function Home() {
   const [userData, setUserData] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { isLoggedIn, setIsLoggedIn, userName, setUserName } = useAuth();
+  const { isLoggedIn } = useAuth();
 
 
   useEffect(() => {

@@ -34,6 +34,10 @@ const Header = () => {
 
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
+    // Xóa tab profile khỏi localStorage
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("profileActiveTab");
+    }
     // Nếu context có setUserRole thì reset luôn
     if (typeof setUserName === "function" && typeof userRole !== "undefined") {
       // Nếu context có setUserRole thì setUserRole("")
@@ -122,20 +126,70 @@ const Header = () => {
             {/* Login/Logout based on authentication status */}
             {isLoggedIn ? (
               <>
-                <button
-                  onClick={handleLogout}
-                  className="ml-2 px-4 py-2 cursor-pointer
-                 bg-white text-blue-700 duration-300
-                 rounded-lg font-medium text-sm hover:bg-blue-100"
-                >
-                  Đăng xuất
-                </button>
+                {/* Dropdown menu for user actions - keep open on hover/focus */}
                 <div
-                  className="ml-2 px-4 py-2 
-                 text-white rounded-lg 
-                font-medium text-sm transition-colors duration-200"
+                  className="relative"
+                  onMouseEnter={() => setIsMenuOpen(true)}
+                  onMouseLeave={() => setIsMenuOpen(false)}
                 >
-                  Chào {userName}
+                  <button
+                    className="px-4 py-2 text-white 
+                    rounded-lg font-medium text-sm cursor-pointer
+                    duration-200 bg-blue-700 hover:bg-blue-800 flex 
+                    items-center focus:outline-none"
+                    onClick={() => setIsMenuOpen((v) => !v)}
+                    tabIndex={0}
+                    aria-haspopup="true"
+                    aria-expanded={isMenuOpen}
+                  >
+                    Chào {userName}
+                  </button>
+                  {isMenuOpen && (
+                    <>
+                      {/* Invisible spacer to keep hover/focus between button and dropdown */}
+                      <div
+                        className="absolute right-0 left-0 h-2"
+                        style={{ top: "100%" }}
+                      ></div>
+                      <div
+                        className="absolute right-0 mt-2 w-48 bg-white rounded-lg 
+                        shadow-lg py-2 z-50 animate-fadeIn border border-blue-100"
+                        tabIndex={-1}
+                      >
+                        <Link
+                          href="/profile"
+                          className="block px-4 py-2 text-gray-800 
+                          hover:bg-blue-100 transition-colors duration-150"
+                          tabIndex={0}
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          Hồ sơ cá nhân
+                        </Link>
+                        {userRole === "admin" && (
+                          <Link
+                            href="/admin/dashboard"
+                            className="block px-4 py-2 text-gray-800 
+                            hover:bg-blue-100 transition-colors duration-150"
+                            tabIndex={0}
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            Trang quản trị
+                          </Link>
+                        )}
+                        <button
+                          onClick={(e) => {
+                            handleLogout(e);
+                            setIsMenuOpen(false);
+                          }}
+                          className="w-full text-left px-4 py-2 cursor-pointer
+                          text-red-600 hover:bg-red-50 duration-150"
+                          tabIndex={0}
+                        >
+                          Đăng xuất
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </>
             ) : (
