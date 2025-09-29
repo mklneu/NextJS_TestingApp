@@ -50,8 +50,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         // Giả sử bạn có hàm getUserInfo trong AuthServices
         const account = await getAccount();
         setUserName(account?.user?.username || null);
-        setUserRole(account.user.role.permissions[0].name || null);
-        console.log(">>> account in AuthContext", account.user.role.permissions[0].name);
+        setUserRole(account.user.role?.name || null);
+        console.log(">>> account in AuthContext", account.user.role?.name);
         // setUserName(userInfo?.username || null);
       };
       fetchUserInfo();

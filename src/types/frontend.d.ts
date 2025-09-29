@@ -6,9 +6,11 @@ interface IButton {
 }
 
 interface User {
+  id: number;
   username: string;
+  fullName: string;
   email: string;
-  age: number;
+  dob: string;
   address: string;
   gender: string;
   role?: { id: number; name: string };

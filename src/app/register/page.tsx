@@ -26,12 +26,15 @@ export default function RegisterPage() {
   const [form, setForm] = useState({
     username: "",
     email: "",
+    fullName: "",
     password: "",
+    confirmPassword: "",
     gender: "",
     address: "",
-    age: "",
+    dob: "",
   });
   const [showPass, setShowPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -45,10 +48,12 @@ export default function RegisterPage() {
     if (
       !form.username ||
       !form.email ||
+      !form.fullName ||
       !form.password ||
+      !form.confirmPassword ||
       !form.gender ||
       !form.address ||
-      !form.age
+      !form.dob
     ) {
       toast.error("Vui lòng nhập đầy đủ thông tin!");
       return false;
@@ -57,8 +62,8 @@ export default function RegisterPage() {
       toast.error("Email không hợp lệ!");
       return false;
     }
-    if (isNaN(Number(form.age)) || Number(form.age) < 1) {
-      toast.error("Tuổi phải là số hợp lệ!");
+    if (form.password !== form.confirmPassword) {
+      toast.error("Mật khẩu nhập lại không khớp!");
       return false;
     }
     return true;
@@ -72,10 +77,11 @@ export default function RegisterPage() {
       await register(
         form.username,
         form.email,
+        form.fullName,
         form.password,
         form.gender,
         form.address,
-        Number(form.age)
+        form.dob
       );
       router.push("/login");
     } catch (error) {
@@ -99,7 +105,7 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="relative">
-              <FaUser className="absolute left-3 top-4 text-blue-400 text-lg" />
+              <FaUser className="absolute left-3 top-3.5 text-blue-400 text-lg" />
               <input
                 type="text"
                 name="username"
@@ -112,7 +118,19 @@ export default function RegisterPage() {
               />
             </div>
             <div className="relative">
-              <FaEnvelope className="absolute left-3 top-4 text-blue-400 text-lg" />
+              <FaUser className="absolute left-3 top-3.5 text-blue-400 text-lg" />
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Họ và tên"
+                value={form.fullName}
+                className="h-12 pl-10 pr-10 py-3 w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-gray-700 transition"
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </div>
+            <div className="relative">
+              <FaEnvelope className="absolute left-3 top-3.5 text-blue-400 text-lg" />
               <input
                 type="email"
                 name="email"
@@ -124,7 +142,22 @@ export default function RegisterPage() {
               />
             </div>
             <div className="relative">
-              <FaLock className="absolute left-3 top-4 text-blue-400 text-lg" />
+              <FaBirthdayCake className="absolute left-3 top-3.5 text-blue-400 text-lg" />
+              <input
+                type="date"
+                name="dob"
+                placeholder="Ngày sinh"
+                value={form.dob}
+                className="h-12 pl-10 pr-2 py-3 w-full 
+                rounded-lg border border-gray-300 
+                focus:border-blue-500 focus:ring-2 
+                focus:ring-blue-100 outline-none text-gray-700 transition"
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </div>
+            <div className="relative">
+              <FaLock className="absolute left-3 top-3.5 text-blue-400 text-lg" />
               <input
                 type={showPass ? "text" : "password"}
                 name="password"
@@ -145,8 +178,32 @@ export default function RegisterPage() {
                 {showPass ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
+
             <div className="relative">
-              <FaVenusMars className="absolute left-3 top-4 text-blue-400 text-lg" />
+              <FaLock className="absolute left-3 top-3.5 text-blue-400 text-lg" />
+              <input
+                type={showConfirmPass ? "text" : "password"}
+                name="confirmPassword"
+                placeholder="Nhập lại mật khẩu"
+                value={form.confirmPassword}
+                className="h-12 pl-10 pr-10 py-3 w-full rounded-lg border
+                 border-gray-300 focus:border-blue-500 focus:ring-2
+                  focus:ring-blue-100 outline-none text-gray-700 transition"
+                onChange={handleChange}
+                disabled={loading}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-4 cursor-pointer text-blue-400 hover:text-blue-600"
+                tabIndex={-1}
+                onClick={() => setShowConfirmPass((v) => !v)}
+              >
+                {showConfirmPass ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+
+            <div className="relative">
+              <FaVenusMars className="absolute left-3 top-3.5 text-blue-400 text-lg" />
               <select
                 name="gender"
                 value={form.gender}
@@ -164,7 +221,7 @@ export default function RegisterPage() {
               </select>
             </div>
             <div className="relative">
-              <FaMapMarkerAlt className="absolute left-3 top-4 text-blue-400 text-lg" />
+              <FaMapMarkerAlt className="absolute left-3 top-3.5 text-blue-400 text-lg" />
               <input
                 type="text"
                 name="address"
@@ -175,26 +232,13 @@ export default function RegisterPage() {
                 disabled={loading}
               />
             </div>
-            <div className="relative">
-              <FaBirthdayCake className="absolute left-3 top-4 text-blue-400 text-lg" />
-              <input
-                type="text"
-                name="age"
-                placeholder="Tuổi"
-                value={form.age}
-                min={1}
-                className="h-12 pl-10 pr-10 py-3 w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-gray-700 transition"
-                onChange={handleChange}
-                disabled={loading}
-              />
-            </div>
           </div>
           <button
             type="submit"
             className={`w-full py-3 rounded-lg font-bold text-white cursor-pointer
                  bg-blue-600 hover:bg-blue-700 transition duration-200 shadow-lg ${
-              loading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
+                   loading ? "opacity-70 cursor-not-allowed" : ""
+                 }`}
             disabled={loading}
           >
             {loading ? (

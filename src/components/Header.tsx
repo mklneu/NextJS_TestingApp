@@ -18,7 +18,14 @@ const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const { isLoggedIn, setIsLoggedIn, userName, setUserName } = useAuth();
+  const {
+    isLoggedIn,
+    setIsLoggedIn,
+    userName,
+    setUserName,
+    userRole,
+    setUserRole,
+  } = useAuth();
 
   useEffect(() => {
     // Kiểm tra trạng thái đăng nhập khi component mount
@@ -27,6 +34,13 @@ const Header = () => {
 
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
+    // Nếu context có setUserRole thì reset luôn
+    if (typeof setUserName === "function" && typeof userRole !== "undefined") {
+      // Nếu context có setUserRole thì setUserRole("")
+      try {
+        setUserRole("");
+      } catch {}
+    }
     logout(setIsLoggedIn, setUserName);
     router.push("/login");
   };
@@ -38,24 +52,29 @@ const Header = () => {
       label: "Trang chủ",
       icon: <FaHome className="mr-2" />,
     },
-    {
-      id: 2,
-      href: "/admin/dashboard",
-      label: "Dashboard",
-      icon: <FaChartBar className="mr-2" />,
-    },
-    {
-      id: 3,
-      href: "/admin/doctors",
-      label: "Bác sĩ",
-      icon: <FaUserMd className="mr-2" />,
-    },
-    {
-      id: 4,
-      href: "/admin/users",
-      label: "Bệnh nhân",
-      icon: <FaUsers className="mr-2" />,
-    },
+    // 3 mục admin chỉ hiển thị nếu là admin
+    ...(userRole === "admin"
+      ? [
+          {
+            id: 2,
+            href: "/admin/dashboard",
+            label: "Dashboard",
+            icon: <FaChartBar className="mr-2" />,
+          },
+          {
+            id: 3,
+            href: "/admin/doctors",
+            label: "Bác sĩ",
+            icon: <FaUserMd className="mr-2" />,
+          },
+          {
+            id: 4,
+            href: "/admin/users",
+            label: "Bệnh nhân",
+            icon: <FaUsers className="mr-2" />,
+          },
+        ]
+      : []),
     {
       id: 5,
       href: "/about",
@@ -111,9 +130,11 @@ const Header = () => {
                 >
                   Đăng xuất
                 </button>
-                <div className="ml-2 px-4 py-2 
+                <div
+                  className="ml-2 px-4 py-2 
                  text-white rounded-lg 
-                font-medium text-sm transition-colors duration-200">
+                font-medium text-sm transition-colors duration-200"
+                >
                   Chào {userName}
                 </div>
               </>

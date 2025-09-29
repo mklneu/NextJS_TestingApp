@@ -15,7 +15,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const { setIsLoggedIn, setUserName } = useAuth();
+  const { setIsLoggedIn, setUserName, setUserRole } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +25,7 @@ export default function LoginPage() {
     }
     setLoading(true);
     try {
-      await login(username, password, setIsLoggedIn, setUserName);
+      await login(username, password, setIsLoggedIn, setUserName, setUserRole);
       // toast.success("Đăng nhập thành công!");
       router.push("/");
     } catch (error) {
@@ -49,7 +49,7 @@ export default function LoginPage() {
         </p>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="relative">
-            <FaUser className="absolute left-3 top-4 text-blue-400 text-lg" />
+            <FaUser className="absolute left-3 top-3.5 text-blue-400 text-lg" />
             <input
               type="text"
               placeholder="Tên đăng nhập"
@@ -61,7 +61,7 @@ export default function LoginPage() {
             />
           </div>
           <div className="relative">
-            <FaLock className="absolute left-3 top-4 text-blue-400 text-lg" />
+            <FaLock className="absolute left-3 top-3.5 text-blue-400 text-lg" />
             <input
               type={showPass ? "text" : "password"}
               placeholder="Mật khẩu"

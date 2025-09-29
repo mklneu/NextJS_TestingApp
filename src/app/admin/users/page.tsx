@@ -1,25 +1,22 @@
 "use client";
 import { useState, useEffect } from "react";
-import { getAllUsers, deleteUserById } from "@/services/UserServices";
 import {
-  FaPlus,
-  FaEdit,
-  FaEye,
-  FaTrash,
-  FaSearch,
-  FaFilter,
-} from "react-icons/fa";
+  getAllUsers,
+  deleteUserById,
+  formatDateToDMY,
+} from "@/services/UserServices";
+import { FaPlus, FaEdit, FaTrash, FaSearch, FaFilter } from "react-icons/fa";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { toast } from "react-toastify";
 import AddNewUserModal from "@/components/Users/AddUser.Modal";
 import UpdateUserModal from "@/components/Users/UpdateUser.Modal";
-import ViewUserModal from "@/components/Users/ViewUser.Modal";
+// import ViewUserModal from "@/components/Users/ViewUser.Modal";
 import { AxiosError } from "axios";
 import { getAllHospitals } from "@/services/HospitalServices";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filterGender, setFilterGender] = useState<string>("ALL");
@@ -27,7 +24,7 @@ export default function UsersPage() {
   // Modal states
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
-  const [showViewModal, setShowViewModal] = useState<boolean>(false);
+  // const [showViewModal, setShowViewModal] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
@@ -245,28 +242,34 @@ export default function UsersPage() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       ID
                     </th>
-                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Tên
+                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Tên đăng nhập
                     </th>
-                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Họ tên
+                    </th>
+                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Email
                     </th>
-                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Tuổi
+                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Ngày sinh
                     </th>
-                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Giới tính
                     </th>
-                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Địa chỉ
+                    </th>
+                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Bệnh viện
                     </th>
-                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Vai trò
                     </th>
-                    <th className="w-1/8 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Thao tác
                     </th>
                   </tr>
@@ -305,13 +308,19 @@ export default function UsersPage() {
                         className="px-6 py-4 text-center
                       whitespace-nowrap text-sm text-gray-500"
                       >
+                        {user.fullName}
+                      </td>
+                      <td
+                        className="px-6 py-4 text-center
+                      whitespace-nowrap text-sm text-gray-500"
+                      >
                         {user.email}
                       </td>
                       <td
                         className="px-6 py-4 text-center
                       whitespace-nowrap text-sm text-gray-500"
                       >
-                        {user.age}
+                        {user.dob ? formatDateToDMY(user.dob) : "N/A"}
                       </td>
                       <td
                         className="px-6 py-4 text-center
@@ -332,6 +341,12 @@ export default function UsersPage() {
                             ? "Nữ"
                             : "Khác"}
                         </span>
+                      </td>
+                      <td
+                        className="px-6 py-4 text-center
+                      whitespace-nowrap text-sm text-gray-500"
+                      >
+                        {user.address}
                       </td>
                       <td
                         className="px-6 py-4 text-center
@@ -459,14 +474,14 @@ export default function UsersPage() {
       )}
 
       {/* View User Modal */}
-      {selectedUserId && (
+      {/* {selectedUserId && (
         <ViewUserModal
           show={showViewModal}
           setShow={setShowViewModal}
           userId={selectedUserId}
           setUserId={setSelectedUserId}
         />
-      )}
+      )} */}
     </div>
   );
 }

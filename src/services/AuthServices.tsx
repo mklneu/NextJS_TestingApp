@@ -7,7 +7,8 @@ export const login = async (
   username: string,
   password: string,
   setIsLoggedIn?: (value: boolean) => void,
-  setUserName?: (value: string | null) => void
+  setUserName?: (value: string | null) => void,
+  setUserRole?: (value: string | null) => void
 ) => {
   try {
     const response = await axiosInstance.post("/auth/login", {
@@ -30,16 +31,19 @@ export const login = async (
             Authorization: `Bearer ${response.data?.data?.access_token}`,
           },
         });
-        console.log(">>>>>> data account", accountResponse.data.data);
-        // if (accountResponse.data?.data?.user?.username) {
-        //   localStorage.setItem(
-        //     "userName",
-        //     accountResponse.data?.data?.user?.username
-        //   );
-        // }
+        const user = accountResponse.data?.data?.user;
         if (setUserName) {
-          setUserName(accountResponse.data?.data?.user?.username || null);
+          setUserName(user?.username || null);
         }
+        if (setUserRole) {
+          setUserRole(user?.role?.name?.toLowerCase() || null);
+        }
+
+        console.log(">>> account in login", user?.role?.name?.toLowerCase());
+        // // Lưu role vào localStorage để header lấy được ngay
+        // if (user?.role?.name) {
+        //   localStorage.setItem("role", user.role.name.toLowerCase());
+        // }
       } catch (error) {
         console.error("❌ Error in fetchAccount:", error);
         toast.error("❌ Error while fetching account!");
@@ -114,19 +118,21 @@ export const logout = async (
 export const register = async (
   username: string,
   email: string,
+  fullName: string,
   password: string,
   gender: string,
   address: string,
-  age: number
+  dob: string
 ) => {
   try {
     const response = await axiosInstance.post("/auth/register", {
       username,
       email,
+      fullName,
       password,
       gender,
       address,
-      age,
+      dob,
     });
     toast.success("Đăng ký thành công!");
     return response.data;

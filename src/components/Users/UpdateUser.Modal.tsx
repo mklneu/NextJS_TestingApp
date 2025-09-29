@@ -31,8 +31,9 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
   } = props;
 
   const [username, setUsername] = useState<string>("");
+  const [fullName, setFullName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  const [age, setAge] = useState<number>(0);
+  const [dob, setDob] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [gender, setGender] = useState<string>("");
   const [role, setRole] = useState<number | string>("");
@@ -44,8 +45,9 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
         try {
           const user = await getUserById(userId);
           setUsername(user.username);
+          setFullName(user.fullName || "");
           setEmail(user.email);
-          setAge(user.age);
+          setDob(user.dob || "");
           setAddress(user.address);
           setGender(user.gender);
           setRole(user.role?.id || "");
@@ -60,7 +62,7 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
   }, [userId]);
 
   const handleUpdate = async () => {
-    if (!username || !email || !role || !company) {
+    if (!username || !fullName || !email || !dob || !role || !company) {
       toast.error("Please fill in all fields!");
       return;
     }
@@ -68,10 +70,11 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
       await updateUser(
         userId,
         username,
+        fullName,
         gender,
         address,
-        age,
-        { id: Number(company) }, // Sửa ở đây: truyền object { id }
+        dob,
+        { id: Number(company) },
         { id: Number(role) }
       );
       onUpdate();
@@ -93,8 +96,10 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
           onSubmit={(e) => e.preventDefault()}
           className="flex justify-center items-center bg-[rgba(0,0,0,0.4)] fixed w-full min-h-screen top-0 right-0 p-4 z-50"
         >
-          <div className="mx-auto bg-white text-black 
-          rounded-lg shadow-2xl border border-gray-400 w-[65%]">
+          <div
+            className="mx-auto bg-white text-black 
+          rounded-lg shadow-2xl border border-gray-400 w-[65%]"
+          >
             <h1 className="px-5 py-4 text-2xl">
               Cập nhật người dùng{" "}
               <span className="text-gray-600 font-bold text-sm">
@@ -109,7 +114,15 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
                   label="Tên tài khoản"
                   value={username}
                   placeholder="Tên tài khoản"
+                  disabled={true}
                   onChange={(e) => setUsername(e.target.value)}
+                />
+                <InputBar
+                  label="Họ và tên"
+                  value={fullName}
+                  placeholder="Họ và tên"
+                  disabled={true}
+                  onChange={(e) => setFullName(e.target.value)}
                 />
                 <InputBar
                   label="Email"
@@ -118,19 +131,24 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
                   disabled={true}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                <InputBar
-                  label="Tuổi"
-                  value={age}
-                  placeholder="Tuổi"
-                  onChange={(e) => setAge(Number(e.target.value))}
-                />
+                
               </div>
               {/* Cột 2 */}
               <div className="flex flex-col gap-4 min-w-0">
                 <InputBar
+                  label="Ngày sinh"
+                  type="date"
+                  value={dob}
+                  placeholder="Ngày sinh"
+                  disabled={true}
+                  onChange={(e) => setDob(e.target.value)}
+                  className="!pr-5"
+                />
+                <InputBar
                   label="Địa chỉ"
                   value={address}
                   placeholder="Địa chỉ"
+                  disabled={true}
                   onChange={(e) => setAddress(e.target.value)}
                 />
                 <InputBar
@@ -138,6 +156,7 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
                   type="select"
                   value={gender}
                   placeholder="Chọn giới tính"
+                  disabled={true}
                   onChange={(e) => setGender(e.target.value)}
                   options={[
                     { label: "Nam", value: "MALE" },

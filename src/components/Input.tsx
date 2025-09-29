@@ -4,7 +4,7 @@ interface IOption {
 }
 
 interface IInputProps {
-  type?: "text" | "email" | "password" | "textarea" | "select";
+  type?: "text" | "email" | "password" | "textarea" | "select" | "date";
   placeholder?: string;
   value: string | number;
   disabled?: boolean;
@@ -31,7 +31,6 @@ const InputBar = ({
   options = [],
   onClick,
   label,
-
 }: IInputProps) => {
   const baseClasses =
     "w-full h-full bg-transparent rounded-xl pl-5 pr-14 placeholder:text-gray-700 border border-cyan-950 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md placeholder-opacity-70 focus:placeholder-opacity-40";
@@ -106,6 +105,29 @@ const InputBar = ({
             />
           </svg>
         </div>
+      </div>
+    );
+  }
+
+  // Xử lý riêng cho type="date"
+  if (type === "date") {
+    return (
+      <div className="flex w-11/12 h-12 mb-4 mx-auto relative">
+        {label && (
+          <label className="text-sm font-medium text-gray-700 px-1 absolute -top-3 left-3 bg-white">
+            {label}
+          </label>
+        )}
+        <input
+          type="date"
+          placeholder={placeholder}
+          required
+          value={value}
+          disabled={disabled}
+          onChange={onChange}
+          onClick={onClick}
+          className={`${baseClasses} ${className}`}
+        />
       </div>
     );
   }

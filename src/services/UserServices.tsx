@@ -3,6 +3,12 @@ import axiosInstance from "./axiosInstance";
 import Button from "@/components/Button";
 import { AxiosError } from "axios";
 
+const formatDateToDMY = (dateStr: string) => {
+  if (!dateStr) return "";
+  const [yyyy, mm, dd] = dateStr.split("-");
+  return `${dd}/${mm}/${yyyy}`;
+};
+
 const getAllUsers = async () => {
   try {
     const response = await axiosInstance.get("/users");
@@ -28,6 +34,7 @@ const getUserById = async (userId: number) => {
 
 const postUser = async (
   username: string,
+  fullName: string,
   email: string,
   password: string,
   gender: string,
@@ -38,6 +45,7 @@ const postUser = async (
     // Uncomment dòng dưới khi có backend
     const response = await axiosInstance.post("/users", {
       username,
+      fullName,
       email,
       password,
       gender,
@@ -58,9 +66,10 @@ const postUser = async (
 const updateUser = async (
   userId: number,
   username: string,
+  fullName: string,
   gender: string,
   address: string,
-  age: number,
+  dob: string,
   company: { id: number },
   role: { id: number }
 ) => {
@@ -69,7 +78,8 @@ const updateUser = async (
       username,
       gender,
       address,
-      age,
+      fullName,
+      dob,
       company,
       role,
     });
@@ -91,7 +101,7 @@ const deleteUserById = async (userId: number, onDelete: () => void) => {
         <div className="flex flex-col p-2 w-full">
           <div className="flex items-center mb-3">
             <span className="font-medium text-gray-800">
-              Are you sure to delete this user?
+              Bạn muốn xóa người dùng này?
             </span>
           </div>
           <div className="flex justify-end space-x-2">
@@ -111,13 +121,13 @@ const deleteUserById = async (userId: number, onDelete: () => void) => {
               }}
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
             >
-              Delete
+              Xóa
             </Button>
             <Button
               onClick={closeToast}
               className="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors font-medium"
             >
-              Cancel
+              Hủy
             </Button>
           </div>
         </div>
@@ -136,4 +146,11 @@ const deleteUserById = async (userId: number, onDelete: () => void) => {
 
   confirmDelete();
 };
-export { getAllUsers, getUserById, postUser, updateUser, deleteUserById };
+export {
+  getAllUsers,
+  getUserById,
+  postUser,
+  updateUser,
+  deleteUserById,
+  formatDateToDMY,
+};
