@@ -13,6 +13,8 @@ type AuthContextType = {
   setUserRole: React.Dispatch<React.SetStateAction<string | null>>;
   userId: number | null;
   setUserId: React.Dispatch<React.SetStateAction<number | null>>;
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 };
 
 // Tạo context với giá trị mặc định
@@ -37,31 +39,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [userName, setUserName] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-  // Kiểm tra trạng thái đăng nhập khi component mount
+  // Luôn fetch lại user info mỗi khi isLoggedIn chuyển thành true
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
 
-    // Lấy userName từ localStorage nếu đã đăng nhập
-    // if (isAuthenticated()) {
-    //   setUserName(localStorage.getItem("userName"));
-    // }
-
     if (isAuthenticated()) {
-      // Lấy thông tin user thông qua API
       const fetchUserInfo = async () => {
-        // Giả sử bạn có hàm getUserInfo trong AuthServices
         const account = await getAccount();
+        setUser(account?.user || null);
         setUserName(account?.user?.username || null);
         setUserRole(account.user.role?.name || null);
         setUserId(account?.user?.id || null);
-        console.log(">>> user id", account?.user?.id);
-        console.log(">>> account in AuthContext", account.user.role?.name);
-        // setUserName(userInfo?.username || null);
       };
       fetchUserInfo();
+    } else {
+      setUser(null);
+      setUserName(null);
+      setUserRole(null);
+      setUserId(null);
     }
-  }, []);
+  }, [isLoggedIn]);
 
   return (
     <AuthContext.Provider
@@ -74,6 +73,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUserRole,
         userId,
         setUserId,
+        user,
+        setUser,
       }}
     >
       {children}

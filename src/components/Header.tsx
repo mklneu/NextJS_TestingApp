@@ -25,6 +25,8 @@ const Header = () => {
     setUserName,
     userRole,
     setUserRole,
+    setUserId,
+    setUser,
   } = useAuth();
 
   useEffect(() => {
@@ -45,7 +47,7 @@ const Header = () => {
         setUserRole("");
       } catch {}
     }
-    logout(setIsLoggedIn, setUserName);
+    logout(setIsLoggedIn, setUserName, setUserRole, setUserId, setUser);
     router.push("/login");
   };
 

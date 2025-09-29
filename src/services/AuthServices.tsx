@@ -8,7 +8,8 @@ export const login = async (
   password: string,
   setIsLoggedIn?: (value: boolean) => void,
   setUserName?: (value: string | null) => void,
-  setUserRole?: (value: string | null) => void
+  setUserRole?: (value: string | null) => void,
+  setUser?: (value: User | null) => void
 ) => {
   try {
     const response = await axiosInstance.post("/auth/login", {
@@ -37,6 +38,9 @@ export const login = async (
         }
         if (setUserRole) {
           setUserRole(user?.role?.name?.toLowerCase() || null);
+        }
+        if (setUser) {
+          setUser(user || null);
         }
 
         console.log(">>> account in login", user?.role?.name?.toLowerCase());
@@ -85,7 +89,10 @@ export const login = async (
 
 export const logout = async (
   setIsLoggedIn?: (value: boolean) => void,
-  setUserName?: (value: string | null) => void
+  setUserName?: (value: string | null) => void,
+  setUserRole?: (value: string | null) => void,
+  setUserId?: (value: number | null) => void,
+  setUser?: (value: User | null) => void
 ) => {
   try {
     const res = await axiosInstance.post(
@@ -113,6 +120,9 @@ export const logout = async (
   // Cập nhật state toàn cục nếu được cung cấp
   if (setIsLoggedIn) setIsLoggedIn(false);
   if (setUserName) setUserName(null);
+  if (setUserRole) setUserRole(null);
+  if (setUserId) setUserId(null);
+  if (setUser) setUser(null);
 };
 
 export const register = async (

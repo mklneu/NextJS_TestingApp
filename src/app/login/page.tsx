@@ -15,7 +15,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const { setIsLoggedIn, setUserName, setUserRole } = useAuth();
+  const { setIsLoggedIn, setUserName, setUserRole, setUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +25,7 @@ export default function LoginPage() {
     }
     setLoading(true);
     try {
-      await login(username, password, setIsLoggedIn, setUserName, setUserRole);
+      await login(username, password, setIsLoggedIn, setUserName, setUserRole, setUser);
       // toast.success("Đăng nhập thành công!");
       router.push("/");
     } catch (error) {
