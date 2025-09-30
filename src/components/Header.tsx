@@ -3,13 +3,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { logout, isAuthenticated } from "@/services/AuthServices";
-import {
-  FaHome,
-  FaChartBar,
-  FaUserMd,
-  FaUsers,
-  FaInfoCircle,
-} from "react-icons/fa";
+import { FaHome, FaInfoCircle } from "react-icons/fa";
 import { MdHealthAndSafety } from "react-icons/md";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -58,29 +52,6 @@ const Header = () => {
       label: "Trang chủ",
       icon: <FaHome className="mr-2" />,
     },
-    // 3 mục admin chỉ hiển thị nếu là admin
-    ...(userRole === "admin"
-      ? [
-          {
-            id: 2,
-            href: "/admin/dashboard",
-            label: "Dashboard",
-            icon: <FaChartBar className="mr-2" />,
-          },
-          {
-            id: 3,
-            href: "/admin/doctors",
-            label: "Bác sĩ",
-            icon: <FaUserMd className="mr-2" />,
-          },
-          {
-            id: 4,
-            href: "/admin/users",
-            label: "Bệnh nhân",
-            icon: <FaUsers className="mr-2" />,
-          },
-        ]
-      : []),
     {
       id: 5,
       href: "/about",

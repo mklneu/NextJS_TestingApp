@@ -18,6 +18,28 @@ interface User {
   // [key: string]: any; // For any other properties
 }
 
+interface Doctor {
+  id: number;
+  fullName: string;
+  email: string;
+  username: string;
+  gender: string;
+  specialty: string;
+  phoneNumber: string;
+  age: number;
+  experienceYears: number;
+  address: string;
+  price: number;
+  status: "ACTIVE" | "INACTIVE";
+  company: { id: number } | null;
+  //   certifications?: string[];
+  //   education?: string;
+  //   scheduleDays?: string[];
+  //   scheduleHours?: string;
+  //   about?: string;
+  //   rating?: number;
+}
+
 interface Hospital {
   id: number;
   name: string;

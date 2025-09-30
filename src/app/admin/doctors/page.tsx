@@ -12,13 +12,8 @@ import { toast } from "react-toastify";
 import AddDoctorModal from "@/components/Doctors/AddDoctor.Modal";
 import UpdateDoctorModal from "@/components/Doctors/UpdateDoctor.Modal";
 import ViewDoctorModal from "@/components/Doctors/ViewDoctor.Modal";
-import {
-  translateSpecialty,
-} from "@/utils/translateEnums";
-import {
-  Doctor,
-  getAllDoctors,
-} from "@/services/DoctorServices";
+import { translateSpecialty } from "@/utils/translateEnums";
+import { getAllDoctors } from "@/services/DoctorServices";
 import { AxiosError } from "axios";
 
 export default function DoctorsPage() {

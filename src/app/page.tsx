@@ -12,7 +12,6 @@ import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { getAllUsers } from "@/services/UserServices";
-import { canAccessApi } from "@/constants/apiRoles";
 
 interface StatCardProps {
   title: string;
@@ -141,13 +140,13 @@ export default function Home() {
   ];
 
   // Demo phân quyền API
-  const [canAccess, setCanAccess] = useState(false);
+  // const [canAccess, setCanAccess] = useState(false);
   // Giả lập role, thực tế lấy từ user context hoặc localStorage
-  const userRole: "ADMIN" | "DOCTOR" | "USER" = "DOCTOR";
+  // const userRole: "ADMIN" | "DOCTOR" | "USER" = "DOCTOR";
 
-  useEffect(() => {
-    setCanAccess(canAccessApi("/api/users/123", userRole));
-  }, [userRole]);
+  // useEffect(() => {
+  //   setCanAccess(canAccessApi("/api/users/123", userRole));
+  // }, [userRole]);
 
   if (isLoading && isLoggedIn) {
     return (
@@ -160,7 +159,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Demo phân quyền API */}
-      <div className="container mx-auto px-4 pt-6">
+      {/* <div className="container mx-auto px-4 pt-6">
         <div className="mb-6">
           {canAccess ? (
             <div className="text-green-600 font-semibold">
@@ -174,7 +173,7 @@ export default function Home() {
             </div>
           )}
         </div>
-      </div>
+      </div> */}
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
         <div className="container mx-auto px-4">

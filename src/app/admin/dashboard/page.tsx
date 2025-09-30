@@ -201,9 +201,9 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-10">
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-700 to-blue-900 text-white p-6 shadow-lg">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-6 text-white shadow-lg">
         <div className="container mx-auto">
           <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
           <p className="text-blue-100">
@@ -241,7 +241,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto py-6">
         {/* Thống kê tổng quan */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-md p-6 border-t-4 border-blue-500 hover:shadow-lg transition-all duration-300">

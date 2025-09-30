@@ -2,25 +2,6 @@ import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
 import { AxiosError } from "axios";
 
-export interface Doctor {
-  id: number;
-  fullName: string;
-  email: string;
-  username: string;
-  gender: string;
-  specialty: string;
-  experienceYears: number;
-  address: string;
-  price: number;
-  status: "ACTIVE" | "INACTIVE";
-  company: { id: number }[];
-  //   certifications?: string[];
-  //   education?: string;
-  //   scheduleDays?: string[];
-  //   scheduleHours?: string;
-  //   about?: string;
-  //   rating?: number;
-}
 
 // Lấy tất cả bác sĩ
 const getAllDoctors = async () => {
