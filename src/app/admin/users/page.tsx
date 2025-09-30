@@ -15,8 +15,8 @@ import { AxiosError } from "axios";
 import { getAllHospitals } from "@/services/HospitalServices";
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<resUser[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<resUser[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filterGender, setFilterGender] = useState<string>("ALL");
@@ -33,7 +33,7 @@ export default function UsersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 6;
 
-  const genders = ["MALE", "FEMALE", "OTHER"];
+  const genders = ["Nam", "Nữ", "Khác"];
 
   // Fetch all users
   const fetchUsers = async () => {
@@ -185,7 +185,7 @@ export default function UsersPage() {
                 <div className="flex items-center">
                   <FaFilter className="text-gray-400 mr-2" />
                   <select
-                    className="bg-gray-50 border outline-none
+                    className="bg-gray-50 border outline-none w-25
                     border-gray-300 text-gray-900 text-sm 
                     rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
                     value={filterGender}

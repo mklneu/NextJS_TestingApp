@@ -12,7 +12,7 @@ import { Pie, Bar, Line } from "react-chartjs-2";
 Chart.register(...registerables);
 
 const Dashboard = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<resUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState("week");
 

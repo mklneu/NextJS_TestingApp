@@ -9,7 +9,7 @@ export const login = async (
   setIsLoggedIn?: (value: boolean) => void,
   setUserName?: (value: string | null) => void,
   setUserRole?: (value: string | null) => void,
-  setUser?: (value: User | null) => void
+  setUser?: (value: resUser | null) => void
 ) => {
   try {
     const response = await axiosInstance.post("/auth/login", {
@@ -92,7 +92,7 @@ export const logout = async (
   setUserName?: (value: string | null) => void,
   setUserRole?: (value: string | null) => void,
   setUserId?: (value: number | null) => void,
-  setUser?: (value: User | null) => void
+  setUser?: (value: resUser | null) => void
 ) => {
   try {
     const res = await axiosInstance.post(

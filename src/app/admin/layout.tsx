@@ -18,31 +18,15 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body
+    <AuthProvider>
+      <div
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <AuthProvider>
-          <div className="flex flex-1 min-h-screen bg-gray-50">
-            <AdminSidebar />
-            <main className="flex-1 bg-[#2b2b2b]">{children}</main>
-          </div>
-          {/* <Footer />
-          <ToastContainer
-            position="top-right"
-            autoClose={2000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick={false}
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-            transition={Slide}
-          /> */}
-        </AuthProvider>
-      </body>
-    </html>
+        <div className="flex flex-1 min-h-screen bg-gray-50">
+          <AdminSidebar />
+          <main className="flex-1 bg-[#2b2b2b]">{children}</main>
+        </div>
+      </div>
+    </AuthProvider>
   );
 }

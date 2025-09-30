@@ -16,18 +16,19 @@ const AddNewUserModal = (props: IAddNewModalProps) => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  const [age, setAge] = useState<number>(0);
+  const [dob, setDob] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [gender, setGender] = useState<string>("");
+  const [fullName, setFullName] = useState<string>("");
 
   const handleSubmit = async () => {
-    if (!username || !password || !email || !age || !address) {
+    if (!username || !password || !email || !dob || !address) {
       toast.error("Please fill in all fields!");
       return;
     }
 
     try {
-      await postUser(username, email, password, gender, address, age);
+      await postUser(username, fullName, email, password, gender, address, dob);
 
       // Refresh the blogs list
       onSubmit(); // Call the onSubmit callback if provided
@@ -35,7 +36,7 @@ const AddNewUserModal = (props: IAddNewModalProps) => {
       setUsername("");
       setPassword("");
       setEmail("");
-      setAge(0);
+      setDob("");
       setAddress("");
       setGender("");
 
@@ -50,7 +51,7 @@ const AddNewUserModal = (props: IAddNewModalProps) => {
     setUsername("");
     setPassword("");
     setEmail("");
-    setAge(0);
+    setDob("");
     setAddress("");
     setGender("");
     setShow(false); // Close modal
@@ -69,43 +70,57 @@ const AddNewUserModal = (props: IAddNewModalProps) => {
           rounded-lg shadow-2xl border border-gray-400
           w-196"
           >
-            <h1 className="px-5 py-4 text-2xl">Add New User</h1>
+            <h1 className="px-5 py-4 text-2xl">Thêm mới bệnh nhân</h1>
             <hr className="mb-6 text-gray-200" />
             <InputBar
-              placeholder="Username"
+              label="Họ và tên"
+              placeholder="Nhập họ và tên"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            ></InputBar>
+            <InputBar
+              label="Tên tài khoản"
+              placeholder="Nhập tên tài khoản"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             ></InputBar>
             <InputBar
-              placeholder="Password"
+              label="Mật khẩu"
+              placeholder="Nhập mật khẩu"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             ></InputBar>
             <InputBar
-              placeholder="Email"
+              label="Email"
+              placeholder="Nhập email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             ></InputBar>
             <InputBar
-              placeholder="Age"
-              value={age}
-              onChange={(e) => setAge(Number(e.target.value))}
+              label="Ngày sinh"
+              placeholder="Nhập ngày sinh"
+              value={dob}
+              type="date"
+              onChange={(e) => setDob(e.target.value)}
+              className="!pr-5"
             ></InputBar>
             <InputBar
-              placeholder="Address"
+              label="Địa chỉ"
+              placeholder="Nhập địa chỉ"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             ></InputBar>
             <InputBar
+              label="Giới tính"
               type="select"
               value={gender}
-              placeholder="Select gender"
+              placeholder="Chọn giới tính"
               onChange={(e) => setGender(e.target.value)}
               options={[
-                { label: "Male", value: "MALE" },
-                { label: "Female", value: "FEMALE" },
-                { label: "Other", value: "OTHER" },
+                { label: "Nam", value: "MALE" },
+                { label: "Nữ", value: "FEMALE" },
+                { label: "Khác", value: "OTHER" },
               ]}
             ></InputBar>
             <div className="flex justify-end mx-auto gap-2 mt-6 mb-8 w-11/12">
@@ -116,10 +131,10 @@ const AddNewUserModal = (props: IAddNewModalProps) => {
                   handleClose();
                 }}
               >
-                Close
+                Đóng
               </Button>
               <Button size="md" onClick={() => handleSubmit()}>
-                Add
+                Thêm
               </Button>
             </div>
           </div>

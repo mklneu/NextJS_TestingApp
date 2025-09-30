@@ -5,8 +5,8 @@ import { AxiosError } from "axios";
 interface UpdateInfoModalProps {
   show: boolean;
   setShow: (value: boolean) => void;
-  user: User;
-  onUpdate: (data: Partial<User>) => Promise<void>;
+  user: resUser;
+  onUpdate: (data: Partial<reqUser>) => Promise<void>;
 }
 
 const UpdateInfoModal = ({
@@ -18,9 +18,11 @@ const UpdateInfoModal = ({
   const [form, setForm] = useState({
     fullName: user.fullName || "",
     dob: user.dob ? user.dob.slice(0, 10) : "",
-    email: user.email || "",
     gender: user.gender || "",
     address: user.address || "",
+    username: user.username || "",
+    company: user.company ? { id: user.company.id } : { id: 0 },
+    role: user.role ? { id: user.role.id } : { id: 0 },
   });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -45,21 +47,14 @@ const UpdateInfoModal = ({
       <div className="bg-white rounded-2xl shadow-2xl p-0 w-full max-w-xl relative animate-fadeIn overflow-hidden">
         <div className="bg-gradient-to-r from-blue-500 to-blue-700 px-8 py-5 flex items-center justify-between">
           <h3 className="text-xl font-bold text-white">Chỉnh sửa hồ sơ</h3>
-          <button
-            className="text-white text-2xl font-bold focus:outline-none hover:text-blue-200"
-            onClick={() => setShow(false)}
-            aria-label="Đóng"
-          >
-            ×
-          </button>
         </div>
-        <form className="p-8 pt-6 space-y-6" onSubmit={handleSubmit}>
+        <form className="p-8 pt-6" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative">
               <input
                 type="text"
                 id="fullName"
-                className="peer w-full border border-blue-200 text-gray-700
+                className="peer w-full border border-blue-200 text-gray-700 h-12
                 rounded-lg px-3 py-3 focus:outline-none
                  bg-white placeholder-transparent"
                 value={form.fullName}
@@ -82,7 +77,7 @@ const UpdateInfoModal = ({
               <input
                 type="date"
                 id="dob"
-                className="peer w-full border border-blue-200 text-gray-700
+                className="peer w-full border border-blue-200 text-gray-700 h-12
                 rounded-lg px-3 py-3 focus:outline-none 
                  bg-white placeholder-transparent"
                 value={form.dob}
@@ -103,17 +98,17 @@ const UpdateInfoModal = ({
               <input
                 type="email"
                 id="email"
-                className="peer w-full border border-blue-200 text-gray-700
+                className="peer w-full border border-blue-200 text-gray-700 h-12
                 rounded-lg px-3 py-3 focus:outline-none cursor-not-allowed
                  bg-white placeholder-transparent"
-                value={form.email}
+                value={user.email}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, email: e.target.value }))
                 }
                 required
                 placeholder="Email"
                 autoComplete="off"
-                disabled={true}
+                disabled
               />
               <label
                 htmlFor="email"
@@ -125,7 +120,7 @@ const UpdateInfoModal = ({
             <div className="relative">
               <select
                 id="gender"
-                className="peer w-full border border-blue-200 text-gray-700
+                className="peer w-full border border-blue-200 text-gray-700 h-12
                 rounded-lg px-3 py-3 focus:outline-none 
              bg-white placeholder-transparent"
                 value={form.gender}
@@ -150,7 +145,7 @@ const UpdateInfoModal = ({
               <input
                 type="text"
                 id="address"
-                className="peer w-full border border-blue-200 text-gray-700
+                className="peer w-full border border-blue-200 text-gray-700 h-12
                 rounded-lg px-3 py-3 focus:outline-none 
                  bg-white placeholder-transparent"
                 value={form.address}
@@ -176,13 +171,12 @@ const UpdateInfoModal = ({
             >
               Hủy
             </Button>
-            <button
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium shadow hover:bg-blue-700 duration-200 text-sm disabled:opacity-60"
-              type="submit"
-              disabled={saving}
+            <Button
+              size="md"
+              className={saving ? "opacity-60 pointer-events-none" : ""}
             >
               {saving ? "Đang lưu..." : "Lưu thay đổi"}
-            </button>
+            </Button>
           </div>
           {message && (
             <div className="mt-4 text-center text-sm text-red-500">

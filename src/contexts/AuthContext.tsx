@@ -13,8 +13,8 @@ type AuthContextType = {
   setUserRole: React.Dispatch<React.SetStateAction<string | null>>;
   userId: number | null;
   setUserId: React.Dispatch<React.SetStateAction<number | null>>;
-  user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  user: resUser | null;
+  setUser: React.Dispatch<React.SetStateAction<resUser | null>>;
 };
 
 // Tạo context với giá trị mặc định
@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [userName, setUserName] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<resUser | null>(null);
 
   // Luôn fetch lại user info mỗi khi isLoggedIn chuyển thành true
   useEffect(() => {

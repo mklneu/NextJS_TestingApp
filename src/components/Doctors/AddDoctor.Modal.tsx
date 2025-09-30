@@ -83,11 +83,9 @@ const AddDoctorModal = (props: IAddModalProps) => {
           <div
             className="mx-auto bg-white text-black 
             rounded-lg shadow-2xl border border-gray-400
-            w-196 max-w-2xl"
+            w-196"
           >
-            <h1 className="px-5 py-4 text-2xl font-semibold">
-              Thêm bác sĩ mới
-            </h1>
+            <h1 className="px-5 py-4 text-2xl">Thêm bác sĩ mới</h1>
             <hr className="mb-6 text-gray-200" />
 
             <InputBar

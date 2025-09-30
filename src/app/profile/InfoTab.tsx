@@ -16,7 +16,7 @@ const InfoTab = () => {
   const [loading, setLoading] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
   // Update user info handler
-  const handleUpdateInfo = async (data: Partial<User>) => {
+  const handleUpdateInfo = async (data: Partial<reqUser>) => {
     if (!user) return;
     // Compose all required arguments for updateUser
     const updated = await updateUser(
@@ -107,7 +107,7 @@ const InfoTab = () => {
               <div className="bg-white rounded-lg p-4 shadow flex items-center gap-3">
                 <FaUserTag className="w-6 h-6 text-blue-400" />
                 <div>
-                  <div className="text-gray-500 text-xs">Tên đăng nhập</div>
+                  <div className="text-gray-500 text-xs">Tên tài khoản</div>
                   <div className="font-semibold text-lg text-gray-600">
                     {user.username}
                   </div>

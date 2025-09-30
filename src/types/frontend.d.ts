@@ -5,7 +5,7 @@ interface IButton {
   className?: string;
 }
 
-interface User {
+interface resUser {
   id: number;
   username: string;
   fullName: string;
@@ -15,6 +15,19 @@ interface User {
   gender: string;
   role?: { id: number; name: string };
   company?: { id: number; name: string };
+  // [key: string]: any; // For any other properties
+}
+
+interface reqUser {
+  id: number;
+  username: string;
+  fullName: string;
+  email: string;
+  dob: string;
+  address: string;
+  gender: string;
+  role?: { id: number };
+  company?: { id: number };
   // [key: string]: any; // For any other properties
 }
 

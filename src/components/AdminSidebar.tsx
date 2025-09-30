@@ -41,12 +41,12 @@ const AdminSidebar = () => {
       <aside
         className={`sticky top-15 h-fit text-white 
         flex flex-col gap-2 duration-300 z-30 ${
-          open ? "w-64 px-6 py-6" : "w-16 px-2 py-6 items-center"
+          open ? "w-64 px-6 py-8" : "w-16 px-2 py-8"
         }`}
         style={{ minWidth: open ? 256 : 64 }}
       >
         <button
-          className="absolute top-4 right-4 bg-blue-800 
+          className="absolute top-4 right-4 bg-blue-800 cursor-pointer
         hover:bg-blue-900 rounded-full p-2 transition-colors z-40"
           onClick={() => setOpen((prev) => !prev)}
           aria-label={open ? "Thu gọn sidebar" : "Mở rộng sidebar"}
@@ -67,7 +67,7 @@ const AdminSidebar = () => {
               key={link.href}
               href={link.href}
               className={`flex items-center rounded-lg duration-300
-                font-medium text-lg hover:bg-blue-800 ${
+                font-medium text-md hover:bg-blue-800 h-12 ${
                   open ? "justify-start px-4 py-3" : "justify-center p-3"
                 }`}
               title={link.label}
@@ -80,7 +80,9 @@ const AdminSidebar = () => {
             >
               {link.icon}
               <span
-                className={`ml-2 duration-200 ${open ? "inline" : "hidden"}`}
+                className={`ml-2 duration-200 ${
+                  open ? "inline" : "hidden h-[208px]"
+                }`}
               >
                 {link.label}
               </span>

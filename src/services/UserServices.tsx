@@ -39,7 +39,7 @@ const postUser = async (
   password: string,
   gender: string,
   address: string,
-  age: number
+  dob: string
 ) => {
   try {
     // Uncomment dòng dưới khi có backend
@@ -50,7 +50,7 @@ const postUser = async (
       password,
       gender,
       address,
-      age,
+      dob,
     });
     toast.success(response.data.message);
     console.log(">>>>>> data user", response.data);

@@ -63,10 +63,9 @@ const FeatureCard = ({
 };
 
 export default function Home() {
-  const [userData, setUserData] = useState<User[]>([]);
+  const [userData, setUserData] = useState<resUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { isLoggedIn } = useAuth();
-
+  const { isLoggedIn, user } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -186,20 +185,24 @@ export default function Home() {
                 Giải pháp toàn diện giúp tối ưu hóa quy trình khám chữa bệnh,
                 quản lý hồ sơ y tế và nâng cao chất lượng chăm sóc sức khỏe.
               </p>
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  href="/admin/users"
-                  className="px-6 py-3 bg-white text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-all"
-                >
-                  Xem người dùng
-                </Link>
-                <Link
-                  href="/admin/dashboard"
-                  className="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg border border-blue-400 hover:bg-blue-600 transition-all"
-                >
-                  Dashboard
-                </Link>
-              </div>
+              {user?.role?.name === "admin" ? (
+                <div className="flex flex-wrap gap-4">
+                  <Link
+                    href="/admin/users"
+                    className="px-6 py-3 bg-white text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-all"
+                  >
+                    Xem người dùng
+                  </Link>
+                  <Link
+                    href="/admin/dashboard"
+                    className="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg border border-blue-400 hover:bg-blue-600 transition-all"
+                  >
+                    Dashboard
+                  </Link>
+                </div>
+              ) : (
+                null
+              )}
             </div>
 
             {/* Homepage picture */}
