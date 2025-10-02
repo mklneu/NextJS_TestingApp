@@ -1,54 +1,58 @@
 import { FaUser, FaCalendarAlt, FaFileMedicalAlt } from "react-icons/fa";
+import Link from "next/link";
 
 interface SidebarProps {
   activeTab: "info" | "appointments" | "medical";
-  setActiveTab: (tab: "info" | "appointments" | "medical") => void;
 }
 
-const Sidebar = ({ activeTab, setActiveTab }: SidebarProps) => {
+const InfoSidebar = ({ activeTab }: SidebarProps) => {
   return (
-    <aside className="w-full md:w-64 bg-white rounded-2xl shadow-xl border border-blue-200 p-6 flex flex-row md:flex-col gap-4 md:gap-0 mb-6 md:mb-0">
-      <button
+    <aside
+      className="w-full md:w-64 bg-white 
+    rounded-2xl shadow-xl border border-blue-200 
+    p-6 flex flex-row md:flex-col gap-4 md:gap-0 mb-6 md:mb-0 md:sticky md:top-20"
+    >
+      <Link
+        href="/profile/info"
         className={`flex items-center gap-3 px-4 py-3 
             rounded-lg font-semibold w-full cursor-pointer 
-            mb-2 md:mb-4 focus:outline-none border transition-colors ${
+            mb-2 md:mb-4 focus:outline-none duration-300 ${
               activeTab === "info"
-                ? "text-blue-500 bg-blue-100 hover:bg-blue-200 border-blue-200"
+                ? "text-blue-500 bg-blue-100 hover:bg-blue-200 "
                 : "text-gray-500 hover:bg-blue-50 border-transparent"
             }`}
-        onClick={() => setActiveTab("info")}
       >
         <FaUser className="w-5 h-5" />
         Thông tin cá nhân
-      </button>
-      <button
+      </Link>
+      <Link
+        href="/profile/appointments"
         className={`flex items-center gap-3 px-4 py-3 
             rounded-lg font-semibold w-full cursor-pointer 
-            mb-2 md:mb-4 focus:outline-none border transition-colors ${
+            mb-2 md:mb-4 focus:outline-none duration-300 ${
               activeTab === "appointments"
-                ? "text-blue-500 bg-blue-100 hover:bg-blue-200 border-blue-200"
+                ? "text-blue-500 bg-blue-100 hover:bg-blue-200 "
                 : "text-gray-500 hover:bg-blue-50 border-transparent"
             }`}
-        onClick={() => setActiveTab("appointments")}
       >
         <FaCalendarAlt className="w-5 h-5" />
         Lịch hẹn
-      </button>
-      <button
+      </Link>
+      <Link
+        href="/profile/medical"
         className={`flex items-center gap-3 px-4 py-3 
             rounded-lg font-semibold w-full cursor-pointer 
-            focus:outline-none border transition-colors ${
+            focus:outline-none duration-300 ${
               activeTab === "medical"
-                ? "text-blue-500 bg-blue-100 hover:bg-blue-200 border-blue-200"
+                ? "text-blue-500 bg-blue-100 hover:bg-blue-200 "
                 : "text-gray-500 hover:bg-blue-50 border-transparent"
             }`}
-        onClick={() => setActiveTab("medical")}
       >
         <FaFileMedicalAlt className="w-5 h-5" />
         Hồ sơ bệnh án
-      </button>
+      </Link>
     </aside>
   );
 };
 
-export default Sidebar;
+export default InfoSidebar;

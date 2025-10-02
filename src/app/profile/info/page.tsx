@@ -1,3 +1,4 @@
+'use client';
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { getUserById, updateUser } from "@/services/UserServices";
@@ -62,7 +63,7 @@ const InfoTab = () => {
 
   return (
     <>
-      <div className="p-8 bg-white rounded-2xl shadow-xl border border-blue-200">
+      <div className="bg-white">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
           {/* Avatar */}
           <div className="flex-shrink-0 flex flex-col items-center">
@@ -72,7 +73,9 @@ const InfoTab = () => {
                 : user.username.charAt(0).toUpperCase()}
             </div>
             <button
-              className="mt-4 px-4 py-2 bg-blue-600 cursor-pointer text-white rounded-lg font-medium shadow hover:bg-blue-700 duration-200 text-sm"
+              className="mt-4 px-4 py-2 bg-blue-600 
+              cursor-pointer text-white rounded-lg font-medium 
+              shadow hover:bg-blue-700 duration-200 text-sm"
               onClick={() => setShowEdit(true)}
             >
               Chỉnh sửa hồ sơ
@@ -80,7 +83,8 @@ const InfoTab = () => {
           </div>
           {/* Info */}
           <div className="flex-1 w-full">
-            <h2 className="text-3xl font-extrabold mb-4 text-blue-700 flex items-center gap-2">
+            <h2 className="text-3xl font-[Montserrat] mb-4
+             text-blue-700 flex items-center gap-2">
               Hồ sơ cá nhân
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

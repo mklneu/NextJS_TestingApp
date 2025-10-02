@@ -139,14 +139,16 @@ const Header = () => {
                         tabIndex={-1}
                       >
                         <Link
-                          href="/profile"
+                          href="/profile/info"
                           className="block px-4 py-2 text-gray-800 
                           hover:bg-blue-100 transition-colors duration-150"
                           tabIndex={0}
                           onClick={(e) => {
                             setIsMenuOpen(false);
-                            e.preventDefault();
-                            scrollToTop();
+                            if (pathname === "/profile/info") {
+                              e.preventDefault();
+                              scrollToTop();
+                            }
                           }}
                         >
                           Hồ sơ cá nhân
@@ -159,8 +161,10 @@ const Header = () => {
                             tabIndex={0}
                             onClick={(e) => {
                               setIsMenuOpen(false);
-                              e.preventDefault();
-                              scrollToTop();
+                              if (pathname === "/admin/dashboard") {
+                                e.preventDefault();
+                                scrollToTop();
+                              }
                             }}
                           >
                             Trang quản trị

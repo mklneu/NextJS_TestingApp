@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "../Button";
 import { AxiosError } from "axios";
 
@@ -24,6 +24,20 @@ const UpdateInfoModal = ({
     company: user.company ? { id: user.company.id } : { id: 0 },
     role: user.role ? { id: user.role.id } : { id: 0 },
   });
+
+  // Reset form state when user changes (e.g. sau khi fetch lại user hoặc F5)
+  useEffect(() => {
+    setForm({
+      fullName: user.fullName || "",
+      dob: user.dob ? user.dob.slice(0, 10) : "",
+      gender: user.gender || "",
+      address: user.address || "",
+      username: user.username || "",
+      company: user.company ? { id: user.company.id } : { id: 0 },
+      role: user.role ? { id: user.role.id } : { id: 0 },
+    });
+  }, [user]);
+  
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
