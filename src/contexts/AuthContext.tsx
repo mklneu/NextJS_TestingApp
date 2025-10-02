@@ -2,6 +2,7 @@
 
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { getAccount, isAuthenticated } from "@/services/AuthServices";
+import { getUserById } from "@/services/UserServices";
 
 // Định nghĩa kiểu dữ liệu cho context
 type AuthContextType = {
@@ -48,10 +49,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (isAuthenticated()) {
       const fetchUserInfo = async () => {
         const account = await getAccount();
-        setUser(account?.user || null);
+        setUserId(account?.user?.id || null);
         setUserName(account?.user?.username || null);
         setUserRole(account.user.role?.name || null);
-        setUserId(account?.user?.id || null);
+
+        if (account?.user?.id) {
+          const resUserById = await getUserById(account.user.id);
+          // console.log("Fetched user by ID:", resUserById);
+          setUser(resUserById || null);
+        }
+
+        // console.log("Fetched user in AuthContext:", account?.user);
       };
       fetchUserInfo();
     } else {

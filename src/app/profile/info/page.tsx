@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { getUserById, updateUser } from "@/services/UserServices";
@@ -14,8 +14,8 @@ import {
 
 const InfoTab = () => {
   const { userRole, userId, user, setUser } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [showEdit, setShowEdit] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [showEdit, setShowEdit] = useState<boolean>(false);
   // Update user info handler
   const handleUpdateInfo = async (data: Partial<reqUser>) => {
     if (!user) return;
@@ -83,8 +83,10 @@ const InfoTab = () => {
           </div>
           {/* Info */}
           <div className="flex-1 w-full">
-            <h2 className="text-3xl font-[Montserrat] mb-4
-             text-blue-700 flex items-center gap-2">
+            <h2
+              className="text-3xl font-[Montserrat] mb-4
+             text-blue-700 flex items-center gap-2"
+            >
               Hồ sơ cá nhân
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
