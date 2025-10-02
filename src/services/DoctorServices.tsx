@@ -2,12 +2,30 @@ import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
 import { AxiosError } from "axios";
 
-
 // Lấy tất cả bác sĩ
-const getAllDoctors = async () => {
+const getAllDoctors = async (
+  page: number,
+  size: number,
+  searchTerm?: string,
+  filterSpecialization?: string,
+  filterStatus?: string
+) => {
   try {
-    const response = await axiosInstance.get("/doctors");
-    return response.data.data.data;
+    // Tạo query string động
+    let query = `/doctors?page=${page}&size=${size}`;
+    if (searchTerm && searchTerm.trim() !== "") {
+      query += `&search=${encodeURIComponent(searchTerm)}`;
+    }
+    if (filterSpecialization && filterSpecialization !== "ALL") {
+      query += `&specialization=${encodeURIComponent(filterSpecialization)}`;
+    }
+    if (filterStatus && filterStatus !== "ALL") {
+      query += `&status=${encodeURIComponent(filterStatus)}`;
+    }
+
+    const response = await axiosInstance.get(query);
+    // console.log("Response from getAllDoctors:", response);
+    return response.data.data;
   } catch (error) {
     const err = error as AxiosError<ErrorResponse>;
     console.error("❌ Error in getAllDoctors:", err);

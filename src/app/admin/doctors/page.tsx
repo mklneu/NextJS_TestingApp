@@ -18,7 +18,6 @@ import { AxiosError } from "axios";
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filterSpecialization, setFilterSpecialization] =
@@ -33,7 +32,9 @@ export default function DoctorsPage() {
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const doctorsPerPage = 8;
+  const [totalDoctors, setTotalDoctors] = useState(0);
 
   // Danh sách chuyên khoa mẫu
   const specializations = [
@@ -56,91 +57,42 @@ export default function DoctorsPage() {
     "UROLOGY",
   ];
 
-  // Tạo dữ liệu mẫu và cung cấp một hàm để làm mới dữ liệu
-  //   const fetchDoctors = () => {
-  //     setLoading(true);
-
-  //     // Trong ứng dụng thực, bạn sẽ sử dụng getAllDoctors() từ DoctorServices
-  //     // Hiện tại dùng dữ liệu mẫu để demo
-  //     setTimeout(() => {
-  //       const mockDoctors: Doctor[] = Array.from({ length: 20 }, (_, i) => ({
-  //         id: i + 1,
-  //         name: `BS. ${
-  //           ["Nguyễn", "Trần", "Lê", "Phạm", "Hoàng"][
-  //             Math.floor(Math.random() * 5)
-  //           ]
-  //         } ${
-  //           ["Văn", "Thị", "Hải", "Quang", "Minh"][Math.floor(Math.random() * 5)]
-  //         } ${
-  //           ["A", "B", "C", "D", "E", "F", "G", "H"][
-  //             Math.floor(Math.random() * 8)
-  //           ]
-  //         }`,
-  //         specialization:
-  //           specializations[Math.floor(Math.random() * specializations.length)],
-  //         email: `doctor${i + 1}@smarthealth.com`,
-  //         phone: `09${Math.floor(10000000 + Math.random() * 90000000)}`,
-  //         experience: Math.floor(1 + Math.random() * 20),
-  //         gender: Math.random() > 0.4 ? "MALE" : "FEMALE",
-  //         status: Math.random() > 0.2 ? "ACTIVE" : "INACTIVE",
-  //       }));
-
-  //       setDoctors(mockDoctors);
-  //       setFilteredDoctors(mockDoctors);
-  //       setLoading(false);
-  //     }, 800);
-  //   };
-
-  const fetchDoctors = async () => {
+  // Fetch doctors from backend with filters and pagination
+  const fetchDoctors = async (page = 1) => {
     setLoading(true);
     try {
-      const data = await getAllDoctors();
-      setDoctors(data);
-      setFilteredDoctors(data);
+      // getAllDoctors(page, limit, searchTerm, filterSpecialization, filterStatus)
+      const res = await getAllDoctors(
+        page,
+        doctorsPerPage,
+        searchTerm,
+        filterSpecialization,
+        filterStatus
+      );
+      // Expecting res = { data: Doctor[], total: number, totalPages: number }
+      setDoctors(res.data);
+      console.log("Fetched doctors:", res.data);
+      setTotalDoctors(res.meta.total || 0);
+      setTotalPages(res.meta.pages || 1);
     } catch (error) {
       const err = error as AxiosError<ErrorResponse>;
-      toast.error("Lỗi khi tải dữ liệu bệnh nhân");
+      toast.error("Lỗi khi tải dữ liệu bác sĩ");
       console.error("Error fetching doctors:", err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Gọi fetchDoctors khi component được mount
+  // Fetch doctors on mount and whenever filters/page change
   useEffect(() => {
-    fetchDoctors();
-  }, []);
+    fetchDoctors(currentPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, searchTerm, filterSpecialization, filterStatus]);
 
-  // Apply filters when search term or specialization filter changes
+  // Reset to page 1 when filters/search change
   useEffect(() => {
-    const results = doctors.filter((doctor) => {
-      const matchesSearch =
-        doctor.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doctor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doctor.phoneNumber.includes(searchTerm);
-
-      const matchesSpecialization =
-        filterSpecialization === "ALL" ||
-        doctor.specialty === filterSpecialization;
-
-      const matchesStatus =
-        filterStatus === "ALL" || doctor.status === filterStatus;
-
-      return matchesSearch && matchesSpecialization && matchesStatus;
-    });
-
-    setFilteredDoctors(results);
-    setCurrentPage(1); // Reset to first page when filters change
-  }, [searchTerm, filterSpecialization, filterStatus, doctors]);
-
-  // Calculate current doctors for pagination
-  const indexOfLastDoctor = currentPage * doctorsPerPage;
-  const indexOfFirstDoctor = indexOfLastDoctor - doctorsPerPage;
-  const currentDoctors = filteredDoctors.slice(
-    indexOfFirstDoctor,
-    indexOfLastDoctor
-  );
-  const totalPages = Math.ceil(filteredDoctors.length / doctorsPerPage);
+    setCurrentPage(1);
+  }, [searchTerm, filterSpecialization, filterStatus]);
 
   // Handlers for doctor actions
   const handleDelete = (doctorId: number) => {
@@ -149,6 +101,8 @@ export default function DoctorsPage() {
     if (window.confirm("Bạn có chắc chắn muốn xóa bác sĩ này?")) {
       setDoctors((prev) => prev.filter((doctor) => doctor.id !== doctorId));
       toast.success("Đã xóa bác sĩ thành công");
+      // Optionally, refresh list from backend
+      fetchDoctors(currentPage);
     }
   };
 
@@ -197,7 +151,7 @@ export default function DoctorsPage() {
                 <div className="mr-3 text-3xl">👨‍⚕️</div>
                 <div>
                   <p className="text-xs text-blue-100">Tổng số bác sĩ</p>
-                  <p className="text-2xl font-bold">{doctors.length}</p>
+                  <p className="text-2xl font-bold">{totalDoctors}</p>
                 </div>
               </div>
             </div>
@@ -278,7 +232,7 @@ export default function DoctorsPage() {
             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mb-4"></div>
             <p className="text-gray-500">Đang tải danh sách bác sĩ...</p>
           </div>
-        ) : filteredDoctors.length === 0 ? (
+        ) : doctors?.length === 0 ? (
           <div className="bg-white rounded-xl shadow-md p-20 text-center">
             <div className="text-gray-400 text-5xl mb-4">🔍</div>
             <h3 className="text-xl font-semibold text-gray-700 mb-2">
@@ -325,7 +279,7 @@ export default function DoctorsPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {currentDoctors.map((doctor) => (
+                  {doctors.map((doctor) => (
                     <tr
                       key={doctor.id}
                       className="hover:bg-blue-50 transition-colors duration-200"
@@ -429,14 +383,12 @@ export default function DoctorsPage() {
               <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
                 <div className="text-sm text-gray-700">
                   Hiển thị{" "}
-                  <span className="font-medium">{indexOfFirstDoctor + 1}</span>{" "}
-                  đến{" "}
-                  <span className="font-medium">
-                    {Math.min(indexOfLastDoctor, filteredDoctors.length)}
-                  </span>{" "}
-                  trong{" "}
-                  <span className="font-medium">{filteredDoctors.length}</span>{" "}
-                  bác sĩ
+                  {doctors.length > 0
+                    ? (currentPage - 1) * doctorsPerPage + 1
+                    : 0}{" "}
+                  đến {(currentPage - 1) * doctorsPerPage + doctors.length}{" "}
+                  trong <span className="font-medium">{totalDoctors}</span> bác
+                  sĩ
                 </div>
                 <nav className="flex space-x-1">
                   <button
