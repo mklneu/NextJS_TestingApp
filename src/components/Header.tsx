@@ -6,6 +6,7 @@ import { logout, isAuthenticated } from "@/services/AuthServices";
 import { FaHome, FaInfoCircle } from "react-icons/fa";
 import { MdHealthAndSafety } from "react-icons/md";
 import { useAuth } from "@/contexts/AuthContext";
+import { scrollToTop } from "./ScrollToTopButton";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
@@ -89,6 +90,14 @@ const Header = () => {
                       ? "bg-white/20 text-white"
                       : "text-blue-100 hover:bg-white/10 hover:text-white"
                   }`}
+                  onClick={
+                    active
+                      ? (e) => {
+                          e.preventDefault();
+                          scrollToTop();
+                        }
+                      : undefined
+                  }
                 >
                   {link.icon}
                   {link.label}
@@ -134,7 +143,11 @@ const Header = () => {
                           className="block px-4 py-2 text-gray-800 
                           hover:bg-blue-100 transition-colors duration-150"
                           tabIndex={0}
-                          onClick={() => setIsMenuOpen(false)}
+                          onClick={(e) => {
+                            setIsMenuOpen(false);
+                            e.preventDefault();
+                            scrollToTop();
+                          }}
                         >
                           Hồ sơ cá nhân
                         </Link>
@@ -144,7 +157,11 @@ const Header = () => {
                             className="block px-4 py-2 text-gray-800 
                             hover:bg-blue-100 transition-colors duration-150"
                             tabIndex={0}
-                            onClick={() => setIsMenuOpen(false)}
+                            onClick={(e) => {
+                              setIsMenuOpen(false);
+                              e.preventDefault();
+                              scrollToTop();
+                            }}
                           >
                             Trang quản trị
                           </Link>
