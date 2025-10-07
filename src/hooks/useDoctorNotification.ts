@@ -33,8 +33,8 @@ export default function useDoctorNotification({
     if (!doctorId || !enabled) return;
 
     // Lấy token từ localStorage (hoặc nơi bạn lưu token)
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("access_token") : "";
+    // const token =
+    //   typeof window !== "undefined" ? localStorage.getItem("access_token") : "";
     const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "http://localhost:8080/ws";
     const socket = new SockJS(`${wsUrl}`);
     const client = new Client({

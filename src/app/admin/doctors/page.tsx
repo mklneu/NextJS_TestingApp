@@ -15,6 +15,7 @@ import ViewDoctorModal from "@/components/Doctors/ViewDoctor.Modal";
 import { translateSpecialty } from "@/utils/translateEnums";
 import { getAllDoctors } from "@/services/DoctorServices";
 import { AxiosError } from "axios";
+import { Pagination } from "@/services/OtherServices";
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -115,24 +116,6 @@ export default function DoctorsPage() {
     setSelectedDoctorId(doctorId);
     setShowViewModal(true);
   };
-
-  // Generate pagination items
-  const paginationItems = [];
-  for (let i = 1; i <= totalPages; i++) {
-    paginationItems.push(
-      <button
-        key={i}
-        onClick={() => setCurrentPage(i)}
-        className={`px-3 py-1 rounded ${
-          currentPage === i
-            ? "bg-blue-600 text-white"
-            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-        }`}
-      >
-        {i}
-      </button>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -380,46 +363,11 @@ export default function DoctorsPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-                <div className="text-sm text-gray-700">
-                  Hiển thị{" "}
-                  {doctors.length > 0
-                    ? (currentPage - 1) * doctorsPerPage + 1
-                    : 0}{" "}
-                  đến {(currentPage - 1) * doctorsPerPage + doctors.length}{" "}
-                  trong <span className="font-medium">{totalDoctors}</span> bác
-                  sĩ
-                </div>
-                <nav className="flex space-x-1">
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                    className={`px-3 py-1 rounded ${
-                      currentPage === 1
-                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    Trước
-                  </button>
-                  {paginationItems}
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                    className={`px-3 py-1 rounded ${
-                      currentPage === totalPages
-                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    Sau
-                  </button>
-                </nav>
-              </div>
+              <Pagination
+                totalPages={totalPages}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+              />
             )}
           </div>
         )}

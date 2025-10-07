@@ -65,3 +65,21 @@ interface ErrorResponse {
   error?: string;
   message?: string;
 }
+
+// Fake data structure (chuẩn bị cho API)
+interface Appointment {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  appointmentDate: string;
+  patientNote: string;
+  doctorNote: string;
+  clinicRoom: string;
+  appointmentType: string;
+  notificationSent: boolean;
+  status: string;
+  createdBy: string;
+  updatedBy: string;
+  patient: { id: number; fullName: string };
+  doctor: { id: number; fullName: string };
+}

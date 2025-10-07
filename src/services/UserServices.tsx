@@ -3,12 +3,6 @@ import axiosInstance from "./axiosInstance";
 import Button from "@/components/Button";
 import { AxiosError } from "axios";
 
-const formatDateToDMY = (dateStr: string) => {
-  if (!dateStr) return "";
-  const [yyyy, mm, dd] = dateStr.split("-");
-  return `${dd}/${mm}/${yyyy}`;
-};
-
 const getAllUsers = async () => {
   try {
     const response = await axiosInstance.get("/users");
@@ -152,5 +146,4 @@ export {
   postUser,
   updateUser,
   deleteUserById,
-  formatDateToDMY,
 };

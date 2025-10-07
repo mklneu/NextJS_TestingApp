@@ -30,21 +30,17 @@ export default function ProfileLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col`}
       >
         <div className="min-h-screen bg-gray-50 ">
-          <div className="flex flex-1 !h-fit bg-gray-50 justify-center px-2 md:px-0">
-            <div className="flex flex-col md:flex-row w-full mt-15
-            max-w-5xl gap-4 md:gap-6 items-stretch">
+          <div className="flex flex-1 !h-fit mb-10
+           bg-gray-50 ml-[5%] px-2 md:px-0">
+            <div
+              className="flex flex-col md:flex-row w-full mt-15
+            max-w-5xl gap-4 md:gap-6 items-stretch"
+            >
               <div className="flex-shrink-0 mb-4 md:mb-0">
                 <InfoSidebar activeTab={activeTab} />
               </div>
-              <main
-                className="flex-1 flex items-center justify-center min-w-[700px]
-                border border-blue-200 rounded-2xl bg-white shadow-xl"
-              >
-                <div
-                  className=" p-3 md:p-10 h-fit "
-                >
-                  {children}
-                </div>
+              <main className="flex-1 flex items-center justify-center border border-blue-200 rounded-2xl bg-white shadow-xl">
+                <div className="w-full h-fit">{children}</div>
               </main>
             </div>
           </div>

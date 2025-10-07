@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import {
   getAllUsers,
   deleteUserById,
-  formatDateToDMY,
 } from "@/services/UserServices";
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaFilter } from "react-icons/fa";
 import { HiOutlineUserGroup } from "react-icons/hi";
@@ -13,6 +12,7 @@ import UpdateUserModal from "@/components/Users/UpdateUser.Modal";
 // import ViewUserModal from "@/components/Users/ViewUser.Modal";
 import { AxiosError } from "axios";
 import { getAllHospitals } from "@/services/HospitalServices";
+import { formatDateToDMY } from "@/services/OtherServices";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<resUser[]>([]);

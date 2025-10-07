@@ -1,3 +1,22 @@
+export const translateAppointmentStatus = (status: string): string => {
+  const statusMap: Record<string, string> = {
+    PENDING: "Chờ xác nhận",
+    CONFIRMED: "Đã xác nhận",
+    CANCELLED: "Đã hủy",
+    COMPLETED: "Hoàn thành",
+  };
+  return statusMap[status] || status;
+};
+export const translateAppointmentType = (type: string): string => {
+  const typeMap: Record<string, string> = {
+    KHAM_TONG_QUAT: "Khám tổng quát",
+    KHAM_CHUYEN_KHOA: "Khám chuyên khoa",
+    TAI_KHAM: "Tái khám",
+    TIEM_CHUNG: "Tiêm chủng",
+    KHAM_SUC_KHOE_DINH_KY: "Khám sức khỏe định kỳ",
+  };
+  return typeMap[type] || type;
+};
 export const translateSpecialty = (specialty: string): string => {
   const specialtyMap: Record<string, string> = {
     CARDIOLOGY: "Tim mạch",

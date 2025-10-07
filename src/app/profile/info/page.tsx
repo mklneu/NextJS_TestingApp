@@ -63,19 +63,20 @@ const InfoTab = () => {
 
   return (
     <>
-      <div className="bg-white">
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+      <div className="bg-white w-full max-w-6xl mx-auto p-6 md:p-10 rounded-2xl">
+        <h2 className="text-3xl font-bold text-blue-600 text-center mb-8">
+          Hồ sơ cá nhân
+        </h2>
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-10">
           {/* Avatar */}
           <div className="flex-shrink-0 flex flex-col items-center">
-            <div className="w-32 h-32 rounded-full bg-gradient-to-tr from-blue-400 to-blue-600 flex items-center justify-center text-white text-5xl font-bold shadow-lg border-4 border-white">
+            <div className="w-36 h-36 rounded-full bg-gradient-to-tr from-blue-400 to-blue-600 flex items-center justify-center text-white text-6xl font-bold shadow-lg border-4 border-white">
               {user.fullName
                 ? user.fullName.charAt(0).toUpperCase()
                 : user.username.charAt(0).toUpperCase()}
             </div>
             <button
-              className="mt-4 px-4 py-2 bg-blue-600 
-              cursor-pointer text-white rounded-lg font-medium 
-              shadow hover:bg-blue-700 duration-200 text-sm"
+              className="mt-6 px-5 py-2 bg-blue-600 cursor-pointer text-white rounded-lg font-medium shadow hover:bg-blue-700 duration-200 text-base"
               onClick={() => setShowEdit(true)}
             >
               Chỉnh sửa hồ sơ
@@ -83,56 +84,57 @@ const InfoTab = () => {
           </div>
           {/* Info */}
           <div className="flex-1 w-full">
-            <h2
-              className="text-3xl font-[Montserrat] mb-4
-             text-blue-700 flex items-center gap-2"
-            >
-              Hồ sơ cá nhân
-            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white rounded-lg p-4 shadow flex items-center gap-3">
-                <FaUser className="w-6 h-6 text-blue-400" />
+              {/* Họ và tên */}
+              <div className="bg-gray-50 rounded-xl p-4 shadow-sm flex items-center gap-3">
+                <FaUser className="w-5 h-5 text-blue-400" />
                 <div>
-                  <div className="text-gray-500 text-xs">Họ và tên</div>
-                  <div className="font-semibold text-lg text-gray-600">
+                  <div className="text-gray-400 text-xs mb-1">Họ và tên</div>
+                  <div className="font-medium text-base text-gray-700">
                     {user.fullName}
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg p-4 shadow flex items-center gap-3">
-                <FaBirthdayCake className="w-6 h-6 text-blue-400" />
+              {/* Ngày sinh */}
+              <div className="bg-gray-50 rounded-xl p-4 shadow-sm flex items-center gap-3">
+                <FaBirthdayCake className="w-5 h-5 text-blue-400" />
                 <div>
-                  <div className="text-gray-500 text-xs">Ngày sinh</div>
-                  <div className="font-semibold text-lg text-gray-600">
+                  <div className="text-gray-400 text-xs mb-1">Ngày sinh</div>
+                  <div className="font-medium text-base text-gray-700">
                     {user.dob
                       ? new Date(user.dob).toLocaleDateString("vi-VN")
                       : "-"}
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg p-4 shadow flex items-center gap-3">
-                <FaUserTag className="w-6 h-6 text-blue-400" />
+              {/* Tên tài khoản */}
+              <div className="bg-gray-50 rounded-xl p-4 shadow-sm flex items-center gap-3">
+                <FaUserTag className="w-5 h-5 text-blue-400" />
                 <div>
-                  <div className="text-gray-500 text-xs">Tên tài khoản</div>
-                  <div className="font-semibold text-lg text-gray-600">
+                  <div className="text-gray-400 text-xs mb-1">
+                    Tên tài khoản
+                  </div>
+                  <div className="font-medium text-base text-gray-700">
                     {user.username}
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg p-4 shadow flex items-center gap-3">
-                <FaEnvelope className="w-6 h-6 text-blue-400" />
+              {/* Email */}
+              <div className="bg-gray-50 rounded-xl p-4 shadow-sm flex items-center gap-3">
+                <FaEnvelope className="w-5 h-5 text-blue-400" />
                 <div>
-                  <div className="text-gray-500 text-xs">Email</div>
-                  <div className="font-semibold text-lg text-gray-600">
+                  <div className="text-gray-400 text-xs mb-1">Email</div>
+                  <div className="font-medium text-base text-gray-700">
                     {user.email}
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg p-4 shadow flex items-center gap-3">
-                <FaTransgender className="w-6 h-6 text-blue-400" />
+              {/* Giới tính */}
+              <div className="bg-gray-50 rounded-xl p-4 shadow-sm flex items-center gap-3">
+                <FaTransgender className="w-5 h-5 text-blue-400" />
                 <div>
-                  <div className="text-gray-500 text-xs">Giới tính</div>
-                  <div className="font-semibold text-lg text-gray-600">
+                  <div className="text-gray-400 text-xs mb-1">Giới tính</div>
+                  <div className="font-medium text-base text-gray-700">
                     {user.gender === "MALE"
                       ? "Nam"
                       : user.gender === "FEMALE"
@@ -141,21 +143,23 @@ const InfoTab = () => {
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg p-4 shadow flex items-center gap-3">
-                <FaUserTag className="w-6 h-6 text-blue-400" />
+              {/* Vai trò */}
+              <div className="bg-gray-50 rounded-xl p-4 shadow-sm flex items-center gap-3">
+                <FaUserTag className="w-5 h-5 text-blue-400" />
                 <div>
-                  <div className="text-gray-500 text-xs">Vai trò</div>
-                  <div className="font-semibold text-lg text-gray-600">
+                  <div className="text-gray-400 text-xs mb-1">Vai trò</div>
+                  <div className="font-medium text-base text-gray-700">
                     {user.role?.name || userRole}
                   </div>
                 </div>
               </div>
+              {/* Địa chỉ */}
               {user.address && (
-                <div className="bg-white rounded-lg p-4 shadow flex items-center gap-3 md:col-span-2">
-                  <FaMapMarkerAlt className="w-6 h-6 text-blue-400" />
+                <div className="bg-gray-50 rounded-xl p-4 shadow-sm flex items-center gap-3 md:col-span-2">
+                  <FaMapMarkerAlt className="w-5 h-5 text-blue-400" />
                   <div>
-                    <div className="text-gray-500 text-xs">Địa chỉ</div>
-                    <div className="font-semibold text-lg text-gray-600">
+                    <div className="text-gray-400 text-xs mb-1">Địa chỉ</div>
+                    <div className="font-medium text-base text-gray-700">
                       {user.address}
                     </div>
                   </div>
