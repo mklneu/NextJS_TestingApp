@@ -2,6 +2,9 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { toast } from "react-toastify";
+import useDoctorNotification from "@/hooks/useDoctorNotification";
+import { getUserById } from "@/services/UserServices";
 import { logout, isAuthenticated } from "@/services/AuthServices";
 import { FaHome, FaInfoCircle } from "react-icons/fa";
 import { MdHealthAndSafety } from "react-icons/md";
@@ -20,9 +23,37 @@ const Header = () => {
     setUserName,
     userRole,
     setUserRole,
+    userId,
     setUserId,
     setUser,
   } = useAuth();
+
+  // Nhận thông báo realtime khi bác sĩ có lịch hẹn mới
+  useDoctorNotification({
+    doctorId: userRole?.toLowerCase() === "doctor" ? userId : null,
+    enabled: userRole?.toLowerCase() === "doctor" && !!userId,
+    onMessage: async (data) => {
+      if (
+        typeof data === "object" &&
+        data !== null &&
+        "patient" in data &&
+        data.patient?.id
+      ) {
+        try {
+          const user = await getUserById(data.patient.id);
+          toast.info(
+            user?.fullName
+              ? `Bạn có lịch hẹn mới từ bệnh nhân ${user.fullName}`
+              : "Bạn có lịch hẹn mới!"
+          );
+        } catch {
+          toast.info("Bạn có lịch hẹn mới!");
+        }
+      } else {
+        toast.info("Bạn có lịch hẹn mới!");
+      }
+    },
+  });
 
   useEffect(() => {
     // Kiểm tra trạng thái đăng nhập khi component mount

@@ -199,6 +199,12 @@ export default function Home() {
                   >
                     Dashboard
                   </Link>
+                  <Link
+                    href="/booking"
+                    className="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg border border-blue-400 hover:bg-blue-600 transition-all"
+                  >
+                    Đặt lịch khám
+                  </Link>
                 </div>
               ) : (
                 null
