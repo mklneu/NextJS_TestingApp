@@ -95,6 +95,10 @@ export default function DoctorsPage() {
     setCurrentPage(1);
   }, [searchTerm, filterSpecialization, filterStatus]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
+
   // Handlers for doctor actions
   const handleDelete = (doctorId: number) => {
     // Trong ứng dụng thực, bạn sẽ gọi deleteDoctorById từ DoctorServices

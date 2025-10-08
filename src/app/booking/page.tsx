@@ -62,7 +62,7 @@ export default function BookingPage() {
   // Phân quyền: chỉ user và admin mới vào được (dùng useEffect để redirect)
   const [isRedirecting, setIsRedirecting] = useState(false);
   useEffect(() => {
-    if (!isLoggedIn || !(userRole === "user" || userRole === "admin")) {
+    if (!isLoggedIn || !(userRole === "patient" || userRole === "admin")) {
       setIsRedirecting(true);
       router.replace("/");
     }
@@ -220,7 +220,11 @@ export default function BookingPage() {
         </div>
         {/* Nút submit chiếm 2 cột */}
         <div className="md:col-span-2">
-          <Button className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold py-3 rounded-xl shadow-lg transition-all duration-200 !text-lg tracking-wide disabled:opacity-60 disabled:cursor-not-allowed">
+          <Button className="w-full bg-gradient-to-r !duration-300
+          from-blue-600 to-blue-500 hover:from-blue-700
+           hover:to-blue-600 text-white font-bold py-3 rounded-xl 
+           shadow-lg !text-lg tracking-wide
+            disabled:opacity-60 disabled:cursor-not-allowed">
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <svg

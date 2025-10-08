@@ -30,8 +30,10 @@ export default function ProfileLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col`}
       >
         <div className="min-h-screen bg-gray-50 ">
-          <div className="flex flex-1 !h-fit mb-10
-           bg-gray-50 ml-[5%] px-2 md:px-0">
+          <div
+            className="flex flex-1 !h-fit mb-10
+           bg-gray-50 ml-[5%] px-2 md:px-0"
+          >
             <div
               className="flex flex-col md:flex-row w-full mt-15
             max-w-5xl gap-4 md:gap-6 items-stretch"

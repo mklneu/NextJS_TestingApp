@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
-import { getUserById, updateUser } from "@/services/UserServices";
+import { getUserById, updateUser } from "@/services/PatientServices";
 import UpdateInfoModal from "@/components/Users/UpdateInfo.Modal";
 import {
   FaUser,

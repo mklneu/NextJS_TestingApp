@@ -22,11 +22,11 @@ interface UseDoctorNotificationOptions {
   enabled?: boolean;
 }
 
-export default function useDoctorNotification({
+const useDoctorNotification = ({
   doctorId,
   onMessage,
   enabled = true,
-}: UseDoctorNotificationOptions) {
+}: UseDoctorNotificationOptions) => {
   const clientRef = useRef<Client | null>(null);
 
   useEffect(() => {
@@ -67,4 +67,6 @@ export default function useDoctorNotification({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doctorId, enabled]);
-}
+};
+
+export { useDoctorNotification };

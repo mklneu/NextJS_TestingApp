@@ -3,31 +3,31 @@ import axiosInstance from "./axiosInstance";
 import Button from "@/components/Button";
 import { AxiosError } from "axios";
 
-const getAllUsers = async () => {
+const getAllPatients = async () => {
   try {
-    const response = await axiosInstance.get("/users");
+    const response = await axiosInstance.get("/patients");
 
     return response.data.data.data || [];
   } catch (error) {
-    console.error("❌ Error in getAllUsers:", error);
-    // toast.error("Failed to fetch users");
+    console.error("❌ Error in getAllPatients:", error);
+    // toast.error("Failed to fetch Patients");
     throw error; // Re-throw để component handle được
   }
 };
 
-const getUserById = async (userId: number) => {
+const getPatientById = async (patientId: number) => {
   try {
-    const response = await axiosInstance.get(`/users/${userId}`);
+    const response = await axiosInstance.get(`/patients/${patientId}`);
     return response.data.data;
   } catch (error) {
-    console.error("❌ Error in getUserById:", error);
-    toast.error("❌ Error while fetching user by ID!");
+    console.error("❌ Error in getPatientById:", error);
+    toast.error("❌ Error while fetching Patient by ID!");
     throw error; // Re-throw để component handle được
   }
 };
 
-const postUser = async (
-  username: string,
+const postPatient = async (
+  Patientname: string,
   fullName: string,
   email: string,
   password: string,
@@ -37,8 +37,8 @@ const postUser = async (
 ) => {
   try {
     // Uncomment dòng dưới khi có backend
-    const response = await axiosInstance.post("/users", {
-      username,
+    const response = await axiosInstance.post("/patients", {
+      Patientname,
       fullName,
       email,
       password,
@@ -47,19 +47,19 @@ const postUser = async (
       dob,
     });
     toast.success(response.data.message);
-    console.log(">>>>>> data user", response.data);
+    console.log(">>>>>> data Patient", response.data);
     return response.data.data;
   } catch (error) {
     const err = error as AxiosError<ErrorResponse>;
-    console.error("❌ Error in postUser:", error);
+    console.error("❌ Error in postPatient:", error);
     toast.error(err?.response?.data?.error);
     throw error; // Re-throw để component handle được
   }
 };
 
-const updateUser = async (
-  userId: number,
-  username: string,
+const updatePatient = async (
+  patientId: number,
+  patientname: string,
   fullName: string,
   gender: string,
   address: string,
@@ -68,8 +68,8 @@ const updateUser = async (
   role: { id: number }
 ) => {
   try {
-    const response = await axiosInstance.put(`/users/${userId}`, {
-      username,
+    const response = await axiosInstance.put(`/patients/${patientId}`, {
+      patientname,
       gender,
       address,
       fullName,
@@ -81,13 +81,13 @@ const updateUser = async (
     return response.data.data;
   } catch (error) {
     const err = error as AxiosError<ErrorResponse>;
-    console.error("❌ Error in updateUser:", error);
+    console.error("❌ Error in updatePatient:", error);
     toast.error(err?.response?.data?.error);
     throw error; // Re-throw để component handle được
   }
 };
 
-const deleteUserById = async (userId: number, onDelete: () => void) => {
+const deletePatientById = async (patientId: number, onDelete: () => void) => {
   // Custom confirm toast
   const confirmDelete = () => {
     toast(
@@ -104,13 +104,13 @@ const deleteUserById = async (userId: number, onDelete: () => void) => {
                 closeToast();
                 try {
                   const response = await axiosInstance.delete(
-                    `/users/${userId}`
+                    `/patients/${patientId}`
                   );
                   onDelete();
                   toast.success(response.data.message);
                 } catch (error) {
-                  console.error("❌ Error in deleteUser: ", error);
-                  toast.error("❌ Error while deleting user!");
+                  console.error("❌ Error in deletePatient: ", error);
+                  toast.error("❌ Error while deleting Patient!");
                 }
               }}
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
@@ -141,9 +141,9 @@ const deleteUserById = async (userId: number, onDelete: () => void) => {
   confirmDelete();
 };
 export {
-  getAllUsers,
-  getUserById,
-  postUser,
-  updateUser,
-  deleteUserById,
+  getAllPatients,
+  getPatientById,
+  postPatient,
+  updatePatient,
+  deletePatientById,
 };

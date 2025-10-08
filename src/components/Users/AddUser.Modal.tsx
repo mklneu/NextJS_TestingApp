@@ -2,7 +2,7 @@ import { useState } from "react";
 import Button from "../Button";
 import { toast } from "react-toastify";
 import InputBar from "../Input";
-import { postUser } from "@/services/UserServices";
+import { postUser } from "@/services/PatientServices";
 
 interface IAddNewModalProps {
   show: boolean;

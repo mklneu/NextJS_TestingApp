@@ -44,7 +44,7 @@ const Pagination = ({
         <button
           onClick={() => {
             setCurrentPage((prev) => Math.max(prev - 1, 1));
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            // window.scrollTo({ top: 0, behavior: "smooth" });
           }}
           disabled={currentPage === 1}
           className={`px-3 py-1 rounded ${
@@ -68,7 +68,7 @@ const Pagination = ({
               key={p}
               onClick={() => {
                 setCurrentPage(Number(p));
-                window.scrollTo({ top: 0, behavior: "smooth" });
+                // window.scrollTo({ top: 0, behavior: "smooth" });
               }}
               className={`px-3 py-1 rounded cursor-pointer ${
                 currentPage === p
@@ -83,7 +83,7 @@ const Pagination = ({
         <button
           onClick={() => {
             setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            // window.scrollTo({ top: 0, behavior: "smooth" });
           }}
           disabled={currentPage === totalPages}
           className={`px-3 py-1 rounded ${
@@ -119,4 +119,25 @@ const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
-export { Pagination, formatDateToDMY, formatAppointmentDate, scrollToTop };
+const getStatusButtonClass = (status: string) => {
+  switch (status) {
+    case "PENDING":
+      return "bg-yellow-100 text-yellow-700 hover:bg-yellow-200";
+    case "CONFIRMED":
+      return "bg-green-100 text-green-700 hover:bg-green-200";
+    case "CANCELLED":
+      return "bg-red-100 text-red-700 hover:bg-red-200";
+    case "COMPLETED":
+      return "bg-blue-100 text-blue-700 hover:bg-blue-200";
+    default:
+      return "bg-gray-100 text-gray-700 hover:bg-gray-200";
+  }
+};
+
+export {
+  Pagination,
+  formatDateToDMY,
+  formatAppointmentDate,
+  scrollToTop,
+  getStatusButtonClass,
+};

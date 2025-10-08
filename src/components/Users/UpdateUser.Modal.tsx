@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Button from "../Button";
 import { toast } from "react-toastify";
 import InputBar from "../Input";
-import { getUserById, updateUser } from "@/services/UserServices";
+import { getPatientById, updatePatient } from "@/services/PatientServices";
 
 interface Option {
   label: string;
@@ -43,7 +43,7 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
     const fetchUserDetails = async () => {
       if (userId) {
         try {
-          const user = await getUserById(userId);
+          const user = await getPatientById(userId);
           setUsername(user.username);
           setFullName(user.fullName || "");
           setEmail(user.email);
@@ -67,7 +67,7 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
       return;
     }
     try {
-      await updateUser(
+      await updatePatient(
         userId,
         username,
         fullName,
@@ -131,7 +131,6 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
                   disabled={true}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                
               </div>
               {/* Cột 2 */}
               <div className="flex flex-col gap-4 min-w-0">

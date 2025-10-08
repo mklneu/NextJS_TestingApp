@@ -11,7 +11,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
-import { getAllUsers } from "@/services/UserServices";
+import { getAllPatients } from "@/services/PatientServices";
 
 interface StatCardProps {
   title: string;
@@ -70,7 +70,7 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const users = await getAllUsers();
+        const users = await getAllPatients();
         setUserData(users);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -207,7 +207,14 @@ export default function Home() {
                   </Link>
                 </div>
               ) : (
-                null
+                <div className="flex flex-wrap gap-4">
+                  <Link
+                    href="/booking"
+                    className="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg border border-blue-400 hover:bg-blue-600 transition-all"
+                  >
+                    Đặt lịch khám
+                  </Link>
+                </div>
               )}
             </div>
 

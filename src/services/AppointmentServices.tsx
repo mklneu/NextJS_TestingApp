@@ -25,12 +25,13 @@ const createAppointment = async (body: AppointmentBody) => {
 
 const getAppointmentByDoctorId = async (
   doctorId: number,
+  sortByTime: string,
   page: number = 1,
   appointmentsPerPage: number = 10
 ) => {
   try {
     const response = await axiosInstance.get(
-      `/appointments/doctors/${doctorId}?page=${page}&size=${appointmentsPerPage}`
+      `/appointments/doctors/${doctorId}?page=${page}&size=${appointmentsPerPage}&sort=appointmentDate,${sortByTime}`
     );
     return response.data.data;
   } catch (error) {
@@ -42,12 +43,13 @@ const getAppointmentByDoctorId = async (
 
 const getAppointmentByPatientId = async (
   patientId: number,
+  sortByTime: string,
   page: number = 1,
   appointmentsPerPage: number = 10
 ) => {
   try {
     const response = await axiosInstance.get(
-      `/appointments/patients/${patientId}?page=${page}&size=${appointmentsPerPage}`
+      `/appointments/patients/${patientId}?page=${page}&size=${appointmentsPerPage}&sort=appointmentDate,${sortByTime}`
     );
     return response.data.data;
   } catch (error) {
@@ -57,8 +59,48 @@ const getAppointmentByPatientId = async (
   }
 };
 
+const confirmAppointment = async (
+  appointmentId: number,
+  doctorNote: string
+) => {
+  return await axiosInstance.patch(
+    `/appointments/${appointmentId}/confirm`,
+    null,
+    {
+      params: { doctorNote },
+    }
+  );
+};
+
+const cancelAppointment = async (
+  appointmentId: number,
+  note: string,
+  role: string = "doctor"
+) => {
+  return await axiosInstance.patch(
+    `/appointments/${appointmentId}/cancel`,
+    null,
+    {
+      params: { note, role },
+    }
+  );
+};
+
+const completeAppointment = async (
+  appointmentId: number,
+  doctorNote: string
+) => {
+  return await axiosInstance.patch(
+    `/appointments/${appointmentId}/complete`,
+    null,
+    { params: { doctorNote } }
+  );
+};
 export {
   createAppointment,
   getAppointmentByDoctorId,
   getAppointmentByPatientId,
+  confirmAppointment,
+  cancelAppointment,
+  completeAppointment,
 };

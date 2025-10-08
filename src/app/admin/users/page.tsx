@@ -1,9 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import {
-  getAllUsers,
-  deleteUserById,
-} from "@/services/UserServices";
+import { getAllUsers, deleteUserById } from "@/services/PatientServices";
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaFilter } from "react-icons/fa";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { toast } from "react-toastify";
