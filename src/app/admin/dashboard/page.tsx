@@ -5,9 +5,9 @@ import { FaCalendarCheck, FaChartLine, FaUser } from "react-icons/fa";
 import { MdHealthAndSafety, MdWarning } from "react-icons/md";
 import { IoMdTrendingUp, IoMdTrendingDown } from "react-icons/io";
 import { BiDollar } from "react-icons/bi";
-import { getAllUsers } from "@/services/PatientServices";
 import { Chart, registerables } from "chart.js";
 import { Pie, Bar, Line } from "react-chartjs-2";
+import { getAllPatients } from "@/services/PatientServices";
 
 Chart.register(...registerables);
 
@@ -19,7 +19,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userData = await getAllUsers();
+        const userData = await getAllPatients();
         setUsers(userData);
       } catch (error) {
         console.error("Error fetching user data:", error);

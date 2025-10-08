@@ -4,12 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "react-toastify";
 import { useDoctorNotification } from "@/hooks/useDoctorNotification";
-import { getUserById } from "@/services/PatientServices";
 import { logout, isAuthenticated } from "@/services/AuthServices";
 import { FaHome, FaInfoCircle } from "react-icons/fa";
 import { MdHealthAndSafety } from "react-icons/md";
 import { useAuth } from "@/contexts/AuthContext";
 import { scrollToTop } from "./ScrollToTopButton";
+import { getPatientById } from "@/services/PatientServices";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
@@ -26,6 +26,7 @@ const Header = () => {
     userId,
     setUserId,
     setUser,
+    setAppointmentsUpdateTrigger,
   } = useAuth();
 
   // Nhận thông báo realtime khi bác sĩ có lịch hẹn mới
@@ -40,12 +41,14 @@ const Header = () => {
         data.patient?.id
       ) {
         try {
-          const user = await getUserById(data.patient.id);
+          const user = await getPatientById(data.patient.id);
+          console.log(">>> [FE] Thông tin bệnh nhân:", user);
           toast.info(
             user?.fullName
               ? `Bạn có lịch hẹn mới từ bệnh nhân ${user.fullName}`
               : "Bạn có lịch hẹn mới!"
           );
+          setAppointmentsUpdateTrigger((prev) => prev + 1);
         } catch {
           toast.info("Bạn có lịch hẹn mới!");
         }

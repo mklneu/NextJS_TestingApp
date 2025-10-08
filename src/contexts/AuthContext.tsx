@@ -16,6 +16,8 @@ type AuthContextType = {
   setUserId: React.Dispatch<React.SetStateAction<number | null>>;
   user: resUser | null;
   setUser: React.Dispatch<React.SetStateAction<resUser | null>>;
+  appointmentsUpdateTrigger: number;
+  setAppointmentsUpdateTrigger: React.Dispatch<React.SetStateAction<number>>;
 };
 
 // Tạo context với giá trị mặc định
@@ -41,6 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const [user, setUser] = useState<resUser | null>(null);
+  const [appointmentsUpdateTrigger, setAppointmentsUpdateTrigger] = useState(0);
 
   // Luôn fetch lại user info mỗi khi isLoggedIn chuyển thành true
   useEffect(() => {
@@ -83,6 +86,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUserId,
         user,
         setUser,
+        appointmentsUpdateTrigger,
+        setAppointmentsUpdateTrigger,
       }}
     >
       {children}

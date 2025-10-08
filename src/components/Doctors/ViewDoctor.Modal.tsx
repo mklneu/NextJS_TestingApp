@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import Button from "../Button";
-import InputBar from "../Input";
 
 interface IViewModalProps {
   show: boolean;
@@ -31,58 +30,57 @@ const ViewDoctorModal = (props: IViewModalProps) => {
   });
 
   useEffect(() => {
+    const fetchDoctorDetails = async () => {
+      try {
+        // Mô phỏng API call - trong thực tế, bạn sẽ gọi API thực sự
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        // Dữ liệu mẫu - trong ứng dụng thực, bạn sẽ lấy từ API
+        const specializations = [
+          "Nội khoa",
+          "Ngoại khoa",
+          "Sản khoa",
+          "Nhi khoa",
+          "Tim mạch",
+          "Thần kinh",
+          "Da liễu",
+          "Mắt",
+        ];
+
+        const certifications = [
+          "Chứng chỉ hành nghề y khoa",
+          "Thành viên Hiệp hội Y khoa Việt Nam",
+          "Chứng nhận chuyên khoa sâu",
+        ];
+
+        const scheduleDays = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6"];
+
+        setDoctor({
+          name: `BS. Nguyễn Văn A${doctorId}`,
+          specialization: specializations[doctorId % specializations.length],
+          email: `doctor${doctorId}@smarthealth.com`,
+          phone: `098765432${doctorId % 10}`,
+          experience: 5 + (doctorId % 15),
+          gender: doctorId % 3 === 0 ? "FEMALE" : "MALE",
+          status: doctorId % 5 === 0 ? "INACTIVE" : "ACTIVE",
+          certifications: certifications.slice(0, 1 + (doctorId % 3)),
+          education: "Đại học Y Hà Nội",
+          scheduleDays: scheduleDays.slice(0, 3 + (doctorId % 3)),
+          scheduleHours: "8:00 - 17:00",
+          about:
+            "Là một bác sĩ có nhiều năm kinh nghiệm trong lĩnh vực y khoa, luôn tận tâm với nghề và mong muốn mang đến dịch vụ chăm sóc sức khỏe tốt nhất cho bệnh nhân.",
+          rating: 4 + (doctorId % 2) * 0.5,
+        });
+      } catch (error) {
+        console.error("Lỗi khi lấy thông tin bác sĩ:", error);
+        toast.error("Không thể lấy thông tin bác sĩ");
+      }
+    };
     // Fetch doctor details if doctorId is provided
     if (doctorId && show) {
       fetchDoctorDetails();
     }
   }, [doctorId, show]);
-
-  const fetchDoctorDetails = async () => {
-    try {
-      // Mô phỏng API call - trong thực tế, bạn sẽ gọi API thực sự
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      // Dữ liệu mẫu - trong ứng dụng thực, bạn sẽ lấy từ API
-      const specializations = [
-        "Nội khoa",
-        "Ngoại khoa",
-        "Sản khoa",
-        "Nhi khoa",
-        "Tim mạch",
-        "Thần kinh",
-        "Da liễu",
-        "Mắt",
-      ];
-
-      const certifications = [
-        "Chứng chỉ hành nghề y khoa",
-        "Thành viên Hiệp hội Y khoa Việt Nam",
-        "Chứng nhận chuyên khoa sâu",
-      ];
-
-      const scheduleDays = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6"];
-
-      setDoctor({
-        name: `BS. Nguyễn Văn A${doctorId}`,
-        specialization: specializations[doctorId % specializations.length],
-        email: `doctor${doctorId}@smarthealth.com`,
-        phone: `098765432${doctorId % 10}`,
-        experience: 5 + (doctorId % 15),
-        gender: doctorId % 3 === 0 ? "FEMALE" : "MALE",
-        status: doctorId % 5 === 0 ? "INACTIVE" : "ACTIVE",
-        certifications: certifications.slice(0, 1 + (doctorId % 3)),
-        education: "Đại học Y Hà Nội",
-        scheduleDays: scheduleDays.slice(0, 3 + (doctorId % 3)),
-        scheduleHours: "8:00 - 17:00",
-        about:
-          "Là một bác sĩ có nhiều năm kinh nghiệm trong lĩnh vực y khoa, luôn tận tâm với nghề và mong muốn mang đến dịch vụ chăm sóc sức khỏe tốt nhất cho bệnh nhân.",
-        rating: 4 + (doctorId % 2) * 0.5,
-      });
-    } catch (error) {
-      console.error("Lỗi khi lấy thông tin bác sĩ:", error);
-      toast.error("Không thể lấy thông tin bác sĩ");
-    }
-  };
 
   const handleClose = () => {
     setDoctorId(null); // Reset doctorId when closing the modal

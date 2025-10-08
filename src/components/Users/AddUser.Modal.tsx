@@ -2,7 +2,7 @@ import { useState } from "react";
 import Button from "../Button";
 import { toast } from "react-toastify";
 import InputBar from "../Input";
-import { postUser } from "@/services/PatientServices";
+import { postPatient } from "@/services/PatientServices";
 
 interface IAddNewModalProps {
   show: boolean;
@@ -28,7 +28,7 @@ const AddNewUserModal = (props: IAddNewModalProps) => {
     }
 
     try {
-      await postUser(username, fullName, email, password, gender, address, dob);
+      await postPatient(username, fullName, email, password, gender, address, dob);
 
       // Refresh the blogs list
       onSubmit(); // Call the onSubmit callback if provided

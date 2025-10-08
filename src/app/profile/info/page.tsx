@@ -1,7 +1,6 @@
 "use client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
-import { getUserById, updateUser } from "@/services/PatientServices";
 import UpdateInfoModal from "@/components/Users/UpdateInfo.Modal";
 import {
   FaUser,
@@ -11,6 +10,7 @@ import {
   FaTransgender,
   FaMapMarkerAlt,
 } from "react-icons/fa";
+import { getPatientById, updatePatient } from "@/services/PatientServices";
 
 const InfoTab = () => {
   const { userRole, userId, user, setUser } = useAuth();
@@ -20,7 +20,7 @@ const InfoTab = () => {
   const handleUpdateInfo = async (data: Partial<reqUser>) => {
     if (!user) return;
     // Compose all required arguments for updateUser
-    const updated = await updateUser(
+    const updated = await updatePatient(
       user.id,
       user.username,
       data.fullName ?? user.fullName,
@@ -37,7 +37,7 @@ const InfoTab = () => {
     const fetchProfile = async () => {
       if (userId) {
         try {
-          const res = await getUserById(userId);
+          const res = await getPatientById(userId);
           setUser(res);
         } finally {
           setLoading(false);

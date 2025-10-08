@@ -49,7 +49,7 @@ const SkeletonRow = () => (
 const AppointmentsTab = () => {
   const [appointments, setAppointments] = useState<Appointment[] | null>(null);
   const [loading, setLoading] = useState(true);
-  const { user, userRole } = useAuth();
+  const { user, userRole, appointmentsUpdateTrigger } = useAuth();
 
   const [sortByTime, setSortByTime] = useState<"asc" | "desc">("asc");
 
@@ -61,7 +61,8 @@ const AppointmentsTab = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
-  const [modalNote, setModalNote] = useState("");
+  const [modalDoctorNote, setModalDoctorNote] = useState("");
+  const [modalPatientNote, setModalPatientNote] = useState("");
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -81,7 +82,7 @@ const AppointmentsTab = () => {
           );
           setAppointments(data?.data || []);
           setTotalPages(data?.meta?.pages || 1);
-          console.log(">>>>>>> data", data);
+          // console.log(">>>>>>> data", data);
         } else if (userRole === "admin" || userRole === "patient") {
           const data = await getAppointmentByPatientId(
             user.id,
@@ -101,11 +102,19 @@ const AppointmentsTab = () => {
       }
     };
     fetchAppointments();
-  }, [user, currentPage, appointmentsPerPage, userRole, sortByTime]);
+  }, [
+    user,
+    currentPage,
+    appointmentsPerPage,
+    userRole,
+    sortByTime,
+    appointmentsUpdateTrigger,
+  ]);
 
   const openModal = (appointment: Appointment) => {
     setSelectedAppointment(appointment);
-    setModalNote(appointment.doctorNote || "");
+    setModalDoctorNote(appointment.doctorNote || "");
+    setModalPatientNote(appointment.patientNote || "");
     setModalOpen(true);
   };
   const closeModal = () => setModalOpen(false);
@@ -115,20 +124,47 @@ const AppointmentsTab = () => {
   ) => {
     if (!selectedAppointment) return;
     try {
+      let newStatus = selectedAppointment.status;
       if (action === "confirm") {
-        await confirmAppointment(selectedAppointment.id, modalNote);
+        await confirmAppointment(selectedAppointment.id, modalDoctorNote);
+        newStatus = "CONFIRMED";
         toast.success("✅ Xác nhận lịch hẹn thành công!");
       }
       if (action === "cancel") {
-        await cancelAppointment(selectedAppointment.id, modalNote, "doctor");
+        const note = userRole === "doctor" ? modalDoctorNote : modalPatientNote;
+        await cancelAppointment(
+          selectedAppointment.id,
+          note,
+          userRole ?? undefined
+        );
+        newStatus = "CANCELLED";
         toast.success("✅ Đã huỷ lịch hẹn!");
       }
       if (action === "complete") {
-        await completeAppointment(selectedAppointment.id, modalNote);
+        await completeAppointment(selectedAppointment.id, modalDoctorNote);
+        newStatus = "COMPLETED";
         toast.success("✅ Đã hoàn thành lịch hẹn!");
       }
+      // Cập nhật lại appointments trong state
+      setAppointments((prev) =>
+        prev
+          ? prev.map((a) =>
+              a.id === selectedAppointment.id
+                ? {
+                    ...a,
+                    status: newStatus,
+                    doctorNote:
+                      userRole === "doctor" ? modalDoctorNote : a.doctorNote,
+                    patientNote:
+                      userRole === "patient" || "admin"
+                        ? modalPatientNote
+                        : a.patientNote,
+                  }
+                : a
+            )
+          : prev
+      );
       closeModal();
-      // Gọi lại fetchAppointments() nếu muốn cập nhật lại danh sách
     } catch (error) {
       const err = error as AxiosError<ErrorResponse>;
       toast.error(err?.response?.data?.message || "Có lỗi xảy ra!");
@@ -215,22 +251,13 @@ const AppointmentsTab = () => {
                     {a.doctorNote}
                   </td>
                   <td className="py-3 px-2 text-center font-semibold ">
-                    {userRole === "doctor" ? (
-                      <button
-                        className={`px-3 py-1 rounded cursor-pointer
+                    <button
+                      className={`px-3 py-1 rounded cursor-pointer
                           transition ${getStatusButtonClass(a.status)}`}
-                        onClick={() => openModal(a)}
-                      >
-                        {translateAppointmentStatus(a.status) || "-"}
-                      </button>
-                    ) : (
-                      <button
-                        className={`px-3 py-1 rounded
-                          transition ${getStatusButtonClass(a.status)}`}
-                      >
-                        {translateAppointmentStatus(a.status) || "-"}
-                      </button>
-                    )}
+                      onClick={() => openModal(a)}
+                    >
+                      {translateAppointmentStatus(a.status) || "-"}
+                    </button>
                   </td>
                 </tr>
               ))
@@ -257,15 +284,14 @@ const AppointmentsTab = () => {
       {modalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)]"
-          onClick={closeModal} // Click ra ngoài sẽ đóng modal
+          onClick={closeModal}
         >
           <div
             className="bg-white rounded-lg shadow-lg p-6 w-[90vw] max-w-md relative"
-            onClick={(e) => e.stopPropagation()} // Click trong modal không đóng
+            onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="absolute top-2 right-2 cursor-pointer
-               text-gray-400 hover:text-gray-600 text-xl"
+              className="absolute top-2 right-2 cursor-pointer text-gray-400 hover:text-gray-600 text-xl"
               onClick={closeModal}
             >
               ×
@@ -273,35 +299,51 @@ const AppointmentsTab = () => {
             <h3 className="text-lg font-semibold mb-3 text-center text-gray-700">
               Cập nhật trạng thái lịch hẹn
             </h3>
-            <textarea
-              className="w-full border rounded p-2 mb-4 
-              min-h-[80px] resize-y text-gray-700 outline-none"
-              placeholder="Nhập ghi chú bác sĩ"
-              value={modalNote}
-              onChange={(e) => setModalNote(e.target.value)}
-            />
+            {userRole === "doctor" ? (
+              <textarea
+                className="w-full border rounded p-2 mb-4 min-h-[80px] resize-y text-gray-700 outline-none"
+                placeholder="Nhập ghi chú bác sĩ"
+                value={modalDoctorNote}
+                onChange={(e) => setModalDoctorNote(e.target.value)}
+              />
+            ) : (
+              <textarea
+                className="w-full border rounded p-2 mb-4 min-h-[80px] resize-y text-gray-700 outline-none"
+                placeholder="Nhập ghi chú bệnh nhân"
+                value={modalPatientNote}
+                onChange={(e) => setModalPatientNote(e.target.value)}
+              />
+            )}
             <div className="flex justify-center gap-2">
-              <button
-                className="px-3 py-1 bg-green-100 cursor-pointer duration-300
-                 text-green-700 rounded hover:bg-green-200 text-sm"
-                onClick={() => handleModalAction("confirm")}
-              >
-                Chấp nhận
-              </button>
-              <button
-                className="px-3 py-1 bg-red-100 cursor-pointer duration-300
-                text-red-700 rounded hover:bg-red-200 text-sm"
-                onClick={() => handleModalAction("cancel")}
-              >
-                Hủy lịch
-              </button>
-              <button
-                className="px-3 py-1 bg-blue-100 cursor-pointer duration-300
-                text-blue-700 rounded hover:bg-blue-200 text-sm"
-                onClick={() => handleModalAction("complete")}
-              >
-                Hoàn thành
-              </button>
+              {userRole === "doctor" ? (
+                <>
+                  <button
+                    className="px-3 py-1 bg-green-100 cursor-pointer duration-300 text-green-700 rounded hover:bg-green-200 text-sm"
+                    onClick={() => handleModalAction("confirm")}
+                  >
+                    Chấp nhận
+                  </button>
+                  <button
+                    className="px-3 py-1 bg-red-100 cursor-pointer duration-300 text-red-700 rounded hover:bg-red-200 text-sm"
+                    onClick={() => handleModalAction("cancel")}
+                  >
+                    Hủy lịch
+                  </button>
+                  <button
+                    className="px-3 py-1 bg-blue-100 cursor-pointer duration-300 text-blue-700 rounded hover:bg-blue-200 text-sm"
+                    onClick={() => handleModalAction("complete")}
+                  >
+                    Hoàn thành
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="px-3 py-1 bg-red-100 cursor-pointer duration-300 text-red-700 rounded hover:bg-red-200 text-sm"
+                  onClick={() => handleModalAction("cancel")}
+                >
+                  Hủy lịch
+                </button>
+              )}
             </div>
           </div>
         </div>

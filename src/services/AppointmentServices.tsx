@@ -1,4 +1,4 @@
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
 import { AxiosError } from "axios";
 
@@ -36,7 +36,7 @@ const getAppointmentByDoctorId = async (
     return response.data.data;
   } catch (error) {
     console.error("❌ Error in getAppointmentByDoctorId:", error);
-    toast.error("❌ Error while fetching appointment by doctor ID!");
+    // toast.error("❌ Error while fetching appointment by doctor ID!");
     throw error; // Re-throw để component handle được
   }
 };
@@ -54,7 +54,7 @@ const getAppointmentByPatientId = async (
     return response.data.data;
   } catch (error) {
     console.error("❌ Error in getAppointmentByPatientId:", error);
-    toast.error("❌ Error while fetching appointment by patient ID!");
+    // toast.error("❌ Error while fetching appointment by patient ID!");
     throw error; // Re-throw để component handle được
   }
 };
