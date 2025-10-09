@@ -25,13 +25,21 @@ const createAppointment = async (body: AppointmentBody) => {
 
 const getAppointmentByDoctorId = async (
   doctorId: number,
-  sortByTime: string,
+  sortField: string,
+  sortOrder: string,
   page: number = 1,
   appointmentsPerPage: number = 10
 ) => {
   try {
     const response = await axiosInstance.get(
-      `/appointments/doctors/${doctorId}?page=${page}&size=${appointmentsPerPage}&sort=appointmentDate,${sortByTime}`
+      `/appointments/doctors/${doctorId}`,
+      {
+        params: {
+          page,
+          size: appointmentsPerPage,
+          sort: `${sortField},${sortOrder}`,
+        },
+      }
     );
     return response.data.data;
   } catch (error) {
@@ -43,13 +51,21 @@ const getAppointmentByDoctorId = async (
 
 const getAppointmentByPatientId = async (
   patientId: number,
-  sortByTime: string,
+  sortField: string,
+  sortOrder: string,
   page: number = 1,
   appointmentsPerPage: number = 10
 ) => {
   try {
     const response = await axiosInstance.get(
-      `/appointments/patients/${patientId}?page=${page}&size=${appointmentsPerPage}&sort=appointmentDate,${sortByTime}`
+      `/appointments/patients/${patientId}`,
+      {
+        params: {
+          page,
+          size: appointmentsPerPage,
+          sort: `${sortField},${sortOrder}`,
+        },
+      }
     );
     return response.data.data;
   } catch (error) {

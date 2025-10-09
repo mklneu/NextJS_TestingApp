@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { getAllUsers, deleteUserById } from "@/services/PatientServices";
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaFilter } from "react-icons/fa";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { toast } from "react-toastify";
@@ -9,7 +8,8 @@ import UpdateUserModal from "@/components/Users/UpdateUser.Modal";
 // import ViewUserModal from "@/components/Users/ViewUser.Modal";
 import { AxiosError } from "axios";
 import { getAllHospitals } from "@/services/HospitalServices";
-import { formatDateToDMY } from "@/services/OtherServices";
+import { formatDateToDMY, Pagination } from "@/services/OtherServices";
+import { deletePatientById, getAllPatients } from "@/services/PatientServices";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<resUser[]>([]);
@@ -36,9 +36,11 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const data = await getAllUsers();
+      const data = await getAllPatients();
       setUsers(data);
       setFilteredUsers(data);
+
+      console.log(">>>>>>>>>>>>>>data:", data);
     } catch (error) {
       const err = error as AxiosError<ErrorResponse>;
       toast.error("Lỗi khi tải dữ liệu bệnh nhân");
@@ -90,6 +92,10 @@ export default function UsersPage() {
     setCurrentPage(1); // Reset to first page when filters change
   }, [searchTerm, filterGender, users]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
+
   // Calculate current users for pagination
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
@@ -99,7 +105,7 @@ export default function UsersPage() {
   // Handlers for user actions
   const handleDelete = async (userId: number) => {
     try {
-      await deleteUserById(userId, fetchUsers);
+      await deletePatientById(userId, fetchUsers);
     } catch (error) {
       console.error("Error deleting user:", error);
     }
@@ -396,48 +402,11 @@ export default function UsersPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-                <div className="text-sm text-gray-700">
-                  Hiển thị{" "}
-                  <span className="font-medium">{indexOfFirstUser + 1}</span>{" "}
-                  đến{" "}
-                  <span className="font-medium">
-                    {Math.min(indexOfLastUser, filteredUsers.length)}
-                  </span>{" "}
-                  trong{" "}
-                  <span className="font-medium">{filteredUsers.length}</span>{" "}
-                  bệnh nhân
-                </div>
-                <nav className="flex space-x-1">
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                    className={`px-3 py-1 rounded ${
-                      currentPage === 1
-                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    Trước
-                  </button>
-                  {paginationItems}
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                    className={`px-3 py-1 rounded ${
-                      currentPage === totalPages
-                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    Sau
-                  </button>
-                </nav>
-              </div>
+              <Pagination
+                totalPages={totalPages}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+              />
             )}
           </div>
         )}
@@ -461,7 +430,7 @@ export default function UsersPage() {
           roleOptions={[
             { label: "Admin", value: "1" },
             { label: "Doctor", value: "2" },
-            { label: "User", value: "3" },
+            { label: "Patient", value: "4" },
           ]}
           companyOptions={hospitals.map((h) => ({
             label: h.name,

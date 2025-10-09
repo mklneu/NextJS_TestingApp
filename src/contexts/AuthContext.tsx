@@ -18,6 +18,8 @@ type AuthContextType = {
   setUser: React.Dispatch<React.SetStateAction<resUser | null>>;
   appointmentsUpdateTrigger: number;
   setAppointmentsUpdateTrigger: React.Dispatch<React.SetStateAction<number>>;
+  appointments: Appointment[];
+  setAppointments: React.Dispatch<React.SetStateAction<Appointment[]>>;
 };
 
 // Tạo context với giá trị mặc định
@@ -44,6 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [userId, setUserId] = useState<number | null>(null);
   const [user, setUser] = useState<resUser | null>(null);
   const [appointmentsUpdateTrigger, setAppointmentsUpdateTrigger] = useState(0);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   // Luôn fetch lại user info mỗi khi isLoggedIn chuyển thành true
   useEffect(() => {
@@ -88,6 +91,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUser,
         appointmentsUpdateTrigger,
         setAppointmentsUpdateTrigger,
+        appointments,
+        setAppointments,
       }}
     >
       {children}

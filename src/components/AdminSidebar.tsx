@@ -24,7 +24,7 @@ const adminLinks = [
     icon: <FaUserMd />,
   },
   {
-    href: "/admin/users",
+    href: "/admin/patients",
     label: "Bệnh nhân",
     icon: <FaUsers />,
   },

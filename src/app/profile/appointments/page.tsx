@@ -51,7 +51,11 @@ const AppointmentsTab = () => {
   const [loading, setLoading] = useState(true);
   const { user, userRole, appointmentsUpdateTrigger } = useAuth();
 
-  const [sortByTime, setSortByTime] = useState<"asc" | "desc">("asc");
+  // Sorting
+  const [sortField, setSortField] = useState<"id" | "appointmentDate">(
+    "appointmentDate"
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -76,7 +80,8 @@ const AppointmentsTab = () => {
         if (userRole === "doctor") {
           const data = await getAppointmentByDoctorId(
             user.id,
-            sortByTime,
+            sortField,
+            sortOrder,
             currentPage,
             appointmentsPerPage
           );
@@ -86,7 +91,8 @@ const AppointmentsTab = () => {
         } else if (userRole === "admin" || userRole === "patient") {
           const data = await getAppointmentByPatientId(
             user.id,
-            sortByTime,
+            sortField,
+            sortOrder,
             currentPage,
             appointmentsPerPage
           );
@@ -107,7 +113,8 @@ const AppointmentsTab = () => {
     currentPage,
     appointmentsPerPage,
     userRole,
-    sortByTime,
+    sortField,
+    sortOrder,
     appointmentsUpdateTrigger,
   ]);
 
@@ -181,20 +188,31 @@ const AppointmentsTab = () => {
           <thead className="bg-blue-50 border-b">
             <tr>
               <th className="py-3 px-2 text-center font-semibold text-gray-700 w-20">
-                No
+                <Button
+                  onClick={() => {
+                    setSortField("id");
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                  }}
+                  className={`!bg-blue-50 !font-semibold
+                     !text-gray-700 !text-base hover:!bg-blue-100 
+                     !duration-300 `}
+                >
+                  No
+                </Button>
               </th>
               <th className="py-3 px-2 text-center font-semibold text-gray-700">
                 {userRole == "doctor" ? "Bệnh nhân" : "Bác sĩ"}
               </th>
               <th className="py-3 px-2 text-center font-semibold text-gray-700">
                 <Button
-                  onClick={() =>
-                    setSortByTime(sortByTime === "asc" ? "desc" : "asc")
-                  }
-                  className="!bg-blue-50 !font-semibold !text-gray-700 !text-base
-                hover:!bg-blue-100 !duration-300"
+                  onClick={() => {
+                    setSortField("appointmentDate");
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                  }}
+                  className={`!bg-blue-50 !font-semibold 
+                    !text-gray-700 !text-base hover:!bg-blue-100 
+                    !duration-300`}
                 >
-                  {" "}
                   Thời gian khám
                 </Button>
               </th>

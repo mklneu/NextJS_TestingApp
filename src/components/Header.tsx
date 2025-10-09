@@ -27,6 +27,7 @@ const Header = () => {
     setUserId,
     setUser,
     setAppointmentsUpdateTrigger,
+    // setAppointments,
   } = useAuth();
 
   // Nhận thông báo realtime khi bác sĩ có lịch hẹn mới
@@ -43,6 +44,22 @@ const Header = () => {
         try {
           const user = await getPatientById(data.patient.id);
           console.log(">>> [FE] Thông tin bệnh nhân:", user);
+          console.log(">>> [FE] Thông tin lịch hẹn mới:", data);
+
+          // const newAppointmentData = {
+          //   ...data.appointment, // Thông tin lịch hẹn từ WebSocket
+          //   patient: user, // Thông tin bệnh nhân đã lấy
+          //   // ... Thêm các trường dữ liệu cần thiết khác để hiển thị
+          // };
+
+          // 2. CẬP NHẬT STATE DANH SÁCH LỊCH HẸN TRỰC TIẾP
+          // (Giả sử bạn có quyền truy cập hàm setAppointments ở đây)
+          // HÀNH ĐỘNG CẦN THIẾT:
+          // setAppointments((prevAppointments) => [
+          //   data, // Thêm lịch hẹn mới vào đầu danh sách
+          //   ...prevAppointments,
+          // ]);
+
           toast.info(
             user?.fullName
               ? `Bạn có lịch hẹn mới từ bệnh nhân ${user.fullName}`
