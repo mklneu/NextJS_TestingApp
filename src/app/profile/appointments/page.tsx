@@ -135,7 +135,7 @@ const AppointmentsTab = () => {
       if (action === "confirm") {
         await confirmAppointment(selectedAppointment.id, modalDoctorNote);
         newStatus = "CONFIRMED";
-        toast.success("✅ Xác nhận lịch hẹn thành công!");
+        toast.success("Xác nhận lịch hẹn thành công!");
       }
       if (action === "cancel") {
         const note = userRole === "doctor" ? modalDoctorNote : modalPatientNote;
@@ -145,12 +145,12 @@ const AppointmentsTab = () => {
           userRole ?? undefined
         );
         newStatus = "CANCELLED";
-        toast.success("✅ Đã huỷ lịch hẹn!");
+        toast.success("Đã huỷ lịch hẹn!");
       }
       if (action === "complete") {
         await completeAppointment(selectedAppointment.id, modalDoctorNote);
         newStatus = "COMPLETED";
-        toast.success("✅ Đã hoàn thành lịch hẹn!");
+        toast.success("Đã hoàn thành lịch hẹn!");
       }
       // Cập nhật lại appointments trong state
       setAppointments((prev) =>
