@@ -3,17 +3,74 @@ import axiosInstance from "./axiosInstance";
 import Button from "@/components/Button";
 import { AxiosError } from "axios";
 
-const getAllPatients = async () => {
-  try {
-    const response = await axiosInstance.get("/patients");
+export interface PatientRequestParams {
+  page: number;
+  size: number;
+  searchTerm: string;
+  filterGender: string;
+}
 
+interface PatientAxiosRequestParams {
+  page: number;
+  size: number;
+  filter?: string; // Thuộc tính filter là tùy chọn
+}
+
+const getAllPatients = async (
+  params: PatientRequestParams = {
+    page: 1,
+    size: 10,
+    searchTerm: "",
+    filterGender: "ALL",
+  }
+) => {
+  try {
+    const { page, size, searchTerm, filterGender } = params;
+
+    // Xây dựng các query params cho API
+    const queryParams: PatientAxiosRequestParams = {
+      page,
+      size,
+    };
+
+    const filters = [];
+    // Thêm điều kiện lọc theo giới tính
+    if (filterGender !== "ALL") {
+      filters.push(`gender ~ '${filterGender}'`);
+    }
+    // Thêm điều kiện tìm kiếm
+    if (searchTerm) {
+      filters.push(
+        `(username : '${searchTerm}' OR email : '${searchTerm}' OR fullName : '${searchTerm}')`
+      );
+    }
+
+    if (filters.length > 0) {
+      queryParams.filter = filters.join(" AND ");
+    }
+
+    const response = await axiosInstance.get("/patients", {
+      params: queryParams,
+    });
+    // Giả sử API trả về cấu trúc { data: [...], meta: { pages: ... } }
     return response.data.data.data || [];
   } catch (error) {
     console.error("❌ Error in getAllPatients:", error);
-    // toast.error("Failed to fetch Patients");
-    throw error; // Re-throw để component handle được
+    throw error;
   }
 };
+
+// const getAllPatients = async () => {
+//   try {
+//     const response = await axiosInstance.get("/patients");
+
+//     return response.data.data.data || [];
+//   } catch (error) {
+//     console.error("❌ Error in getAllPatients:", error);
+//     // toast.error("Failed to fetch Patients");
+//     throw error; // Re-throw để component handle được
+//   }
+// };
 
 const getPatientById = async (patientId: number) => {
   try {

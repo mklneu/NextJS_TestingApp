@@ -122,7 +122,7 @@ export default function DoctorsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen bg-gray-50 py-4 px-4">
       <div className="container mx-auto">
         {/* Header with stats */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-6 mb-8 text-white shadow-lg">

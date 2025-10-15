@@ -34,7 +34,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <Header />
-          <main className="flex-1 bg-[#2b2b2b]">{children}</main>
+          <main className="flex-1 bg-blue-50 min-h-screen">{children}</main>
           <ScrollToTopButton />
           <Footer />
           <ToastContainer

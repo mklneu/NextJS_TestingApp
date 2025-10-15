@@ -8,7 +8,6 @@ import {
   cancelAppointment,
   completeAppointment,
 } from "@/services/AppointmentServices";
-import { FaUserMd, FaCalendarAlt } from "react-icons/fa";
 import { AxiosError } from "axios";
 import {
   translateAppointmentStatus,
@@ -21,6 +20,7 @@ import {
 } from "@/services/OtherServices";
 import Button from "@/components/Button";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 // Fake loading skeleton
 const SkeletonRow = () => (
@@ -57,6 +57,9 @@ const AppointmentsTab = () => {
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
+  // Filter by Status
+  const [filterStatus, setFilterStatus] = useState<string>("ALL");
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -77,25 +80,20 @@ const AppointmentsTab = () => {
     const fetchAppointments = async () => {
       setLoading(true);
       try {
+        const commonParams = {
+          sortField,
+          sortOrder,
+          page: currentPage,
+          appointmentsPerPage,
+          filterStatus, // Thêm tham số filter
+        };
+
         if (userRole === "doctor") {
-          const data = await getAppointmentByDoctorId(
-            user.id,
-            sortField,
-            sortOrder,
-            currentPage,
-            appointmentsPerPage
-          );
+          const data = await getAppointmentByDoctorId(user.id, commonParams);
           setAppointments(data?.data || []);
           setTotalPages(data?.meta?.pages || 1);
-          // console.log(">>>>>>> data", data);
         } else if (userRole === "admin" || userRole === "patient") {
-          const data = await getAppointmentByPatientId(
-            user.id,
-            sortField,
-            sortOrder,
-            currentPage,
-            appointmentsPerPage
-          );
+          const data = await getAppointmentByPatientId(user.id, commonParams);
           setAppointments(data?.data || []);
           setTotalPages(data?.meta?.pages || 1);
         }
@@ -115,6 +113,7 @@ const AppointmentsTab = () => {
     userRole,
     sortField,
     sortOrder,
+    filterStatus, // Thêm vào dependency array
     appointmentsUpdateTrigger,
   ]);
 
@@ -180,9 +179,35 @@ const AppointmentsTab = () => {
 
   return (
     <div className="p-2 sm:p-4 md:p-8 min-h-[400px] w-full max-w-none mx-auto">
-      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-blue-700">
-        <FaCalendarAlt className="text-blue-500" /> Lịch hẹn của tôi
+      <h2 className="text-2xl font-bold flex items-center gap-2 text-blue-700">
+        Lịch hẹn của tôi
       </h2>
+      <div className="flex items-center my-5 justify-end gap-4 ">
+        {userRole !== "doctor" ? (
+          <Link href="/booking">
+            <Button size="md" className="rounded-lg">
+              Đặt lịch khám mới
+            </Button>
+          </Link>
+        ) : null}
+        {/* Thay thế bộ lọc chuyên khoa bằng bộ lọc trạng thái */}
+        <select
+          className="bg-gray-50 border outline-none 
+                            border-gray-300 text-gray-900 text-sm 
+                            rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+          value={filterStatus}
+          onChange={(e) => {
+            setFilterStatus(e.target.value);
+            setCurrentPage(1); // Reset về trang 1 khi thay đổi filter
+          }}
+        >
+          <option value="ALL">Tất cả trạng thái</option>
+          <option value="PENDING">Chờ xác nhận</option>
+          <option value="CONFIRMED">Đã xác nhận</option>
+          <option value="COMPLETED">Đã hoàn thành</option>
+          <option value="CANCELLED">Đã hủy</option>
+        </select>
+      </div>
       <div className="w-full overflow-x-auto">
         <table className="min-w-[1200px] w-full border rounded-lg">
           <thead className="bg-blue-50 border-b">
@@ -245,15 +270,8 @@ const AppointmentsTab = () => {
                   <td className="py-3 px-2 text-center font-mono text-xs text-gray-500">
                     {a.id}
                   </td>
-                  <td
-                    className="py-3 px-2 justify-center
-                  font-medium flex items-center gap-2 max-w-[220px] 
-                  whitespace-nowrap overflow-hidden text-ellipsis"
-                  >
-                    <FaUserMd className="text-blue-400" />
-                    <span className="truncate">
-                      {a.patient ? a.patient.fullName : a.doctor.fullName}
-                    </span>
+                  <td className="py-3 px-2 text-center">
+                    {a.patient ? a.patient.fullName : a.doctor.fullName}
                   </td>
                   <td className="py-3 px-2 text-center">
                     {formatAppointmentDate(a.appointmentDate)}
@@ -270,9 +288,15 @@ const AppointmentsTab = () => {
                   </td>
                   <td className="py-3 px-2 text-center font-semibold ">
                     <button
-                      className={`px-3 py-1 rounded cursor-pointer
-                          transition ${getStatusButtonClass(a.status)}`}
+                      className={`px-3 py-1 rounded transition ${getStatusButtonClass(
+                        a.status
+                      )} disabled:cursor-default cursor-pointer`}
                       onClick={() => openModal(a)}
+                      disabled={
+                        a.status === "COMPLETED" ||
+                        a.status === "CANCELLED" ||
+                        (userRole !== "doctor" && a.status === "CONFIRMED")
+                      }
                     >
                       {translateAppointmentStatus(a.status) || "-"}
                     </button>
@@ -333,34 +357,45 @@ const AppointmentsTab = () => {
               />
             )}
             <div className="flex justify-center gap-2">
-              {userRole === "doctor" ? (
+              {userRole === "doctor" && selectedAppointment ? (
                 <>
-                  <button
-                    className="px-3 py-1 bg-green-100 cursor-pointer duration-300 text-green-700 rounded hover:bg-green-200 text-sm"
-                    onClick={() => handleModalAction("confirm")}
-                  >
-                    Chấp nhận
-                  </button>
-                  <button
-                    className="px-3 py-1 bg-red-100 cursor-pointer duration-300 text-red-700 rounded hover:bg-red-200 text-sm"
-                    onClick={() => handleModalAction("cancel")}
-                  >
-                    Hủy lịch
-                  </button>
-                  <button
-                    className="px-3 py-1 bg-blue-100 cursor-pointer duration-300 text-blue-700 rounded hover:bg-blue-200 text-sm"
-                    onClick={() => handleModalAction("complete")}
-                  >
-                    Hoàn thành
-                  </button>
+                  {selectedAppointment.status === "PENDING" && (
+                    <>
+                      <button
+                        className="px-3 py-1 bg-green-100 cursor-pointer duration-300 text-green-700 rounded hover:bg-green-200 text-sm"
+                        onClick={() => handleModalAction("confirm")}
+                      >
+                        Chấp nhận
+                      </button>
+                      <button
+                        className="px-3 py-1 bg-red-100 cursor-pointer duration-300 text-red-700 rounded hover:bg-red-200 text-sm"
+                        onClick={() => handleModalAction("cancel")}
+                      >
+                        Hủy lịch
+                      </button>
+                    </>
+                  )}
+                  {selectedAppointment.status === "CONFIRMED" && (
+                    <button
+                      className="px-3 py-1 bg-blue-100 cursor-pointer duration-300 text-blue-700 rounded hover:bg-blue-200 text-sm"
+                      onClick={() => handleModalAction("complete")}
+                    >
+                      Hoàn thành
+                    </button>
+                  )}
                 </>
               ) : (
-                <button
-                  className="px-3 py-1 bg-red-100 cursor-pointer duration-300 text-red-700 rounded hover:bg-red-200 text-sm"
-                  onClick={() => handleModalAction("cancel")}
-                >
-                  Hủy lịch
-                </button>
+                <>
+                  {/* Sửa điều kiện từ CONFIRMED thành PENDING */}
+                  {selectedAppointment?.status === "PENDING" && (
+                    <button
+                      className="px-3 py-1 bg-red-100 cursor-pointer duration-300 text-red-700 rounded hover:bg-red-200 text-sm"
+                      onClick={() => handleModalAction("cancel")}
+                    >
+                      Hủy lịch
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>

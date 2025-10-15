@@ -206,7 +206,7 @@ export default function Home() {
                     Đặt lịch khám
                   </Link>
                 </div>
-              ) : (
+              ) : user?.role?.name === "doctor" ? null : (
                 <div className="flex flex-wrap gap-4">
                   <Link
                     href="/booking"

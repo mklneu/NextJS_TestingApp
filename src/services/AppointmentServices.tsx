@@ -1,8 +1,24 @@
-// import { toast } from "react-toastify";
-import axiosInstance from "./axiosInstance";
 import { AxiosError } from "axios";
+import axiosInstance from "./axiosInstance";
 
-export interface AppointmentBody {
+// Interface cho các tham số truyền vào hàm service
+interface AppointmentRequestParams {
+  sortField: string;
+  sortOrder: string;
+  page: number;
+  appointmentsPerPage: number;
+  filterStatus: string;
+}
+
+// Interface cho đối tượng params sẽ được gửi đi trong request của Axios
+interface AxiosRequestParams {
+  page: number;
+  size: number;
+  sort: string;
+  filter?: string; // Thuộc tính filter là tùy chọn (optional)
+}
+
+interface AppointmentBody {
   patient: { id: number };
   doctor: { id: number };
   appointmentDate: string;
@@ -25,53 +41,61 @@ const createAppointment = async (body: AppointmentBody) => {
 
 const getAppointmentByDoctorId = async (
   doctorId: number,
-  sortField: string,
-  sortOrder: string,
-  page: number = 1,
-  appointmentsPerPage: number = 10
+  params: AppointmentRequestParams
 ) => {
+  const { sortField, sortOrder, page, appointmentsPerPage, filterStatus } =
+    params;
   try {
+    // Khai báo requestParams với kiểu dữ liệu rõ ràng
+    const requestParams: AxiosRequestParams = {
+      page,
+      size: appointmentsPerPage,
+      sort: `${sortField},${sortOrder}`,
+    };
+
+    // Nếu filterStatus không phải "ALL", thêm tham số filter vào request
+    if (filterStatus !== "ALL") {
+      requestParams.filter = `status ~ '${filterStatus}'`;
+    }
+
     const response = await axiosInstance.get(
       `/appointments/doctors/${doctorId}`,
-      {
-        params: {
-          page,
-          size: appointmentsPerPage,
-          sort: `${sortField},${sortOrder}`,
-        },
-      }
+      { params: requestParams }
     );
     return response.data.data;
   } catch (error) {
     console.error("❌ Error in getAppointmentByDoctorId:", error);
-    // toast.error("❌ Error while fetching appointment by doctor ID!");
-    throw error; // Re-throw để component handle được
+    throw error;
   }
 };
 
 const getAppointmentByPatientId = async (
   patientId: number,
-  sortField: string,
-  sortOrder: string,
-  page: number = 1,
-  appointmentsPerPage: number = 10
+  params: AppointmentRequestParams
 ) => {
+  const { sortField, sortOrder, page, appointmentsPerPage, filterStatus } =
+    params;
   try {
+    // Khai báo requestParams với kiểu dữ liệu rõ ràng
+    const requestParams: AxiosRequestParams = {
+      page,
+      size: appointmentsPerPage,
+      sort: `${sortField},${sortOrder}`,
+    };
+
+    // Nếu filterStatus không phải "ALL", thêm tham số filter vào request
+    if (filterStatus !== "ALL") {
+      requestParams.filter = `status ~ '${filterStatus}'`;
+    }
+
     const response = await axiosInstance.get(
       `/appointments/patients/${patientId}`,
-      {
-        params: {
-          page,
-          size: appointmentsPerPage,
-          sort: `${sortField},${sortOrder}`,
-        },
-      }
+      { params: requestParams }
     );
     return response.data.data;
   } catch (error) {
     console.error("❌ Error in getAppointmentByPatientId:", error);
-    // toast.error("❌ Error while fetching appointment by patient ID!");
-    throw error; // Re-throw để component handle được
+    throw error;
   }
 };
 
@@ -112,11 +136,12 @@ const completeAppointment = async (
     { params: { doctorNote } }
   );
 };
+
 export {
-  createAppointment,
   getAppointmentByDoctorId,
   getAppointmentByPatientId,
   confirmAppointment,
   cancelAppointment,
   completeAppointment,
+  createAppointment,
 };

@@ -103,7 +103,7 @@ export default function BookingPage() {
 
   return (
     <div
-      className="max-w-3xl mx-auto bg-white rounded-2xl 
+      className="max-w-3xl mx-auto bg-white rounded-2xl
     shadow-2xl p-12 my-12 border border-blue-100 animate-fadeIn"
     >
       <h1
@@ -220,11 +220,13 @@ export default function BookingPage() {
         </div>
         {/* Nút submit chiếm 2 cột */}
         <div className="md:col-span-2">
-          <Button className="w-full bg-gradient-to-r !duration-300
+          <Button
+            className="w-full bg-gradient-to-r !duration-300
           from-blue-600 to-blue-500 hover:from-blue-700
            hover:to-blue-600 text-white font-bold py-3 rounded-xl 
            shadow-lg !text-lg tracking-wide
-            disabled:opacity-60 disabled:cursor-not-allowed">
+            disabled:opacity-60 disabled:cursor-not-allowed"
+          >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <svg

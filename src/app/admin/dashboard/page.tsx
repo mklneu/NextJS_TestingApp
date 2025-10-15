@@ -7,7 +7,7 @@ import { IoMdTrendingUp, IoMdTrendingDown } from "react-icons/io";
 import { BiDollar } from "react-icons/bi";
 import { Chart, registerables } from "chart.js";
 import { Pie, Bar, Line } from "react-chartjs-2";
-import { getAllPatients } from "@/services/PatientServices";
+import { getAllPatients, PatientRequestParams } from "@/services/PatientServices";
 
 Chart.register(...registerables);
 
@@ -19,8 +19,15 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userData = await getAllPatients();
-        setUsers(userData);
+        const params: PatientRequestParams = {
+          page: 1,
+          size: 1000, // Lấy tối đa 1000 user cho thống kê
+          searchTerm: "",
+          filterGender: "ALL",
+        };
+        const response = await getAllPatients(params);
+        // 2. Dữ liệu trả về nằm trong thuộc tính 'data'
+        setUsers(response || []);
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {
@@ -201,7 +208,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen bg-gray-50 py-4 px-4">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-6 text-white shadow-lg">
         <div className="container mx-auto">
