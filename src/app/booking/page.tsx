@@ -104,7 +104,7 @@ export default function BookingPage() {
   return (
     <div
       className="max-w-3xl mx-auto bg-white rounded-2xl
-    shadow-2xl p-12 my-12 border border-blue-100 animate-fadeIn"
+    shadow-2xl p-12 mt-20 mb-35 border border-blue-100 animate-fadeIn"
     >
       <h1
         className="text-3xl font-bold 

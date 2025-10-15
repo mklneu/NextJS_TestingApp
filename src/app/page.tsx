@@ -65,7 +65,7 @@ const FeatureCard = ({
 export default function Home() {
   const [userData, setUserData] = useState<resUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn, userRole } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -185,7 +185,7 @@ export default function Home() {
                 Giải pháp toàn diện giúp tối ưu hóa quy trình khám chữa bệnh,
                 quản lý hồ sơ y tế và nâng cao chất lượng chăm sóc sức khỏe.
               </p>
-              {user?.role?.name === "admin" ? (
+              {userRole === "admin" ? (
                 <div className="flex flex-wrap gap-4">
                   <Link
                     href="/admin/users"
@@ -206,7 +206,7 @@ export default function Home() {
                     Đặt lịch khám
                   </Link>
                 </div>
-              ) : user?.role?.name === "doctor" ? null : (
+              ) : userRole === "doctor" ? null : userRole === "patient" ? (
                 <div className="flex flex-wrap gap-4">
                   <Link
                     href="/booking"
@@ -215,7 +215,7 @@ export default function Home() {
                     Đặt lịch khám
                   </Link>
                 </div>
-              )}
+              ) : null}
             </div>
 
             {/* Homepage picture */}

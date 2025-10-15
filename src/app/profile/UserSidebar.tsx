@@ -1,16 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import {
-  FaBars,
-  FaChevronLeft,
-  FaUser,
-} from "react-icons/fa";
+import { FaBars, FaChevronLeft, FaUser } from "react-icons/fa";
 import { IoCalendarClear } from "react-icons/io5";
 import { IoIosFolderOpen } from "react-icons/io";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { scrollToTop } from "../../components/ScrollToTopButton";
+import { FaUserClock } from "react-icons/fa";
 import { useAuth } from "@/contexts/AuthContext";
 
 const userLinks = [
@@ -25,9 +22,16 @@ const userLinks = [
     icon: <IoCalendarClear />,
   },
   {
-    href: "/profile/medical",
+    href: "/profile/test_result",
     label: "Hồ sơ bệnh án",
     icon: <IoIosFolderOpen />,
+    roles: ["patient"], // Chỉ hiển thị cho bệnh nhân
+  },
+  {
+    href: "/profile/examinations", // Sửa lại đường dẫn cho đúng
+    label: "Chờ khám",
+    icon: <FaUserClock />,
+    roles: ["doctor"], // Chỉ hiển thị cho bác sĩ
   },
 ];
 
@@ -36,10 +40,11 @@ const UserSidebar = () => {
   const pathname = usePathname();
   const { userRole } = useAuth();
 
-  const filteredLinks =
-    userRole === "doctor"
-      ? userLinks.filter((link) => link.href !== "/profile/medical")
-      : userLinks;
+  // Lọc các link dựa trên vai trò của người dùng
+  const filteredLinks = userLinks.filter(
+    (link) => !link.roles || (userRole && link.roles.includes(userRole))
+  );
+
   return (
     <div
       className="min-h-screen bg-gradient-to-b shadow-lg 

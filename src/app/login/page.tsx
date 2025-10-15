@@ -15,7 +15,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const { setIsLoggedIn, setUserName, setUserRole, setUser } = useAuth();
+  const { setIsLoggedIn, setUserName, setUserRole, setUser } =
+    useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,9 +26,29 @@ export default function LoginPage() {
     }
     setLoading(true);
     try {
-      await login(username, password, setIsLoggedIn, setUserName, setUserRole, setUser);
+      const userData = await login(
+        username,
+        password,
+        setIsLoggedIn,
+        setUserName,
+        setUserRole,
+        setUser
+      );
       // toast.success("Đăng nhập thành công!");
-      router.push("/");
+      switch (userData?.data?.user?.role?.name.toLowerCase()) {
+        case "admin":
+          router.push("/admin");
+          break;
+        case "doctor":
+          router.push("/doctor"); // Đây chính là dòng đưa bác sĩ đến trang dashboard
+          break;
+        case "patient":
+          router.push("/");
+          break;
+        default:
+          router.push("/"); // Chuyển về trang chủ nếu không có vai trò cụ thể
+      }
+      // router.push("/");
     } catch (error) {
       const err = error as AxiosError<ErrorResponse>;
       toast.error(err?.response?.data?.message || "Đăng nhập thất bại!");

@@ -43,7 +43,7 @@ export default function ProfileLayout({
                 {/* <InfoSidebar activeTab={activeTab} /> */}
                 <UserSidebar />
               </div>
-              <main className="flex-1 p-1 rounded-2xl bg-white  overflow-hidden">
+              <main className="flex-1 p-1 rounded-2xl bg-white overflow-hidden">
                 <div className="w-full h-full">{children}</div>
               </main>
             </div>

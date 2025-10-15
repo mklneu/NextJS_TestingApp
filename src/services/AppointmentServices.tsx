@@ -39,6 +39,16 @@ const createAppointment = async (body: AppointmentBody) => {
   }
 };
 
+const getAppointmentById = async (appointmentId: number) => {
+  try {
+    const response = await axiosInstance.get(`/appointments/${appointmentId}`);
+    return response.data.data;
+  } catch (error) {
+    console.error("❌ Error in getAppointmentById:", error);
+    throw error;
+  }
+};
+
 const getAppointmentByDoctorId = async (
   doctorId: number,
   params: AppointmentRequestParams
@@ -140,6 +150,7 @@ const completeAppointment = async (
 export {
   getAppointmentByDoctorId,
   getAppointmentByPatientId,
+  getAppointmentById,
   confirmAppointment,
   cancelAppointment,
   completeAppointment,
