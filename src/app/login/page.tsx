@@ -15,8 +15,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const { setIsLoggedIn, setUserName, setUserRole, setUser } =
-    useAuth();
+  const { setIsLoggedIn, setUserName, setUserRole, setUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +39,7 @@ export default function LoginPage() {
           router.push("/admin");
           break;
         case "doctor":
-          router.push("/doctor"); // Đây chính là dòng đưa bác sĩ đến trang dashboard
+          router.push("/"); // Đây chính là dòng đưa bác sĩ đến trang dashboard
           break;
         case "patient":
           router.push("/");

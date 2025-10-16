@@ -58,7 +58,7 @@ const ExaminationsPage = () => {
   }, [user, userRole]);
 
   return (
-    <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
+    <div className="p-4 md:p-8 bg-blue-50 min-h-screen">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-blue-700 mb-6 flex items-center gap-3">
           <FaUserClock />

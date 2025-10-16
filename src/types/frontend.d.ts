@@ -44,7 +44,7 @@ interface Doctor {
   address: string;
   price: number;
   status: "ACTIVE" | "INACTIVE";
-  company: { id: number } | null;
+  hospital: { id: number } | null;
   //   certifications?: string[];
   //   education?: string;
   //   scheduleDays?: string[];

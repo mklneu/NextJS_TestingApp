@@ -19,7 +19,7 @@ interface PatientAxiosRequestParams {
 const getAllPatients = async (
   params: PatientRequestParams = {
     page: 1,
-    size: 10,
+    size: 8,
     searchTerm: "",
     filterGender: "ALL",
   }
@@ -36,7 +36,7 @@ const getAllPatients = async (
     const filters = [];
     // Thêm điều kiện lọc theo giới tính
     if (filterGender !== "ALL") {
-      filters.push(`gender ~ '${filterGender}'`);
+      filters.push(`gender = '${filterGender}'`);
     }
     // Thêm điều kiện tìm kiếm
     if (searchTerm) {
@@ -53,7 +53,7 @@ const getAllPatients = async (
       params: queryParams,
     });
     // Giả sử API trả về cấu trúc { data: [...], meta: { pages: ... } }
-    return response.data.data.data || [];
+    return response.data.data || [];
   } catch (error) {
     console.error("❌ Error in getAllPatients:", error);
     throw error;
@@ -84,7 +84,7 @@ const getPatientById = async (patientId: number) => {
 };
 
 const postPatient = async (
-  Patientname: string,
+  username: string,
   fullName: string,
   email: string,
   password: string,
@@ -95,7 +95,7 @@ const postPatient = async (
   try {
     // Uncomment dòng dưới khi có backend
     const response = await axiosInstance.post("/patients", {
-      Patientname,
+      username,
       fullName,
       email,
       password,

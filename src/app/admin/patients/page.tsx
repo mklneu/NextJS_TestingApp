@@ -25,7 +25,7 @@ export default function UsersPage() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); // State để lưu tổng số trang từ API
-  const usersPerPage = 6;
+  const usersPerPage = 8;
 
   // Fetch users với các tham số
   const fetchUsers = async () => {

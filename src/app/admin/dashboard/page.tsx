@@ -23,11 +23,12 @@ const Dashboard = () => {
           page: 1,
           size: 1000, // Lấy tối đa 1000 user cho thống kê
           searchTerm: "",
-          filterGender: "ALL",
+          filterGender: "",
         };
         const response = await getAllPatients(params);
         // 2. Dữ liệu trả về nằm trong thuộc tính 'data'
-        setUsers(response || []);
+        setUsers(response?.data || []);
+        console.log("Fetched users:", response?.data || []);
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {

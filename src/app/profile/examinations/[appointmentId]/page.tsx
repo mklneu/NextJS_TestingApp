@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { FaUserInjured, FaCalendarCheck, FaNotesMedical } from "react-icons/fa";
 import { getAppointmentById } from "@/services/AppointmentServices";
 import { AxiosError } from "axios";
 import { getPatientById } from "@/services/PatientServices";
 import { translateGender } from "@/utils/translateEnums";
+import { FaPlus } from "react-icons/fa6";
+import { IoIosArrowBack } from "react-icons/io";
 
 const ExaminationDetailPage = () => {
   const params = useParams();
+  const router = useRouter();
   const appointmentId = Number(params.appointmentId);
 
   const [patient, setPatient] = useState<resUser | null>(null);
@@ -56,6 +59,17 @@ const ExaminationDetailPage = () => {
 
   return (
     <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
+      <div>
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-1 cursor-pointer
+           text-gray-600 hover:text-gray-900
+            font-semibold mb-6 transition-colors duration-200 focus:outline-none"
+        >
+          <IoIosArrowBack size={20} />
+          Quay lại danh sách chờ khám
+        </button>
+      </div>
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Cột thông tin bệnh nhân */}
         <div className="lg:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit">
@@ -105,9 +119,16 @@ const ExaminationDetailPage = () => {
               <p className="text-sm text-gray-500 mb-4">
                 Tạo và quản lý các kết quả xét nghiệm cho bệnh nhân.
               </p>
-              <button className="bg-blue-500 cursor-pointer duration-300
-              text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-                + Tạo kết quả xét nghiệm
+              <button
+                className="bg-blue-500 cursor-pointer duration-300
+              text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center gap-2"
+                onClick={() =>
+                  router.push(
+                    `/profile/examinations/${appointmentId}/test_result`
+                  )
+                }
+              >
+                <FaPlus className="" /> Tạo kết quả xét nghiệm
               </button>
             </div>
 
@@ -119,18 +140,27 @@ const ExaminationDetailPage = () => {
               <p className="text-sm text-gray-500 mb-4">
                 Tạo đơn thuốc điện tử cho bệnh nhân.
               </p>
-              <button className="bg-green-500 cursor-pointer duration-300
-              text-white px-4 py-2 rounded-lg hover:bg-green-600">
-                + Tạo đơn thuốc
+              <button
+                className="bg-green-500 cursor-pointer duration-300
+              text-white px-4 py-2 rounded-lg hover:bg-green-600 flex items-center gap-2"
+                onClick={() =>
+                  router.push(
+                    `/profile/examinations/${appointmentId}/prescription`
+                  )
+                }
+              >
+                <FaPlus /> Tạo đơn thuốc
               </button>
             </div>
           </div>
 
           {/* Nút hoàn thành */}
           <div className="mt-8 text-right">
-            <button className="bg-indigo-600 cursor-pointer
+            <button
+              className="bg-indigo-600 cursor-pointer
             text-white font-bold px-6 py-3 rounded-lg 
-            hover:bg-indigo-700 duration-300">
+            hover:bg-indigo-700 duration-300"
+            >
               Hoàn thành buổi khám
             </button>
           </div>

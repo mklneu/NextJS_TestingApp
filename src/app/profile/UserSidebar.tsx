@@ -47,7 +47,7 @@ const UserSidebar = () => {
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-b shadow-lg 
+      className="min-h-full bg-gradient-to-b shadow-lg 
         from-blue-700 to-blue-900"
     >
       <aside

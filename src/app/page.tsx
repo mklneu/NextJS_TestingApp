@@ -70,8 +70,8 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const users = await getAllPatients();
-        setUserData(users);
+        const res = await getAllPatients();
+        setUserData(res?.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
