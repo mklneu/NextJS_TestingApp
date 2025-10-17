@@ -3,13 +3,24 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { FaUserInjured, FaCalendarCheck, FaNotesMedical } from "react-icons/fa";
+import {
+  FaUserInjured,
+  FaCalendarCheck,
+  FaNotesMedical,
+  FaFileMedicalAlt, // Icon mới
+} from "react-icons/fa";
 import { getAppointmentById } from "@/services/AppointmentServices";
 import { AxiosError } from "axios";
 import { getPatientById } from "@/services/PatientServices";
-import { translateGender } from "@/utils/translateEnums";
+import { translateGender, translateTestType } from "@/utils/translateEnums";
 import { FaPlus } from "react-icons/fa6";
 import { IoIosArrowBack } from "react-icons/io";
+// 1. Import service và type mới
+import {
+  getTestResultsByAppointmentId,
+  TestResult,
+} from "@/services/TestResultServices";
+import Button from "@/components/Button";
 
 const ExaminationDetailPage = () => {
   const params = useParams();
@@ -18,27 +29,37 @@ const ExaminationDetailPage = () => {
 
   const [patient, setPatient] = useState<resUser | null>(null);
   const [appointment, setAppointment] = useState<Appointment | null>(null);
+  // 2. Thêm state để lưu danh sách kết quả xét nghiệm
+  const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!appointmentId) return;
-    // if (!patientId) return;
-    const fetchAppointment = async () => {
+
+    const fetchAllData = async () => {
       try {
         setLoading(true);
-        const appResponse = await getAppointmentById(appointmentId);
+        // Dùng Promise.all để gọi các API song song cho nhanh
+        const [appResponse, resultsResponse] = await Promise.all([
+          getAppointmentById(appointmentId),
+          getTestResultsByAppointmentId(appointmentId),
+        ]);
+
         setAppointment(appResponse);
+        setTestResults(resultsResponse); // 3. Lưu kết quả vào state
+
+        // Gọi API lấy thông tin patient sau khi có appResponse
         const paResponse = await getPatientById(appResponse.patient.id);
         setPatient(paResponse);
       } catch (error) {
         const err = error as AxiosError<ErrorResponse>;
-        console.error("Error fetching appointment:", err.message);
-        toast.error("Không thể tải thông tin lịch hẹn.");
+        console.error("Error fetching examination data:", err.message);
+        toast.error("Không thể tải thông tin buổi khám.");
       } finally {
         setLoading(false);
       }
     };
-    fetchAppointment();
+    fetchAllData();
   }, [appointmentId]);
 
   if (loading) {
@@ -110,26 +131,70 @@ const ExaminationDetailPage = () => {
             {/* <strong>Lý do khám:</strong> {appointment.reason} */}
           </p>
 
-          <div className="space-y-6">
+          <div className="space-y-3">
             {/* Khu vực tạo kết quả xét nghiệm */}
-            <div className="p-4 border rounded-lg">
+            <div className="p-4 border rounded-lg space-y-3">
               <h3 className="font-semibold text-lg flex items-center gap-2 text-gray-800">
                 <FaNotesMedical /> Chỉ định xét nghiệm
               </h3>
-              <p className="text-sm text-gray-500 mb-4">
-                Tạo và quản lý các kết quả xét nghiệm cho bệnh nhân.
-              </p>
-              <button
-                className="bg-blue-500 cursor-pointer duration-300
+
+              {/* 4. Hiển thị danh sách kết quả đã có */}
+              {testResults.length > 0 ? (
+                <div className="space-y-3">
+                  <p className="text-sm font-medium text-gray-600">
+                    Các kết quả đã tạo:
+                  </p>
+                  {testResults.map((result) => (
+                    <div
+                      key={result.id}
+                      className="flex items-center hover:shadow-md cursor-pointer
+                      justify-between p-3 duration-300
+                      bg-gray-50 rounded-lg border"
+                      onClick={() =>
+                        router.push(
+                          `/profile/appointments/${appointmentId}/testResult/${result.id}`
+                        )
+                      }
+                    >
+                      <div className="flex items-center gap-3">
+                        <FaFileMedicalAlt className="text-blue-500" />
+                        <div>
+                          <p className="font-semibold text-gray-800">
+                            {translateTestType(result.testType) ||
+                              "Xét nghiệm khác"}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Ngày:{" "}
+                            {new Date(result.testTime).toLocaleDateString(
+                              "vi-VN"
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">
+                  Chưa có kết quả xét nghiệm nào được tạo cho buổi khám này.
+                </p>
+              )}
+
+              {/* Nút tạo mới */}
+              <div className="pt-2">
+                <Button
+                  className="bg-blue-500 cursor-pointer duration-300
               text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center gap-2"
-                onClick={() =>
-                  router.push(
-                    `/profile/examinations/${appointmentId}/test_result`
-                  )
-                }
-              >
-                <FaPlus className="" /> Tạo kết quả xét nghiệm
-              </button>
+                  onClick={() =>
+                    router.push(
+                      `/profile/appointments/${appointmentId}/testResult`
+                    )
+                  }
+                  icon={<FaPlus />}
+                >
+                  Tạo kết quả xét nghiệm mới
+                </Button>
+              </div>
             </div>
 
             {/* Khu vực kê đơn thuốc */}
@@ -140,29 +205,24 @@ const ExaminationDetailPage = () => {
               <p className="text-sm text-gray-500 mb-4">
                 Tạo đơn thuốc điện tử cho bệnh nhân.
               </p>
-              <button
+              <Button
                 className="bg-green-500 cursor-pointer duration-300
               text-white px-4 py-2 rounded-lg hover:bg-green-600 flex items-center gap-2"
                 onClick={() =>
                   router.push(
-                    `/profile/examinations/${appointmentId}/prescription`
+                    `/profile/appointments/${appointmentId}/prescription`
                   )
                 }
+                icon={<FaPlus />}
               >
-                <FaPlus /> Tạo đơn thuốc
-              </button>
+                Tạo đơn thuốc mới
+              </Button>
             </div>
           </div>
 
           {/* Nút hoàn thành */}
-          <div className="mt-8 text-right">
-            <button
-              className="bg-indigo-600 cursor-pointer
-            text-white font-bold px-6 py-3 rounded-lg 
-            hover:bg-indigo-700 duration-300"
-            >
-              Hoàn thành buổi khám
-            </button>
+          <div className="flex mt-4 justify-end">
+            <Button variant="purple">Hoàn thành buổi khám</Button>
           </div>
         </div>
       </div>

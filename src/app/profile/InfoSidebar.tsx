@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarProps {
-  activeTab: "info" | "appointments" | "medical";
+  activeTab: "info" | "appointments" | "testRult";
 }
 
 const InfoSidebar = ({ activeTab }: SidebarProps) => {
@@ -11,7 +11,7 @@ const InfoSidebar = ({ activeTab }: SidebarProps) => {
 
   return (
     <aside
-      className="w-full md:w-64 bg-white 
+      className="w-full md:w-64 bg-white
     rounded-2xl shadow-xl border border-blue-200 
     p-6 flex flex-row md:flex-col gap-4 md:gap-0 mb-6 md:mb-0 md:sticky md:top-20"
     >
@@ -43,11 +43,11 @@ const InfoSidebar = ({ activeTab }: SidebarProps) => {
       </Link>
       {userRole !== "doctor" && (
         <Link
-          href="/profile/medical"
+          href="/profile/testResult"
           className={`flex items-center gap-3 px-4 py-3 mt-2 md:mt-4
                 rounded-lg font-semibold w-full cursor-pointer 
                 focus:outline-none duration-300 ${
-                  activeTab === "medical"
+                  activeTab === "testRult"
                     ? "text-blue-500 bg-blue-100 hover:bg-blue-200 "
                     : "text-gray-500 hover:bg-blue-50 border-transparent"
                 }`}

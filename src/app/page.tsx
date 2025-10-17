@@ -12,6 +12,7 @@ import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { getAllPatients } from "@/services/PatientServices";
+import Button from "@/components/Button";
 
 interface StatCardProps {
   title: string;
@@ -373,9 +374,9 @@ export default function Home() {
             Khám phá các giải pháp SmartHealth và trải nghiệm cách quản lý y tế
             hiện đại, tiết kiệm thời gian và tối ưu hóa quy trình.
           </p>
-          <button className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all">
-            Bắt đầu ngay
-          </button>
+          <div className="flex justify-center">
+            <Button size="lg">Bắt đầu ngay</Button>
+          </div>
         </div>
       </section>
     </div>

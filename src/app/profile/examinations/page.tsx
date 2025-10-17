@@ -75,7 +75,7 @@ const ExaminationsPage = () => {
           <div className="space-y-4">
             {appointments.map((app) => (
               <Link
-                href={`/profile/examinations/${app.id}`}
+                href={`/profile/appointments/${app.id}`}
                 key={app.id}
                 className="block"
               >
@@ -88,6 +88,9 @@ const ExaminationsPage = () => {
                       alt={app.patient.fullName}
                       className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
                     /> */}
+                    <div className="text-gray-500">St.
+                       <span className="text-sm">{app.id}</span>
+                       </div>
                     <div className="flex-1 text-center sm:text-left">
                       <h2 className="text-lg font-semibold text-gray-800">
                         {app.patient.fullName}

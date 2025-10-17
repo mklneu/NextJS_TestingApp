@@ -179,14 +179,12 @@ const UpdateInfoModal = ({
           <div className="flex justify-end gap-2 mt-8">
             <Button
               variant="secondary"
-              size="md"
               onClick={() => setShow(false)}
               className={saving ? "opacity-60 pointer-events-none" : ""}
             >
               Hủy
             </Button>
             <Button
-              size="md"
               className={saving ? "opacity-60 pointer-events-none" : ""}
             >
               {saving ? "Đang lưu..." : "Lưu thay đổi"}

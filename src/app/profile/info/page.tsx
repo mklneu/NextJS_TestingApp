@@ -11,6 +11,7 @@ import {
   FaMapMarkerAlt,
 } from "react-icons/fa";
 import { getPatientById, updatePatient } from "@/services/PatientServices";
+import Button from "@/components/Button";
 
 const InfoTab = () => {
   const { userRole, userId, user, setUser } = useAuth();
@@ -50,12 +51,12 @@ const InfoTab = () => {
   }, [userId, setUser]);
 
   if (loading) {
-    return <div className="text-center mt-10">Đang tải thông tin...</div>;
+    return <div className="text-center mt-10 min-h-screen">Đang tải thông tin...</div>;
   }
 
   if (!user) {
     return (
-      <div className="text-center mt-10 text-red-500">
+      <div className="text-center mt-10 text-red-500 min-h-screen">
         Không tìm thấy thông tin người dùng.
       </div>
     );
@@ -63,7 +64,8 @@ const InfoTab = () => {
 
   return (
     <>
-      <div className="bg-white w-full max-w-6xl mx-auto p-6 md:p-10 rounded-2xl">
+      <div className="bg-white w-full max-w-6xl min-h-screen
+      mx-auto p-6 md:p-10 rounded-2xl">
         <h2 className="text-3xl font-bold text-blue-600 text-center mb-8">
           Hồ sơ cá nhân
         </h2>
@@ -75,12 +77,12 @@ const InfoTab = () => {
                 ? user.fullName.charAt(0).toUpperCase()
                 : user.username.charAt(0).toUpperCase()}
             </div>
-            <button
-              className="mt-6 px-5 py-2 bg-blue-600 cursor-pointer text-white rounded-lg font-medium shadow hover:bg-blue-700 duration-200 text-base"
+            <Button
+              className="mt-6"
               onClick={() => setShowEdit(true)}
             >
               Chỉnh sửa hồ sơ
-            </button>
+            </Button>
           </div>
           {/* Info */}
           <div className="flex-1 w-full">

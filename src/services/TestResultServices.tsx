@@ -1,11 +1,13 @@
 import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
 
+type TestStatus = "PENDING" | "COMPLETED" | "REVIEWED";
+
 export interface TestResult {
   id: number;
   patient: { id: number; name?: string };
   doctor: { id: number; name?: string };
-  status: string;
+  status: TestStatus;
   testType: string;
   testTime: string;
   generalConclusion: string;
@@ -18,6 +20,33 @@ export interface TestResult {
     referenceRange: string;
     notes?: string;
   }[];
+}
+
+export interface TestResultBody {
+  patient: { id: number };
+  doctor: { id: number };
+  appointment: { id: number };
+  status: TestStatus;
+  testType: string;
+  testTime: string; // ISO 8601 format date string e.g., "2025-10-12T10:30:00Z"
+  generalConclusion: string;
+  attachmentFile?: string;
+  detailedTestItems: DetailedTestItemBody[];
+}
+
+export interface UpdateTestResultBody {
+  status?: TestStatus;
+  generalConclusion?: string;
+  attachmentFile?: string;
+  detailedTestItems?: DetailedTestItemBody[];
+}
+
+export interface DetailedTestItemBody {
+  itemName: string;
+  value: number;
+  unit: string;
+  referenceRange: string;
+  notes?: string;
 }
 
 const getTestResultsByPatientId = async (
@@ -53,34 +82,6 @@ const getTestResultById = async (testResultId: number): Promise<TestResult> => {
   }
 };
 
-export interface DetailedTestItemBody {
-  itemName: string;
-  value: number;
-  unit: string;
-  referenceRange: string;
-  notes?: string;
-}
-
-export interface TestResultBody {
-  patient: { id: number };
-  doctor: { id: number };
-  status: "COMPLETED" | "PENDING";
-  testType: string;
-  testTime: string; // ISO 8601 format date string e.g., "2025-10-12T10:30:00Z"
-  generalConclusion: string;
-  attachmentFile?: string;
-  detailedTestItems: DetailedTestItemBody[];
-}
-
-export interface UpdateTestResultBody {
-  status?: "COMPLETED" | "PENDING" | "REVIEWED";
-  testType?: string;
-  testTime?: string;
-  generalConclusion?: string;
-  attachmentFile?: string;
-  detailedTestItems?: DetailedTestItemBody[];
-}
-
 const createTestResult = async (body: TestResultBody) => {
   try {
     const response = await axiosInstance.post("/test-results", body);
@@ -93,12 +94,27 @@ const createTestResult = async (body: TestResultBody) => {
   }
 };
 
+const getTestResultsByAppointmentId = async (
+  appointmentId: number
+): Promise<TestResult[]> => {
+  try {
+    const response = await axiosInstance.get(
+      `/test-results/appointment/${appointmentId}`
+    );
+    // Giả sử API trả về mảng trong response.data.data
+    return response.data.data || [];
+  } catch (error) {
+    console.error("❌ Error fetching test results by appointment:", error);
+    throw error;
+  }
+};
+
 const updateTestResult = async (
   testResultId: number,
   body: UpdateTestResultBody
 ): Promise<TestResult> => {
   try {
-    const response = await axiosInstance.patch(
+    const response = await axiosInstance.put(
       `/test-results/${testResultId}`,
       body
     );
@@ -137,6 +153,7 @@ const deleteTestResult = async (
 export {
   getTestResultsByPatientId,
   getTestResultById,
+  getTestResultsByAppointmentId,
   createTestResult,
   updateTestResult,
   deleteTestResult,

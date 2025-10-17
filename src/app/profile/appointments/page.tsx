@@ -178,7 +178,7 @@ const AppointmentsTab = () => {
   };
 
   return (
-    <div className="p-2 sm:p-4 md:p-8 min-h-[400px] w-full max-w-none mx-auto">
+    <div className="p-2 sm:p-4 md:p-8 min-h-screen w-full max-w-none mx-auto">
       <h2 className="text-2xl font-bold flex items-center gap-2 text-blue-700">
         Lịch hẹn của tôi
       </h2>
@@ -193,8 +193,9 @@ const AppointmentsTab = () => {
         {/* Thay thế bộ lọc chuyên khoa bằng bộ lọc trạng thái */}
         <select
           className="bg-gray-50 border outline-none 
-                            border-gray-300 text-gray-900 text-sm 
-                            rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                      border-gray-300 text-gray-900 text-sm 
+                        rounded-lg focus:ring-blue-500
+                         focus:border-blue-500 block p-2.5"
           value={filterStatus}
           onChange={(e) => {
             setFilterStatus(e.target.value);
@@ -212,15 +213,16 @@ const AppointmentsTab = () => {
         <table className="min-w-[1200px] w-full border rounded-lg">
           <thead className="bg-blue-50 border-b">
             <tr>
-              <th className="py-3 px-2 text-center font-semibold text-gray-700 w-20">
+              <th className="py-3 px-2 flex justify-center font-semibold text-gray-700 w-20">
                 <Button
                   onClick={() => {
                     setSortField("id");
                     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
                   }}
                   className={`!bg-blue-50 !font-semibold
-                     !text-gray-700 !text-base hover:!bg-blue-100 
-                     !duration-300 `}
+                     !text-gray-700 !text-base  
+                     !duration-300 !border-none shadow-none `}
+                  translate={false}
                 >
                   No
                 </Button>
@@ -228,15 +230,16 @@ const AppointmentsTab = () => {
               <th className="py-3 px-2 text-center font-semibold text-gray-700">
                 {userRole == "doctor" ? "Bệnh nhân" : "Bác sĩ"}
               </th>
-              <th className="py-3 px-2 text-center font-semibold text-gray-700">
+              <th className="py-3 px-2 flex justify-center font-semibold text-gray-700">
                 <Button
                   onClick={() => {
                     setSortField("appointmentDate");
                     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
                   }}
                   className={`!bg-blue-50 !font-semibold 
-                    !text-gray-700 !text-base hover:!bg-blue-100 
-                    !duration-300`}
+                    !text-gray-700 !text-base 
+                    !duration-300 !border-none shadow-none`}
+                  translate={false}
                 >
                   Thời gian khám
                 </Button>
@@ -267,7 +270,7 @@ const AppointmentsTab = () => {
                   key={a.id}
                   className="hover:bg-blue-50 transition text-gray-600 border-b border-b-gray-300"
                 >
-                  <td className="py-3 px-2 text-center font-mono text-xs text-gray-500">
+                  <td className="py-3 px-2 text-center font-mono text-xs text-gray-500 w-20">
                     {a.id}
                   </td>
                   <td className="py-3 px-2 text-center">

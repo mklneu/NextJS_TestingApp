@@ -65,7 +65,7 @@ const MedicalTab = () => {
 
   // Giao diện chính
   return (
-    <div className="p-2 sm:p-4 md:p-8 min-h-[400px] w-full max-w-none mx-auto">
+    <div className="p-2 sm:p-4 md:p-8 min-h-screen w-full max-w-none mx-auto">
       <h2 className="text-2xl font-bold flex items-center gap-2 text-blue-700 mb-6">
         <FaFileMedicalAlt />
         Hồ sơ bệnh án của tôi

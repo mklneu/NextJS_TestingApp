@@ -191,12 +191,10 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
               </div>
             </div>
             <div className="flex justify-end mx-auto gap-2 mt-8 mb-8 w-11/12">
-              <Button variant="secondary" size="md" onClick={handleClose}>
+              <Button variant="secondary" size="sm" onClick={handleClose}>
                 Close
               </Button>
-              <Button size="md" onClick={handleUpdate}>
-                Update
-              </Button>
+              <Button onClick={handleUpdate} size="sm">Update</Button>
             </div>
           </div>
         </form>

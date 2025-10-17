@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { IoIosArrowBack } from "react-icons/io";
 import { FaPills, FaPlus, FaTrash } from "react-icons/fa";
+import Button from "@/components/Button";
 
 interface Medicine {
   id: number;
@@ -108,7 +109,7 @@ const CreatePrescriptionPage = () => {
         </button>
 
         <div className="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
-          <h1 className="text-2xl md:text-3xl font-bold text-green-700 mb-6 flex items-center gap-3">
+          <h1 className="text-xl font-bold text-green-700 mb-6 flex items-center gap-3">
             <FaPills />
             Tạo đơn thuốc
           </h1>
@@ -181,15 +182,9 @@ const CreatePrescriptionPage = () => {
             </div>
 
             {/* Nút thêm thuốc */}
-            <button
-              type="button"
-              onClick={addMedicine}
-              className="flex items-center gap-2 cursor-pointer
-              text-blue-600 font-semibold hover:text-blue-800
-               duration-200"
-            >
-              <FaPlus /> Thêm thuốc
-            </button>
+            <Button onClick={addMedicine} icon={<FaPlus />}>
+              Thêm thuốc
+            </Button>
 
             {/* Lời dặn của bác sĩ */}
             <div>
@@ -211,26 +206,16 @@ const CreatePrescriptionPage = () => {
 
             {/* Nút hành động */}
             <div className="flex justify-end gap-4 pt-4">
-              <button
-                type="button"
+              <Button
                 onClick={() => router.back()}
-                className="px-6 py-2 text-sm cursor-pointer
-                font-medium text-gray-700 duration-300
-                bg-gray-100 border border-gray-300
-                 outline-none rounded-lg hover:bg-gray-200"
+                variant="secondary"
+                size="sm"
               >
                 Hủy
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-6 py-2 text-sm cursor-pointer
-                font-medium text-white bg-green-600 duration-300
-                rounded-lg hover:bg-green-700 focus:ring-4
-                 focus:outline-none focus:ring-green-300 disabled:bg-green-300"
-              >
+              </Button>
+              <Button isLoading={loading} variant="green" size="sm">
                 {loading ? "Đang lưu..." : "Lưu đơn thuốc"}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

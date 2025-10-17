@@ -22,10 +22,10 @@ const userLinks = [
     icon: <IoCalendarClear />,
   },
   {
-    href: "/profile/test_result",
+    href: "/profile/testResult",
     label: "Hồ sơ bệnh án",
     icon: <IoIosFolderOpen />,
-    roles: ["patient"], // Chỉ hiển thị cho bệnh nhân
+    roles: ["patient", "admin"]// Hiển thị cho bệnh nhân và admin
   },
   {
     href: "/profile/examinations", // Sửa lại đường dẫn cho đúng

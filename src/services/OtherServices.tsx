@@ -134,10 +134,27 @@ const getStatusButtonClass = (status: string) => {
   }
 };
 
+// Hàm khởi tạo giá trị thời gian mặc định là GMT+7
+const getInitialGmt7Time = () => {
+  // 1. Lấy thời gian hiện tại
+  const now = new Date();
+
+  // 2. Tính toán thời gian tại GMT+7
+  // now.getTime() là mili giây tại UTC, ta chỉ cần cộng thêm 7 giờ
+  const gmt7Time = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+
+  // 3. Định dạng lại thành chuỗi YYYY-MM-DDTHH:mm
+  // toISOString() sẽ chuyển thời gian về định dạng chuẩn UTC.
+  // Vì đối tượng `gmt7Time` đã chứa đúng giá trị thời gian của GMT+7,
+  // nên khi định dạng, chuỗi kết quả sẽ chính xác.
+  return gmt7Time.toISOString().slice(0, 16);
+};
+
 export {
   Pagination,
   formatDateToDMY,
   formatAppointmentDate,
   scrollToTop,
   getStatusButtonClass,
+  getInitialGmt7Time,
 };
