@@ -31,7 +31,7 @@ const Button = ({
     danger: "bg-red-500 hover:bg-red-600 text-white",
     alarm: "bg-yellow-500 hover:bg-yellow-600 text-white",
     green: "bg-green-500 hover:bg-green-600 text-white",
-    purple: "bg-indigo-600 hover:bg-indigo-700 text-white",
+    purple: "bg-indigo-500 hover:bg-indigo-600 text-white",
   };
 
   const sizeClasses = {

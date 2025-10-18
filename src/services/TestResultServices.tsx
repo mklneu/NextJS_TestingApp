@@ -49,21 +49,14 @@ export interface DetailedTestItemBody {
   notes?: string;
 }
 
-const getTestResultsByPatientId = async (
-  patientId: number
-): Promise<TestResult[]> => {
+const createTestResult = async (body: TestResultBody) => {
   try {
-    const response = await axiosInstance.get(
-      `/test-results/patient/${patientId}`
-    );
-    console.log("Fetched test results:", response.data.data);
-    return response.data.data || [];
+    const response = await axiosInstance.post("/test-results", body);
+    toast.success("Tạo kết quả xét nghiệm thành công!");
+    return response.data.data; // Giả sử API trả về dữ liệu trong 'data.data'
   } catch (error) {
-    console.error(
-      `❌ Error fetching test results for patient ${patientId}:`,
-      error
-    );
-    toast.error("Không thể tải danh sách kết quả xét nghiệm.");
+    console.error("❌ Error creating test result:", error);
+    toast.error("Có lỗi xảy ra khi tạo kết quả xét nghiệm.");
     throw error;
   }
 };
@@ -82,14 +75,21 @@ const getTestResultById = async (testResultId: number): Promise<TestResult> => {
   }
 };
 
-const createTestResult = async (body: TestResultBody) => {
+const getTestResultsByPatientId = async (
+  patientId: number
+): Promise<TestResult[]> => {
   try {
-    const response = await axiosInstance.post("/test-results", body);
-    toast.success("Tạo kết quả xét nghiệm thành công!");
-    return response.data.data; // Giả sử API trả về dữ liệu trong 'data.data'
+    const response = await axiosInstance.get(
+      `/test-results/patient/${patientId}`
+    );
+    console.log("Fetched test results:", response.data.data);
+    return response.data.data || [];
   } catch (error) {
-    console.error("❌ Error creating test result:", error);
-    toast.error("Có lỗi xảy ra khi tạo kết quả xét nghiệm.");
+    console.error(
+      `❌ Error fetching test results for patient ${patientId}:`,
+      error
+    );
+    toast.error("Không thể tải danh sách kết quả xét nghiệm.");
     throw error;
   }
 };

@@ -257,7 +257,7 @@ const CreateTestResultPage = () => {
               {detailedTestItems.map((item, index) => (
                 <div
                   key={item.id}
-                  className="p-4 border rounded-lg bg-gray-50/70 relative"
+                  className="p-4 border border-gray-300 rounded-lg bg-gray-50/70 relative"
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pr-[2%]">
                     <input

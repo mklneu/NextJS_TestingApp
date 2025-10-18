@@ -65,7 +65,7 @@ export const translateTestType = (testType: string): string => {
     HEMATOLOGY_BLOOD_CHEMISTRY: "Xét nghiệm Huyết học - Sinh hóa máu",
     URINALYSIS: "Xét nghiệm Nước tiểu",
     STOOL_TEST: "Xét nghiệm Phân",
-    IMAGING_RADIOLOGY: "Chẩn đoán Hình ảnh - X-Quang",
+    IMAGING_RADIOLOGY: "Chẩn đoán Hình ảnh X-Quang",
     PATHOLOGY_BIOPSY: "Giải phẫu bệnh - Sinh thiết",
     FUNCTIONAL_TEST: "Xét nghiệm Chức năng",
     MICROBIOLOGY: "Vi sinh vật học",

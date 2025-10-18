@@ -13,7 +13,7 @@ import { getAppointmentById } from "@/services/AppointmentServices";
 import { AxiosError } from "axios";
 import { getPatientById } from "@/services/PatientServices";
 import { translateGender, translateTestType } from "@/utils/translateEnums";
-import { FaPlus } from "react-icons/fa6";
+import { FaPlus, FaPrescriptionBottle } from "react-icons/fa6";
 import { IoIosArrowBack } from "react-icons/io";
 // 1. Import service và type mới
 import {
@@ -21,6 +21,7 @@ import {
   TestResult,
 } from "@/services/TestResultServices";
 import Button from "@/components/Button";
+import { getPrescriptionsByAppointmentId, Prescription } from "@/services/PrescriptionServices";
 
 const ExaminationDetailPage = () => {
   const params = useParams();
@@ -31,6 +32,7 @@ const ExaminationDetailPage = () => {
   const [appointment, setAppointment] = useState<Appointment | null>(null);
   // 2. Thêm state để lưu danh sách kết quả xét nghiệm
   const [testResults, setTestResults] = useState<TestResult[]>([]);
+  const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,13 +42,15 @@ const ExaminationDetailPage = () => {
       try {
         setLoading(true);
         // Dùng Promise.all để gọi các API song song cho nhanh
-        const [appResponse, resultsResponse] = await Promise.all([
+        const [appResponse, resultsResponse, prescriptionResponse] = await Promise.all([
           getAppointmentById(appointmentId),
           getTestResultsByAppointmentId(appointmentId),
+          getPrescriptionsByAppointmentId(appointmentId),
         ]);
 
         setAppointment(appResponse);
         setTestResults(resultsResponse); // 3. Lưu kết quả vào state
+        setPrescriptions(prescriptionResponse);
 
         // Gọi API lấy thông tin patient sau khi có appResponse
         const paResponse = await getPatientById(appResponse.patient.id);
@@ -79,7 +83,7 @@ const ExaminationDetailPage = () => {
   }
 
   return (
-    <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
+    <div className="p-4 md:p-8 bg-gray-50 min-h-screen w-full">
       <div>
         <button
           onClick={() => router.back()}
@@ -91,10 +95,10 @@ const ExaminationDetailPage = () => {
           Quay lại danh sách chờ khám
         </button>
       </div>
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Cột thông tin bệnh nhân */}
         <div className="lg:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit">
-          <h2 className="text-xl font-bold text-blue-700 mb-4 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-sky-700 mb-4 flex items-center gap-2">
             <FaUserInjured /> Thông tin bệnh nhân
           </h2>
           <div className="flex flex-col items-center text-center">
@@ -124,17 +128,14 @@ const ExaminationDetailPage = () => {
 
         {/* Cột chính cho việc khám bệnh */}
         <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold text-blue-700 mb-4 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-sky-700 mb-1 flex items-center gap-2">
             <FaCalendarCheck /> Thông tin buổi khám
           </h2>
-          <p className="mb-4">
-            {/* <strong>Lý do khám:</strong> {appointment.reason} */}
-          </p>
 
-          <div className="space-y-3">
+          <div className=" lg:space-x-3 lg:flex lg:flex-row w-full">
             {/* Khu vực tạo kết quả xét nghiệm */}
-            <div className="p-4 border rounded-lg space-y-3">
-              <h3 className="font-semibold text-lg flex items-center gap-2 text-gray-800">
+            <div className="mt-3 p-4 border rounded-lg space-y-3 lg:w-1/2">
+              <h3 className="font-semibold text-lg flex items-center gap-2 text-gray-600">
                 <FaNotesMedical /> Chỉ định xét nghiệm
               </h3>
 
@@ -183,8 +184,6 @@ const ExaminationDetailPage = () => {
               {/* Nút tạo mới */}
               <div className="pt-2">
                 <Button
-                  className="bg-blue-500 cursor-pointer duration-300
-              text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center gap-2"
                   onClick={() =>
                     router.push(
                       `/profile/appointments/${appointmentId}/testResult`
@@ -198,25 +197,65 @@ const ExaminationDetailPage = () => {
             </div>
 
             {/* Khu vực kê đơn thuốc */}
-            <div className="p-4 border rounded-lg">
-              <h3 className="font-semibold text-lg text-gray-800">
+            <div className="mt-3 p-4 border rounded-lg space-y-3 lg:w-1/2">
+              <h3 className="font-semibold text-lg flex items-center gap-2 text-gray-600">
+                <FaPrescriptionBottle />
                 Kê đơn thuốc
               </h3>
-              <p className="text-sm text-gray-500 mb-4">
-                Tạo đơn thuốc điện tử cho bệnh nhân.
-              </p>
-              <Button
-                className="bg-green-500 cursor-pointer duration-300
-              text-white px-4 py-2 rounded-lg hover:bg-green-600 flex items-center gap-2"
-                onClick={() =>
-                  router.push(
-                    `/profile/appointments/${appointmentId}/prescription`
-                  )
-                }
-                icon={<FaPlus />}
-              >
-                Tạo đơn thuốc mới
-              </Button>
+
+              {prescriptions.length > 0 ? (
+                <div className="space-y-3">
+                  <p className="text-sm font-medium text-gray-600">
+                    Các đơn thuốc đã tạo:
+                  </p>
+                  {prescriptions.map((result) => (
+                    <div
+                      key={result.id}
+                      className="flex items-center hover:shadow-md cursor-pointer
+                      justify-between p-3 duration-300
+                      bg-gray-50 rounded-lg border"
+                      onClick={() =>
+                        router.push(
+                          `/profile/appointments/${appointmentId}/prescription/${result.id}`
+                        )
+                      }
+                    >
+                      <div className="flex items-center gap-3">
+                        <FaFileMedicalAlt className="text-green-500" />
+                        <div>
+                          <p className="font-semibold text-gray-800">
+                            {translateTestType(result.diagnosis) ||
+                              "Xét nghiệm khác"}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Ngày:{" "}
+                            {new Date(result.prescriptionDate).toLocaleDateString(
+                              "vi-VN"
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">
+                  Chưa có đơn thuốc nào được tạo cho buổi khám này.
+                </p>
+              )}
+              <div className="pt-2">
+                <Button
+                  onClick={() =>
+                    router.push(
+                      `/profile/appointments/${appointmentId}/prescription`
+                    )
+                  }
+                  variant="green"
+                  icon={<FaPlus />}
+                >
+                  Tạo đơn thuốc mới
+                </Button>
+              </div>
             </div>
           </div>
 

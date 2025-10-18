@@ -83,3 +83,10 @@ interface Appointment {
   patient: { id: number; fullName: string };
   doctor: { id: number; fullName: string };
 }
+
+interface PaginationMeta {
+  page: number;
+  pageSize: number;
+  pages: number;
+  total: number;
+}
