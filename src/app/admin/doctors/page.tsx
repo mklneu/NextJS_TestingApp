@@ -315,7 +315,7 @@ export default function DoctorsPage() {
                         {doctor.experienceYears} năm
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <div
+                        {/* <div
                           className={`px-2 flex mx-auto w-fit
                             text-xs leading-5 font-semibold rounded-full ${
                               doctor.status === "ACTIVE"
@@ -326,7 +326,7 @@ export default function DoctorsPage() {
                           {doctor.status === "ACTIVE"
                             ? "Đang hoạt động"
                             : "Tạm ngưng"}
-                        </div>
+                        </div> */}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-3 justify-center">

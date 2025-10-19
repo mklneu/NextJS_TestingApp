@@ -23,6 +23,8 @@ import {
   getTestResultsByPatientId,
   TestResult,
 } from "@/services/TestResultServices";
+import DoctorOnly from "@/components/DoctorOnly";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Cập nhật interface để `quantity` có thể là chuỗi rỗng
 interface EditablePrescriptionItem
@@ -38,6 +40,8 @@ const PrescriptionDetailPage = () => {
   const params = useParams();
   const router = useRouter();
   const prescriptionId = params.prescriptionId as string;
+
+  const { userRole } = useAuth();
 
   const [prescription, setPrescription] = useState<Prescription | null>(null);
   const [loading, setLoading] = useState(true);
@@ -309,10 +313,12 @@ const PrescriptionDetailPage = () => {
       <div className="max-w-4xl mx-auto">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1 text-slate-600 hover:text-slate-900 font-semibold mb-6"
+          className="flex items-center gap-1 cursor-pointer
+           text-gray-600 hover:text-gray-900
+            font-semibold mb-6 transition-colors duration-200 focus:outline-none"
         >
           <IoIosArrowBack size={20} />
-          Quay lại
+          Quay lại trang lịch hẹn
         </button>
 
         <div className="bg-white p-6 md:p-8 rounded-2xl shadow-lg space-y-8">
@@ -321,33 +327,35 @@ const PrescriptionDetailPage = () => {
               <FaFilePrescription />
               Chi tiết đơn thuốc
             </h1>
-            {!isEditing ? (
-              <Button
-                onClick={() => setIsEditing(true)}
-                icon={<FaEdit />}
-                variant="green"
-              >
-                Chỉnh sửa
-              </Button>
-            ) : (
-              <div className="flex gap-2">
+            <DoctorOnly userRole={userRole}>
+              {!isEditing ? (
                 <Button
-                  onClick={handleUpdate}
-                  icon={<FaSave />}
-                  isLoading={isUpdating}
+                  onClick={() => setIsEditing(true)}
+                  icon={<FaEdit />}
                   variant="green"
                 >
-                  Lưu
+                  Cập nhật
                 </Button>
-                <Button
-                  variant="secondary"
-                  onClick={handleCancel}
-                  icon={<FaTimes />}
-                >
-                  Hủy
-                </Button>
-              </div>
-            )}
+              ) : (
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleUpdate}
+                    icon={<FaSave />}
+                    isLoading={isUpdating}
+                    variant="green"
+                  >
+                    Lưu
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={handleCancel}
+                    icon={<FaTimes />}
+                  >
+                    Hủy
+                  </Button>
+                </div>
+              )}
+            </DoctorOnly>
           </div>
 
           <div className="border-t pt-6 space-y-4">
@@ -514,7 +522,10 @@ const PrescriptionDetailPage = () => {
                               className="w-full p-2 text-slate-800 font-medium outline-none"
                             />
                             {activeIndex === index && (
-                              <div className="absolute z-10 w-fit bg-white border border-gray-200 rounded-lg mt-1 max-h-48 overflow-y-auto shadow-lg">
+                              <div
+                                className="absolute z-10 w-fit 
+                              bg-white border border-gray-200 rounded-lg mt-1 max-h-50 overflow-y-auto shadow-lg"
+                              >
                                 {medicineSearchResults.length > 0 ? (
                                   medicineSearchResults.map((result) => (
                                     <div
@@ -522,7 +533,8 @@ const PrescriptionDetailPage = () => {
                                       onClick={() =>
                                         handleSelectMedicine(index, result)
                                       }
-                                      className="p-2.5 text-sm text-gray-800 hover:bg-gray-100 cursor-pointer"
+                                      className="p-2.5 text-sm
+                                      text-gray-800 hover:bg-gray-100 cursor-pointer"
                                     >
                                       {result.name}
                                     </div>

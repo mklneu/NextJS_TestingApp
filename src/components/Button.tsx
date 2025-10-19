@@ -2,7 +2,16 @@ import React from "react";
 
 // 1. Thêm icon và isLoading vào props
 interface IButtonProps {
-  variant?: "primary" | "secondary" | "danger" | "alarm" | "green" | "purple";
+  variant?:
+    | "primary"
+    | "secondary"
+    | "danger"
+    | "alarm"
+    | "green"
+    | "purple"
+    | "lightBlue"
+    | "white"
+    | "none";
   size?: "sm" | "md" | "lg";
   onClick?: () => void;
   children: React.ReactNode;
@@ -32,6 +41,9 @@ const Button = ({
     alarm: "bg-yellow-500 hover:bg-yellow-600 text-white",
     green: "bg-green-500 hover:bg-green-600 text-white",
     purple: "bg-indigo-500 hover:bg-indigo-600 text-white",
+    lightBlue: "bg-blue-100 hover:bg-blue-200 text-blue-700",
+    white : "bg-gray-100 hover:bg-gray-100 text-gray-600",
+    none: "",
   };
 
   const sizeClasses = {

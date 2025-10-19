@@ -31,20 +31,12 @@ interface reqUser {
   // [key: string]: any; // For any other properties
 }
 
-interface Doctor {
-  id: number;
-  fullName: string;
-  email: string;
-  username: string;
-  gender: string;
-  specialty: string;
+interface Doctor extends resUser {
   phoneNumber: string;
-  age: number;
+  specialty: string;
   experienceYears: number;
-  address: string;
   price: number;
-  status: "ACTIVE" | "INACTIVE";
-  hospital: { id: number } | null;
+  hospital: { id: number; name?: string };
   //   certifications?: string[];
   //   education?: string;
   //   scheduleDays?: string[];

@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { IoIosArrowBack } from "react-icons/io";
 import { FaStethoscope, FaEdit } from "react-icons/fa";
-import { MdOutlineSaveAlt, MdOutlineCancel} from "react-icons/md";
+import { MdOutlineSaveAlt, MdOutlineCancel } from "react-icons/md";
 import {
   getTestResultById,
   updateTestResult, // 1. Import hàm update
@@ -14,11 +14,15 @@ import {
 import { AxiosError } from "axios";
 import { translateTestType } from "@/utils/translateEnums";
 import Button from "@/components/Button";
+import { useAuth } from "@/contexts/AuthContext";
+import DoctorOnly from "@/components/DoctorOnly";
 
 const TestResultDetailPage = () => {
   const params = useParams();
   const router = useRouter();
   const testResultId = params.testResultId as string;
+
+  const { userRole } = useAuth();
 
   const [testResult, setTestResult] = useState<TestResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -125,40 +129,41 @@ const TestResultDetailPage = () => {
 
         <div className="bg-white p-6 md:p-8 rounded-2xl shadow-lg space-y-8">
           <div className="flex justify-between items-start">
-            <h1 className="text-2xl font-bold text-blue-600 flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-sky-700 flex items-center gap-3">
               <FaStethoscope />
               Chi tiết kết quả xét nghiệm
             </h1>
-            {/* 6. Hiển thị nút Cập nhật / Lưu / Hủy */}
-            {!isEditing ? (
-              <Button
-                size="sm"
-                onClick={() => setIsEditing(true)}
-                icon={<FaEdit />}
-              >
-                Cập nhật
-              </Button>
-            ) : (
-              <div className="flex gap-2">
+            <DoctorOnly userRole={userRole}>
+              {!isEditing ? (
                 <Button
                   size="sm"
-                  variant="primary"
-                  onClick={handleUpdate}
-                  icon={<MdOutlineSaveAlt />}
-                  isLoading={isUpdating}
+                  onClick={() => setIsEditing(true)}
+                  icon={<FaEdit />}
                 >
-                  Lưu
+                  Cập nhật
                 </Button>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={handleCancel}
-                  icon={<MdOutlineCancel />}
-                >
-                  Hủy
-                </Button>
-              </div>
-            )}
+              ) : (
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    onClick={handleUpdate}
+                    icon={<MdOutlineSaveAlt />}
+                    isLoading={isUpdating}
+                  >
+                    Lưu
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={handleCancel}
+                    icon={<MdOutlineCancel />}
+                  >
+                    Hủy
+                  </Button>
+                </div>
+              )}
+            </DoctorOnly>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-base">

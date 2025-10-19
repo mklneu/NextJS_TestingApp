@@ -29,6 +29,12 @@ interface AppointmentBody {
   notificationSent?: boolean;
 }
 
+export interface CompleteAppointmentBody {
+  doctorNote: string;
+  testResultIds: number[];
+  prescriptionIds: number[];
+}
+
 const createAppointment = async (body: AppointmentBody) => {
   try {
     await axiosInstance.post("/appointments", body);
@@ -138,12 +144,11 @@ const cancelAppointment = async (
 
 const completeAppointment = async (
   appointmentId: number,
-  doctorNote: string
+  payload: CompleteAppointmentBody // <-- Nhận vào một object payload
 ) => {
-  return await axiosInstance.patch(
+  return await axiosInstance.put(
     `/appointments/${appointmentId}/complete`,
-    null,
-    { params: { doctorNote } }
+    payload // <-- Gửi payload làm body của request, không dùng params nữa
   );
 };
 

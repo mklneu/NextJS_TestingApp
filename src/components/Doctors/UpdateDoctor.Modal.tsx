@@ -18,13 +18,13 @@ const initialDoctorState: Partial<Doctor> = {
   specialty: "",
   email: "",
   username: "",
-  age: 0,
+  dob: "",
   phoneNumber: "",
   address: "",
   price: 0,
   experienceYears: 0,
   gender: "MALE",
-  status: "ACTIVE",
+  // status: "ACTIVE",
   hospital: { id: 0 },
 };
 
@@ -69,25 +69,43 @@ const UpdateDoctorModal = (props: IUpdateModalProps) => {
 
   useEffect(() => {
     // Fetch doctor details if doctorId is provided
+
+    const fetchDoctorDetails = async () => {
+      setLoading(true);
+      try {
+        const data = await getDoctorById(doctorId);
+        setDoctorData(data); // Cập nhật state với dữ liệu từ API
+      } catch (error) {
+        console.error("Lỗi khi lấy thông tin bác sĩ:", error);
+        toast.error("Không thể lấy thông tin bác sĩ");
+        // handleClose(); // Đóng modal nếu có lỗi
+        setDoctorId(null);
+        setShow(false);
+        setDoctorData(initialDoctorState); // Reset form
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (doctorId && show) {
       fetchDoctorDetails();
     }
-  }, [doctorId, show]);
+  }, [doctorId, show, setDoctorId, setShow]);
 
   // 3. Hàm lấy dữ liệu từ API thật
-  const fetchDoctorDetails = async () => {
-    setLoading(true);
-    try {
-      const data = await getDoctorById(doctorId);
-      setDoctorData(data); // Cập nhật state với dữ liệu từ API
-    } catch (error) {
-      console.error("Lỗi khi lấy thông tin bác sĩ:", error);
-      toast.error("Không thể lấy thông tin bác sĩ");
-      handleClose(); // Đóng modal nếu có lỗi
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const fetchDoctorDetails = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const data = await getDoctorById(doctorId);
+  //     setDoctorData(data); // Cập nhật state với dữ liệu từ API
+  //   } catch (error) {
+  //     console.error("Lỗi khi lấy thông tin bác sĩ:", error);
+  //     toast.error("Không thể lấy thông tin bác sĩ");
+  //     handleClose(); // Đóng modal nếu có lỗi
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   // Sửa lại kiểu dữ liệu của 'e' để bao gồm cả HTMLTextAreaElement
   const handleInputChange = (
@@ -209,7 +227,7 @@ const UpdateDoctorModal = (props: IUpdateModalProps) => {
                   ]}
                 />
 
-                <InputBar
+                {/* <InputBar
                   type="select"
                   label="Trạng thái"
                   value={doctorData.status || ""}
@@ -219,7 +237,7 @@ const UpdateDoctorModal = (props: IUpdateModalProps) => {
                     { label: "Đang hoạt động", value: "ACTIVE" },
                     { label: "Tạm ngưng", value: "INACTIVE" },
                   ]}
-                />
+                /> */}
 
                 <div className="flex justify-end mx-auto gap-2 mt-6 mb-8 w-11/12">
                   <Button variant="secondary" size="md" onClick={handleClose}>

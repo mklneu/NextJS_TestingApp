@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { createAppointment } from "@/services/AppointmentServices";
 import { getAllDoctors } from "@/services/DoctorServices";
 import Button from "@/components/Button";
+import { AxiosError } from "axios";
 
 const appointmentTypes = [
   { value: "KHAM_TONG_QUAT", label: "Khám tổng quát" },
@@ -81,10 +82,12 @@ export default function BookingPage() {
     e.preventDefault();
     setLoading(true);
     try {
+      // Chuyển đổi chuỗi datetime-local sang định dạng ISO 8601 (UTC)
+      const isoDateString = new Date(form.appointmentDate).toISOString();
       const body = {
         patient: { id: Number(form.patientId) },
         doctor: { id: Number(form.doctorId) },
-        appointmentDate: form.appointmentDate,
+        appointmentDate: isoDateString,
         patientNote: form.patientNote,
         doctorNote: form.doctorNote,
         clinicRoom: form.clinicRoom,
@@ -95,7 +98,10 @@ export default function BookingPage() {
       toast.success("Đặt lịch thành công!");
       router.push("/");
     } catch (error) {
-      toast.error(error as string);
+      const errorMessage =
+        (error as AxiosError<ErrorResponse>).response?.data.message ||
+        "Đặt lịch thất bại, vui lòng thử lại.";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

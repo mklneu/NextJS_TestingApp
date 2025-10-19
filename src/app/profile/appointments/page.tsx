@@ -6,7 +6,6 @@ import {
   getAppointmentByPatientId,
   confirmAppointment,
   cancelAppointment,
-  completeAppointment,
 } from "@/services/AppointmentServices";
 import { AxiosError } from "axios";
 import {
@@ -21,35 +20,46 @@ import {
 import Button from "@/components/Button";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { FaCalendarCheck } from "react-icons/fa6";
 
 // Fake loading skeleton
 const SkeletonRow = () => (
   <tr className="animate-pulse">
-    <td className="py-3 px-2">
-      <div className="h-4 bg-gray-200 rounded w-20" />
+    <td className="py-3 px-2 w-1/8">
+      <div className="h-4 bg-gray-200 rounded" />
     </td>
-    <td className="py-3 px-2">
-      <div className="h-4 bg-gray-200 rounded w-24" />
+    <td className="py-3 px-2 w-1/8">
+      <div className="h-4 bg-gray-200 rounded" />
     </td>
-    <td className="py-3 px-2">
-      <div className="h-4 bg-gray-200 rounded w-16" />
+    <td className="py-3 px-2 w-1/8">
+      <div className="h-4 bg-gray-200 rounded" />
     </td>
-    <td className="py-3 px-2">
-      <div className="h-4 bg-gray-200 rounded w-20" />
+    <td className="py-3 px-2 w-1/8">
+      <div className="h-4 bg-gray-200 rounded" />
     </td>
-    <td className="py-3 px-2">
-      <div className="h-4 bg-gray-200 rounded w-28" />
+    <td className="py-3 px-2 w-1/8">
+      <div className="h-4 bg-gray-200 rounded" />
     </td>
-    <td className="py-3 px-2">
-      <div className="h-4 bg-gray-200 rounded w-16" />
+    <td className="py-3 px-2 w-1/8">
+      <div className="h-4 bg-gray-200 rounded" />
+    </td>
+    <td className="py-3 px-2 w-1/8">
+      <div className="h-4 bg-gray-200 rounded" />
+    </td>
+    <td className="py-3 px-2 w-1/8">
+      <div className="h-4 bg-gray-200 rounded" />
     </td>
   </tr>
 );
 
 const AppointmentsTab = () => {
+  const router = useRouter();
+
+  const { user, userRole, appointmentsUpdateTrigger } = useAuth();
+
   const [appointments, setAppointments] = useState<Appointment[] | null>(null);
   const [loading, setLoading] = useState(true);
-  const { user, userRole, appointmentsUpdateTrigger } = useAuth();
 
   // Sorting
   const [sortField, setSortField] = useState<"id" | "appointmentDate">(
@@ -147,7 +157,7 @@ const AppointmentsTab = () => {
         toast.success("Đã huỷ lịch hẹn!");
       }
       if (action === "complete") {
-        await completeAppointment(selectedAppointment.id, modalDoctorNote);
+        // await completeAppointment(selectedAppointment.id, modalDoctorNote);
         newStatus = "COMPLETED";
         toast.success("Đã hoàn thành lịch hẹn!");
       }
@@ -180,6 +190,7 @@ const AppointmentsTab = () => {
   return (
     <div className="p-2 sm:p-4 md:p-8 min-h-screen w-full max-w-none mx-auto">
       <h2 className="text-2xl font-bold flex items-center gap-2 text-blue-700">
+        <FaCalendarCheck />
         Lịch hẹn của tôi
       </h2>
       <div className="flex items-center my-5 justify-end gap-4 ">
@@ -192,7 +203,7 @@ const AppointmentsTab = () => {
         ) : null}
         {/* Thay thế bộ lọc chuyên khoa bằng bộ lọc trạng thái */}
         <select
-          className="bg-gray-50 border outline-none 
+          className="bg-gray-50 border outline-none cursor-pointer
                       border-gray-300 text-gray-900 text-sm 
                         rounded-lg focus:ring-blue-500
                          focus:border-blue-500 block p-2.5"
@@ -211,7 +222,7 @@ const AppointmentsTab = () => {
       </div>
       <div className="w-full overflow-x-auto">
         <table className="min-w-[1200px] w-full border rounded-lg">
-          <thead className="bg-blue-50 border-b">
+          <thead className="bg-blue-100 border-b">
             <tr>
               <th className="py-3 px-2 flex justify-center font-semibold text-gray-700 w-20">
                 <Button
@@ -219,7 +230,7 @@ const AppointmentsTab = () => {
                     setSortField("id");
                     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
                   }}
-                  className={`!bg-blue-50 !font-semibold
+                  className={`!bg-transparent !font-semibold
                      !text-gray-700 !text-base  
                      !duration-300 !border-none shadow-none `}
                   translate={false}
@@ -236,7 +247,7 @@ const AppointmentsTab = () => {
                     setSortField("appointmentDate");
                     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
                   }}
-                  className={`!bg-blue-50 !font-semibold 
+                  className={`!bg-transparent !font-semibold 
                     !text-gray-700 !text-base 
                     !duration-300 !border-none shadow-none`}
                   translate={false}
@@ -268,7 +279,19 @@ const AppointmentsTab = () => {
               appointments.map((a) => (
                 <tr
                   key={a.id}
-                  className="hover:bg-blue-50 transition text-gray-600 border-b border-b-gray-300"
+                  className={`hover:bg-blue-50 duration-300
+                  text-gray-600 border-b border-b-gray-300
+                  ${
+                    a.status === "PENDING"
+                      ? "bg-gray-50 cursor-not-allowed text-gray-400"
+                      : "cursor-pointer hover:bg-blue-50"
+                  }
+                  `}
+                  onClick={() => {
+                    if (a.status !== "PENDING") {
+                      router.push(`/profile/appointments/${a.id}`);
+                    }
+                  }}
                 >
                   <td className="py-3 px-2 text-center font-mono text-xs text-gray-500 w-20">
                     {a.id}
@@ -293,12 +316,13 @@ const AppointmentsTab = () => {
                     <button
                       className={`px-3 py-1 rounded transition ${getStatusButtonClass(
                         a.status
-                      )} disabled:cursor-default cursor-pointer`}
+                      )} disabled:cursor-not-allowed cursor-pointer`}
                       onClick={() => openModal(a)}
                       disabled={
                         a.status === "COMPLETED" ||
                         a.status === "CANCELLED" ||
-                        (userRole !== "doctor" && a.status === "CONFIRMED")
+                        // (userRole !== "doctor" && a.status === "CONFIRMED")
+                        a.status === "CONFIRMED"
                       }
                     >
                       {translateAppointmentStatus(a.status) || "-"}

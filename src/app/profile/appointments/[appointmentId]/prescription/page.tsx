@@ -392,7 +392,7 @@ const CreatePrescriptionPage = () => {
                             onChange={() => handleTestResultToggle(result.id)}
                           />
                           <span className="text-sm text-gray-800">
-                            {translateTestType(result.testType)} (Ngày:{" "}
+                            {translateTestType(result.testType)} (Ngày{" "}
                             {new Date(result.testTime).toLocaleDateString(
                               "vi-VN"
                             )}
@@ -443,7 +443,8 @@ const CreatePrescriptionPage = () => {
                           required
                         />
                         {activeIndex === index && (
-                          <div className="absolute z-10 w-full bg-white rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg">
+                          <div className="absolute z-10 w-full 
+                          bg-white rounded-lg mt-1 max-h-50 overflow-y-auto shadow-lg">
                             {medicineSearchResults.length > 0 ? (
                               // 1. CÓ KẾT QUẢ: Hiển thị danh sách
                               medicineSearchResults.map((result) => (

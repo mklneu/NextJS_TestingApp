@@ -24,14 +24,15 @@ export interface PrescriptionItemBody {
 // Dữ liệu trả về hoàn chỉnh cho một đơn thuốc
 export interface Prescription {
   id: number;
-  patient: { id: number };
-  doctor: { id: number };
+  patient: { id: number ; name: string};
+  doctor: { id: number ; name: string};
   appointment: { id: number };
   prescriptionDate: string;
   diagnosis: string;
   advice: string;
-  testResults: TestResultItem[];
+  totalCost: number;
   prescriptionItems: PrescriptionItemResponse[];
+  testResults: TestResultItem[];
 }
 
 // Dữ liệu trả về cho một mục thuốc (có thêm thông tin tên thuốc)
@@ -88,6 +89,24 @@ const getPrescriptionById = async (id: number): Promise<Prescription> => {
   }
 };
 
+const getPrescriptionsByPatientId = async (
+  patientId: number
+): Promise<Prescription[]> => {
+  try {
+    const response = await axiosInstance.get(
+      `/prescriptions/patient/${patientId}`
+    );
+    // console.log("Fetched prescriptions:", response.data.data);
+    return response.data.data || [];
+  } catch (error) {
+    console.error(
+      `❌ Error fetching prescriptions with patient ${patientId}:`,
+      error
+    );
+    throw error;
+  }
+};
+
 /**
  * Lấy danh sách các đơn thuốc theo ID của buổi khám
  * @param appointmentId ID của buổi khám
@@ -132,6 +151,7 @@ const updatePrescription = async (
 export {
   createPrescription,
   getPrescriptionById,
+  getPrescriptionsByPatientId,
   getPrescriptionsByAppointmentId,
   updatePrescription,
 };
