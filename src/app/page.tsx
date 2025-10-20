@@ -175,7 +175,15 @@ export default function Home() {
         </div>
       </div> */}
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+      <section
+        className=" relative
+      bg-gradient-to-br  from-gray-900 via-gray-900 to-slate-800
+      text-white py-16"
+      >
+        <div
+          className=" inset-0  absolute opacity-20
+        bg-[url('https://www.transparenttextures.com/patterns/gplay.png')]"
+        ></div>
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-10 md:mb-0">
@@ -365,17 +373,17 @@ export default function Home() {
       </section> */}
 
       {/* Call to Action Section */}
-      <section className="py-16 px-4 bg-gradient-to-r from-blue-50 to-blue-100">
+      <section className="py-16 px-4 bg-gradient-to-br from-blue-500 to-blue-600">
         <div className="container mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">
+          <h2 className="text-3xl font-bold text-white mb-6">
             Sẵn sàng nâng cao hiệu quả quản lý y tế?
           </h2>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-200 mb-8 max-w-2xl mx-auto">
             Khám phá các giải pháp SmartHealth và trải nghiệm cách quản lý y tế
             hiện đại, tiết kiệm thời gian và tối ưu hóa quy trình.
           </p>
           <div className="flex justify-center">
-            <Button size="lg">Bắt đầu ngay</Button>
+            <Button size="lg" variant="white">Bắt đầu ngay</Button>
           </div>
         </div>
       </section>
