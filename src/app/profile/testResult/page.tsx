@@ -42,7 +42,7 @@ const MedicalTab = () => {
     useState<Prescription | null>(null);
 
   // 1. Luôn khởi tạo với giá trị mặc định, giống hệt server
-  const [activeTab, setActiveTab] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<string>("testResults");
 
   // 2. Dùng useEffect để đọc từ localStorage SAU KHI component đã được mount ở client
   useEffect(() => {

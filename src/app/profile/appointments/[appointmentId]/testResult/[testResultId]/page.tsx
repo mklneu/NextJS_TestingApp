@@ -134,6 +134,7 @@ const TestResultDetailPage = () => {
               Chi tiết kết quả xét nghiệm
             </h1>
             <DoctorOnly userRole={userRole}>
+              {}
               {!isEditing ? (
                 <Button
                   size="sm"

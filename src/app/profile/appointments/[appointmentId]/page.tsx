@@ -17,7 +17,11 @@ import {
 } from "@/services/AppointmentServices";
 import { AxiosError } from "axios";
 import { getPatientById } from "@/services/PatientServices";
-import { translateGender, translateTestType } from "@/utils/translateEnums";
+import {
+  translateAppointmentType,
+  translateGender,
+  translateTestType,
+} from "@/utils/translateEnums";
 import { FaPlus, FaPrescriptionBottle, FaUserDoctor } from "react-icons/fa6";
 import { IoIosArrowBack } from "react-icons/io";
 // 1. Import service và type mới
@@ -263,12 +267,21 @@ const ExaminationDetailPage = () => {
         {/* Cột chính cho việc khám bệnh */}
         <div className="h-fit lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
           <div>
-            <h2 className="text-xl font-bold text-sky-700 mb-1 flex items-center gap-2">
-              <FaCalendarCheck /> Thông tin buổi khám
-            </h2>
-            <div className="text-gray-500 text-sm">
-              Thời giam khám:{" "}
-              {formatAppointmentDate(appointment.appointmentDate)}
+            <div className="flex items-baseline text-xl font-bold text-sky-700 mb-1 gap-2">
+              <FaCalendarCheck />
+              <span> Thông tin buổi khám</span>{" "}
+              <span className="text-sm font-medium text-gray-500">
+                ({translateAppointmentType(appointment.appointmentType)})
+              </span>
+            </div>
+            <div className="flex justify-between border-b border-gray-300 my-2">
+              <div className="text-gray-500 text-sm">
+                Thời giam khám:{" "}
+                {formatAppointmentDate(appointment.appointmentDate)}
+              </div>
+              <div className="text-gray-500 text-sm">
+                Phòng khám: {appointment.clinicRoom}
+              </div>
             </div>
           </div>
 

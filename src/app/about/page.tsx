@@ -22,7 +22,9 @@ const AboutPage = () => {
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-blue-600 to-blue-800 py-20 overflow-hidden">
+      <section className="relative 
+      bg-gradient-to-br from-gray-900 via-gray-900 to-slate-800
+      py-20 overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <Image
             src="/images/health-pattern.jpg"
