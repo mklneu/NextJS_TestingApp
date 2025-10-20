@@ -24,7 +24,8 @@ interface StatCardProps {
 const StatCard = ({ title, value, icon, color }: StatCardProps) => {
   return (
     <div
-      className={`bg-white rounded-xl shadow-md p-6 border-t-4 ${color} hover:shadow-lg transition-all duration-300`}
+      className={`bg-white rounded-xl shadow-md p-6 
+        border-t-4 ${color} hover:shadow-lg transition-all duration-300`}
     >
       <div className="flex justify-between items-center">
         <div>
@@ -157,7 +158,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Demo phân quyền API */}
       {/* <div className="container mx-auto px-4 pt-6">
         <div className="mb-6">
@@ -177,7 +178,8 @@ export default function Home() {
       {/* Hero Section */}
       <section
         className=" relative
-      bg-gradient-to-br  from-gray-900 via-gray-900 to-slate-800
+        bg-gradient-to-br  from-blue-500 to-blue-600
+      dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-900 dark:to-slate-800
       text-white py-16"
       >
         <div
@@ -383,7 +385,9 @@ export default function Home() {
             hiện đại, tiết kiệm thời gian và tối ưu hóa quy trình.
           </p>
           <div className="flex justify-center">
-            <Button size="lg" variant="white">Bắt đầu ngay</Button>
+            <Button size="lg" variant="white">
+              Bắt đầu ngay
+            </Button>
           </div>
         </div>
       </section>
