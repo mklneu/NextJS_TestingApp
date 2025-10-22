@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import { Slide, ToastContainer } from "react-toastify";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 import { AuthProvider } from "@/contexts/AuthContext";
+// import ThemeSwitch from "@/components/ThemeSwitch";
+import { Providers } from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,29 +30,34 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <AuthProvider>
-          <Header />
-          <main className="flex-1 bg-blue-50 ">{children}</main>
-          <ScrollToTopButton />
-          <Footer />
-          <ToastContainer
-            position="top-right"
-            autoClose={2000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick={false}
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-            transition={Slide}
-          />
-        </AuthProvider>
+        <Providers>
+          <AuthProvider>
+            <Header />
+            <main className="flex-1 bg-blue-50">
+              {children}
+            </main>
+            <ScrollToTopButton />
+            <Footer />
+            <ToastContainer
+              position="top-right"
+              autoClose={2000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick={false}
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="dark"
+              transition={Slide}
+            />
+            {/* <ThemeSwitch /> */}
+          </AuthProvider>
+        </Providers>
       </body>
     </html>
   );

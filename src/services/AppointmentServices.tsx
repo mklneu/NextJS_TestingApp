@@ -19,12 +19,10 @@ interface AxiosRequestParams {
 }
 
 interface AppointmentBody {
-  patient: { id: number };
-  doctor: { id: number };
+  patient: { id: number | undefined};
+  doctor: { id: number | undefined};
   appointmentDate: string;
   patientNote: string;
-  doctorNote: string;
-  clinicRoom: string;
   appointmentType: string;
   notificationSent?: boolean;
 }
@@ -37,8 +35,8 @@ export interface CompleteAppointmentBody {
 
 const createAppointment = async (body: AppointmentBody) => {
   try {
-    await axiosInstance.post("/appointments", body);
-    return { success: true };
+    const res = await axiosInstance.post("/appointments", body);
+    return res.data;
   } catch (error) {
     const err = error as AxiosError<ErrorResponse>;
     throw err.response?.data?.message || err.message || "Có lỗi xảy ra";

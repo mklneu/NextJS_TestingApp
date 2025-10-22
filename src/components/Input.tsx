@@ -4,11 +4,11 @@ interface IOption {
 }
 
 interface IInputProps {
-  type?: "text" | "email" | "password" | "textarea" | "select" | "date";
+  type?: "text" | "email" | "password" | "textarea" | "select" | "date" | "datetime-local";
   placeholder?: string;
   value: string | number;
   disabled?: boolean;
-  onChange: (
+  onChange?: (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
@@ -18,6 +18,7 @@ interface IInputProps {
   onClick?: () => void; // Chỉ dùng cho input bình thường
   options?: IOption[]; // Chỉ dùng cho type select
   label?: string; // Chỉ dùng cho input bình thường
+  name?: string; // Chỉ dùng cho input bình thường
 }
 
 const InputBar = ({
@@ -31,27 +32,32 @@ const InputBar = ({
   options = [],
   onClick,
   label,
+  name,
 }: IInputProps) => {
   const baseClasses =
-    "w-full h-full bg-transparent rounded-xl pl-5 pr-14 placeholder:text-gray-700 border border-cyan-950 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md placeholder-opacity-70 focus:placeholder-opacity-40";
+    "w-full h-full bg-transparent rounded-xl pl-5 pr-14 placeholder:text-gray-700 border border-cyan-950 duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md placeholder-opacity-70 focus:placeholder-opacity-40";
 
   const textareaClasses =
-    "w-full h-full bg-transparent rounded-xl pl-5 pr-14 pt-3  placeholder:text-gray-700 border border-cyan-950 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md placeholder-opacity-70 focus:placeholder-opacity-40";
+    "w-full min-h-15 h-full bg-transparent rounded-xl pl-5 pr-14 pt-3 text-gray-900 placeholder:text-gray-500 border border-gray-300 duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md placeholder-opacity-70 focus:placeholder-opacity-40";
 
   const selectClasses =
-    "w-full h-full bg-white rounded-xl pl-5 pr-10 text-gray-700 border border-cyan-950 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md cursor-pointer";
+    "w-full h-full bg-white rounded-xl pl-5 pr-10 text-gray-700 border border-cyan-950 duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md cursor-pointer";
 
   if (type === "textarea") {
     return (
-      <div className="flex w-11/12 mb-4 mx-auto">
+      <div className="flex mb-4 mx-auto">
         {label && (
-          <label className="text-sm font-medium text-gray-700 px-1 absolute -top-[10.5px] left-3 bg-white">
+          <label className="text-sm
+          font-medium text-gray-700 
+          px-1 absolute -top-[10.5px] 
+          left-3 bg-white">
             {label}
           </label>
         )}
         <textarea
           placeholder={placeholder}
           required
+          name={name}
           value={value}
           disabled={disabled}
           onChange={onChange}
@@ -64,14 +70,21 @@ const InputBar = ({
 
   if (type === "select") {
     return (
-      <div className="flex w-11/12 h-12 mb-4 mx-auto relative ">
+      <div className="flex h-12 mb-4 mx-auto relative ">
         {label && (
-          <label className="text-sm font-medium text-gray-700 px-1 absolute -top-[10.5px] left-3 bg-white">
+          <label
+            className="text-sm 
+          font-medium text-gray-700 
+          px-1 absolute -top-[10.5px] 
+          left-3 bg-white"
+          >
             {label}
           </label>
         )}
         <select
+          name={name}
           value={value}
+          required
           disabled={disabled}
           onChange={onChange}
           className={`${selectClasses} ${className} appearance-none `}
@@ -85,7 +98,7 @@ const InputBar = ({
             <option
               key={option.value}
               value={option.value}
-              className="py-2 px-4 hover:bg-blue-100 "
+              className="py-2 px-4 hover:bg-blue-100"
             >
               {option.label}
             </option>
@@ -112,14 +125,42 @@ const InputBar = ({
   // Xử lý riêng cho type="date"
   if (type === "date") {
     return (
-      <div className="flex w-11/12 h-12 mb-4 mx-auto relative">
+      <div className="flex h-12 mb-4 mx-auto relative">
         {label && (
-          <label className="text-sm font-medium text-gray-700 px-1 absolute -top-3 left-3 bg-white">
+          <label className="text-sm 
+          font-medium text-gray-700 
+          px-1 absolute -top-3 left-3 bg-white">
             {label}
           </label>
         )}
         <input
           type="date"
+          name={name}
+          placeholder={placeholder}
+          required
+          value={value}
+          disabled={disabled}
+          onChange={onChange}
+          onClick={onClick}
+          className={`${baseClasses} ${className}`}
+        />
+      </div>
+    );
+  }
+
+  if (type === "datetime-local") {
+    return (
+      <div className="flex h-12 mb-4 mx-auto relative">
+        {label && (
+          <label className="text-sm 
+          font-medium text-gray-700 
+          px-1 absolute -top-3 left-3 bg-white">
+            {label}
+          </label>
+        )}
+        <input
+          type="datetime-local"
+          name={name}
           placeholder={placeholder}
           required
           value={value}
@@ -133,9 +174,13 @@ const InputBar = ({
   }
 
   return (
-    <div className="flex w-11/12 h-12 mb-4 mx-auto relative">
+    <div className="flex h-12 mb-4 mx-auto relative">
       {label && (
-        <label className="text-sm font-medium text-gray-700 px-1 absolute -top-3 left-3 bg-white">
+        <label
+          className="text-sm 
+        font-medium text-gray-700 
+        px-1 absolute -top-3 left-3 bg-white"
+        >
           {label}
         </label>
       )}

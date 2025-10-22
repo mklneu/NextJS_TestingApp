@@ -105,6 +105,7 @@ const AppointmentsTab = () => {
         } else if (userRole === "admin" || userRole === "patient") {
           const data = await getAppointmentByPatientId(user.id, commonParams);
           setAppointments(data?.data || []);
+          console.log("Fetched appointments data:", data);
           setTotalPages(data?.meta?.pages || 1);
         }
       } catch (error) {
@@ -297,7 +298,9 @@ const AppointmentsTab = () => {
                     {a.id}
                   </td>
                   <td className="py-3 px-2 text-center">
-                    {a.patient ? a.patient.fullName : a.doctor.fullName}
+                    {userRole === "doctor"
+                      ? a.patient.fullName
+                      : a.doctor.fullName}
                   </td>
                   <td className="py-3 px-2 text-center">
                     {formatAppointmentDate(a.appointmentDate)}

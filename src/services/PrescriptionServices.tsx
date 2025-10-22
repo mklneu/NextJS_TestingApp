@@ -7,7 +7,7 @@ export interface PrescriptionBody {
   appointment: { id: number };
   prescriptionDate: string;
   diagnosis: string;
-  advice: string;
+  advice?: string;
   testResultIds?: number[];
   prescriptionItems: PrescriptionItemBody[];
 }
@@ -29,7 +29,7 @@ export interface Prescription {
   appointment: { id: number };
   prescriptionDate: string;
   diagnosis: string;
-  advice: string;
+  advice?: string;
   totalCost: number;
   prescriptionItems: PrescriptionItemResponse[];
   testResults: TestResultItem[];

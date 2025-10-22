@@ -1,3 +1,5 @@
+import { Prescription } from "./PrescriptionServices";
+
 // Pagination component
 const Pagination = ({
   totalPages,
@@ -150,6 +152,23 @@ const getInitialGmt7Time = () => {
   return gmt7Time.toISOString().slice(0, 16);
 };
 
+const formatTotalCost = (prescriptions: Prescription[]): string => {
+  // 1. Tính tổng chi phí từ mảng prescriptions
+  const totalCost = prescriptions.reduce(
+    (total, prescription) => total + (prescription.totalCost || 0),
+    0
+  );
+
+  // 2. Định dạng số tiền sang kiểu tiền tệ Việt Nam
+  const formattedCost = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(totalCost);
+
+  // 3. Trả về chuỗi đã định dạng
+  return formattedCost;
+};
+
 export {
   Pagination,
   formatDateToDMY,
@@ -157,4 +176,5 @@ export {
   scrollToTop,
   getStatusButtonClass,
   getInitialGmt7Time,
+  formatTotalCost,
 };

@@ -43,7 +43,7 @@ const Button = ({
     purple: "bg-indigo-500 hover:bg-indigo-600 text-white",
     lightBlue: "bg-blue-100 hover:bg-blue-200 text-blue-700",
     white : "bg-gray-100 hover:bg-gray-100 text-gray-600",
-    none: "",
+    none: "border border-gray-300",
   };
 
   const sizeClasses = {

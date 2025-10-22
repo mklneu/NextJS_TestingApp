@@ -158,7 +158,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       {/* Demo phân quyền API */}
       {/* <div className="container mx-auto px-4 pt-6">
         <div className="mb-6">
@@ -183,7 +183,7 @@ export default function Home() {
       text-white py-16"
       >
         <div
-          className=" inset-0  absolute opacity-20
+          className=" inset-0 absolute opacity-20
         bg-[url('https://www.transparenttextures.com/patterns/gplay.png')]"
         ></div>
         <div className="container mx-auto px-4">
@@ -197,31 +197,41 @@ export default function Home() {
                 quản lý hồ sơ y tế và nâng cao chất lượng chăm sóc sức khỏe.
               </p>
               {userRole === "admin" ? (
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-4 ">
                   <Link
-                    href="/admin/users"
-                    className="px-6 py-3 bg-white text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-all"
+                    href="/admin/patients"
+                    className="px-6 py-3 z-10 duration-300
+                    bg-white text-blue-600 
+                    font-medium rounded-lg hover:bg-blue-50"
                   >
                     Xem người dùng
                   </Link>
                   <Link
                     href="/admin/dashboard"
-                    className="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg border border-blue-400 hover:bg-blue-600 transition-all"
+                    className="px-6 py-3 z-10
+                    bg-transparent text-white duration-300
+                    font-medium rounded-lg border
+                     border-blue-400 hover:bg-white/10"
                   >
                     Dashboard
                   </Link>
                   <Link
                     href="/booking"
-                    className="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg border border-blue-400 hover:bg-blue-600 transition-all"
+                    className="px-6 py-3 z-10
+                     bg-transparent cursor-pointer duration-300
+                     text-white font-medium rounded-lg 
+                     border border-blue-400 hover:bg-white/10"
                   >
                     Đặt lịch khám
                   </Link>
                 </div>
               ) : userRole === "doctor" ? null : userRole === "patient" ? (
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-4 z-10">
                   <Link
                     href="/booking"
-                    className="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg border border-blue-400 hover:bg-blue-600 transition-all"
+                    className="px-6 py-3 bg-transparent duration-300
+                     text-white font-medium rounded-lg 
+                     border border-blue-400 hover:bg-white/10"
                   >
                     Đặt lịch khám
                   </Link>
@@ -385,7 +395,7 @@ export default function Home() {
             hiện đại, tiết kiệm thời gian và tối ưu hóa quy trình.
           </p>
           <div className="flex justify-center">
-            <Button size="lg" variant="white">
+            <Button size="lg" variant="none" className="hover:bg-white/10">
               Bắt đầu ngay
             </Button>
           </div>

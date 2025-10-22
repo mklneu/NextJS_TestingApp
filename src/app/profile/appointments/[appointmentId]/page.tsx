@@ -37,7 +37,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { getDoctorById } from "@/services/DoctorServices";
 import DoctorOnly from "@/components/DoctorOnly";
-import { formatAppointmentDate } from "@/services/OtherServices";
+import { formatAppointmentDate, formatTotalCost } from "@/services/OtherServices";
 
 const ExaminationDetailPage = () => {
   const params = useParams();
@@ -61,7 +61,7 @@ const ExaminationDetailPage = () => {
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [showAllPrescriptions, setShowAllPrescriptions] = useState(false);
 
-  const itemsToShowInitially = 1;
+  const itemsToShowInitially = 2;
 
   const [loading, setLoading] = useState(true);
 
@@ -217,7 +217,7 @@ const ExaminationDetailPage = () => {
       <div className="mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Cột thông tin bệnh nhân */}
         <div className="lg:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit">
-          <h2 className="text-xl font-bold text-sky-700 mb-4 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-sky-700 mb-4 flex items-baseline gap-2">
             {userRole === "doctor" ? (
               <>
                 <FaUserInjured /> Thông tin bệnh nhân
@@ -254,7 +254,7 @@ const ExaminationDetailPage = () => {
           </div>
           {appointment.doctorNote && (
             <div className="mt-6 border-t border-gray-300 pt-4">
-              <h3 className="text-lg font-bold text-sky-700 mb-2 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-sky-700 mb-2 flex items-baseline gap-2">
                 <FaNotesMedical /> Ghi chú của bác sĩ
               </h3>
               <p className="text-gray-700 whitespace-pre-wrap">
@@ -435,6 +435,18 @@ const ExaminationDetailPage = () => {
                   Chưa có kết quả xét nghiệm nào được tạo cho buổi khám này.
                 </p>
               )}
+              <div className="w-full">
+                <div className="w-fit mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex justify-between items-baseline space-x-1 text-sm">
+                    <span className="font-medium text-gray-700">
+                      Tổng chi phí thuốc:
+                    </span>
+                    <span className="font-bold text-green-600">
+                      {formatTotalCost(prescriptions)}
+                    </span>
+                  </div>
+                </div>
+              </div>
               {!["COMPLETED", "CANCELLED"].includes(appointment.status) && (
                 <DoctorOnly userRole={userRole}>
                   <div className="pt-2">

@@ -4,9 +4,11 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "react-toastify";
 import { createAppointment } from "@/services/AppointmentServices";
-import { getAllDoctors } from "@/services/DoctorServices";
+import { getDoctorsByHospitalId } from "@/services/DoctorServices";
 import Button from "@/components/Button";
 import { AxiosError } from "axios";
+import { getAllHospitals } from "@/services/HospitalServices";
+import InputBar from "@/components/Input";
 
 const appointmentTypes = [
   { value: "KHAM_TONG_QUAT", label: "Khám tổng quát" },
@@ -22,246 +24,326 @@ export default function BookingPage() {
 
   // State cho form (luôn khai báo trước mọi return)
   const [form, setForm] = useState({
-    patientId: user?.id || "",
     doctorId: "",
-    patient_fullName: user?.fullName || "",
     appointmentDate: "",
     patientNote: "",
-    doctorNote: "",
-    clinicRoom: "",
     appointmentType: "KHAM_TONG_QUAT",
   });
+
+  const [hospitals, setHospitals] = useState<Hospital[]>([]);
+  const [selectedHospital, setSelectedHospital] = useState<string>("");
+
   const [loading, setLoading] = useState(false);
   const [doctors, setDoctors] = useState<{ id: number; fullName: string }[]>(
     []
   );
   const [loadingDoctors, setLoadingDoctors] = useState(false);
+
   useEffect(() => {
-    const fetchDoctors = async () => {
-      setLoadingDoctors(true);
+    const fetchHospitals = async () => {
       try {
-        const data: { data: { id: number; fullName: string }[] } =
-          await getAllDoctors(1, 1000);
-        setDoctors(
-          Array.isArray(data?.data)
-            ? data.data.map((d) => ({
-                id: d.id,
-                fullName: d.fullName,
-              }))
-            : []
-        );
-        console.log("Fetched doctors:", data);
+        const res = await getAllHospitals();
+        setHospitals(res);
       } catch {
-        setDoctors([]);
-      } finally {
-        setLoadingDoctors(false);
+        toast.error("Không thể tải danh sách bệnh viện.");
       }
     };
-    fetchDoctors();
+    fetchHospitals();
   }, []);
+
+  useEffect(() => {
+    if (selectedHospital) {
+      const fetchDoctors = async () => {
+        setLoadingDoctors(true);
+        // Reset danh sách bác sĩ cũ
+        setDoctors([]);
+        setForm((prev) => ({ ...prev, doctorId: "" }));
+        try {
+          const res = await getDoctorsByHospitalId(selectedHospital);
+          setDoctors(res.data);
+        } catch {
+          toast.error("Không thể tải danh sách bác sĩ cho bệnh viện này.");
+        } finally {
+          setLoadingDoctors(false);
+        }
+      };
+      fetchDoctors();
+    }
+  }, [selectedHospital]); // Chạy lại khi selectedHospital thay đổi
+
+  const handleHospitalChange = (
+    e: React.ChangeEvent<
+      HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement
+    >
+  ) => {
+    setSelectedHospital(e.target.value);
+  };
 
   // Phân quyền: chỉ user và admin mới vào được (dùng useEffect để redirect)
   const [isRedirecting, setIsRedirecting] = useState(false);
+  // Sửa lại useEffect này
   useEffect(() => {
-    if (!isLoggedIn || !(userRole === "patient" || userRole === "admin")) {
-      setIsRedirecting(true);
-      router.replace("/");
+    // Chỉ thực hiện kiểm tra và chuyển hướng KHI userRole đã có giá trị (không còn là null nữa)
+    // Điều này đảm bảo AuthProvider đã kiểm tra xong trạng thái đăng nhập.
+    if (userRole !== null) {
+      if (!isLoggedIn || !(userRole === "patient" || userRole === "admin")) {
+        toast.error("Bạn không có quyền truy cập trang này."); // Thêm thông báo lỗi
+        setIsRedirecting(true);
+        router.replace("/");
+      }
     }
-  }, [isLoggedIn, userRole, router]);
-  if (isRedirecting) return null;
+  }, [isLoggedIn, userRole, router]); // Vẫn giữ dependencies như cũ
+
+  // Thêm một trạng thái loading dựa trên userRole
+  const authLoading = userRole === null && isLoggedIn === false; // Giả định ban đầu isLoggedIn là false
+
+  // Nếu đang loading thông tin auth hoặc đang chuyển hướng, hiển thị loading
+  if (authLoading || isRedirecting) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Đang kiểm tra quyền truy cập...</p>
+        {/* Hoặc một component Spinner đẹp hơn */}
+      </div>
+    );
+  }
 
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
+    console.log(
+      "handleChange called for:",
+      e.target.name,
+      "with value:",
+      e.target.value
+    ); // Thêm dòng này
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    if (!form.doctorId || !form.appointmentDate) {
+      toast.error("Vui lòng chọn đầy đủ thông tin.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      // Chuyển đổi chuỗi datetime-local sang định dạng ISO 8601 (UTC)
       const isoDateString = new Date(form.appointmentDate).toISOString();
       const body = {
-        patient: { id: Number(form.patientId) },
+        patient: { id: user?.id },
         doctor: { id: Number(form.doctorId) },
         appointmentDate: isoDateString,
         patientNote: form.patientNote,
-        doctorNote: form.doctorNote,
-        clinicRoom: form.clinicRoom,
         appointmentType: form.appointmentType,
-        notificationSent: false,
+        notificationSent: true,
       };
-      await createAppointment(body);
-      toast.success("Đặt lịch thành công!");
-      router.push("/");
+      const res = await createAppointment(body);
+      toast.success(res.message);
+      router.push("/profile/appointments");
     } catch (error) {
-      const errorMessage =
-        (error as AxiosError<ErrorResponse>).response?.data.message ||
-        "Đặt lịch thất bại, vui lòng thử lại.";
-      toast.error(errorMessage);
+      const err = error as AxiosError<ErrorResponse>;
+      console.error("❌ Error in booking appointment:", err);
+      toast.error("Đặt lịch thất bại, vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div
-      className="max-w-3xl mx-auto bg-white rounded-2xl
-    shadow-2xl p-12 mt-20 mb-35 border border-blue-100 animate-fadeIn"
-    >
-      <h1
-        className="text-3xl font-bold 
-      mb-8 text-blue-700 flex items-center gap-2"
+    <div className="bg-slate-50 min-h-screen p-4 sm:p-8 flex  justify-center">
+      <div
+        className="max-w-4xl w-full mx-auto h-fit
+      bg-white rounded-2xl shadow-xl p-8 md:p-12 
+      border border-gray-100"
       >
-        Đặt lịch khám
-      </h1>
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
-      >
-        {/* Cột trái */}
-        <div className="space-y-5">
-          <div>
-            <label className="block font-semibold mb-1 text-gray-800">
-              Bệnh nhân
-            </label>
-            <input
-              type="text"
-              name="patient_fullName"
-              value={form.patient_fullName}
-              disabled
-              className="w-full border-2 border-blue-200 
-              rounded-lg px-3 py-2 bg-gray-100 text-gray-700 
-              font-semibold opacity-90 outline-none"
-            />
-          </div>
-          <div>
-            <label className="block font-semibold mb-1 text-gray-800">
-              Bác sĩ <span className="text-red-500">*</span>
-            </label>
-            <select
-              name="doctorId"
-              value={form.doctorId}
-              onChange={handleChange}
-              required
-              className="w-full border-2 border-blue-200 cursor-pointer rounded-lg px-3 py-2 bg-white text-gray-800 font-medium appearance-none outline-none"
-              disabled={loadingDoctors}
-            >
-              <option value="" disabled>
-                {loadingDoctors
-                  ? "Đang tải danh sách bác sĩ..."
-                  : "-- Chọn bác sĩ --"}
-              </option>
-              {doctors.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.fullName}
+        <h1 className="text-3xl font-bold mb-8 text-blue-700">
+          Đặt lịch hẹn khám bệnh
+        </h1>
+        <form onSubmit={handleSubmit} className="">
+          {/* Hàng đầu tiên: Bệnh nhân và Bệnh viện */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block font-semibold mb-2 text-gray-700">
+                Bệnh nhân
+              </label>
+              <InputBar
+                type="text"
+                value={user?.fullName || ""}
+                disabled
+                className="w-full border-gray-200 border-1
+                 rounded-lg px-4 py-3 bg-gray-100 outline-none
+                  text-gray-500 font-medium"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="hospital"
+                className="block font-semibold mb-2 text-gray-700"
+              >
+                Chọn Bệnh viện <span className="text-red-500">*</span>
+              </label>
+              <InputBar
+                type="select"
+                value={selectedHospital}
+                onChange={handleHospitalChange}
+                className="w-full border-gray-300 border-1 
+                 rounded-lg px-4 py-3 bg-white outline-none
+                 text-gray-800 focus:border-blue-500
+                  "
+                options={hospitals.map((hospital) => ({
+                  label: hospital.name, // Dùng hospital.name làm label hiển thị
+                  value: hospital.id.toString(), // Dùng hospital.id làm giá trị thực tế
+                }))}
+                placeholder="Chọn bệnh viện"
+              >
+                {/* <option value="" disabled>
+                  -- Vui lòng chọn bệnh viện --
                 </option>
-              ))}
-            </select>
+                {hospitals?.map((h) => (
+                  <option key={h.id} value={h.id}>
+                    {h.name}
+                  </option>
+                ))} */}
+              </InputBar>
+            </div>
           </div>
-          <div>
-            <label className="block font-semibold mb-1 text-gray-800">
-              Ngày giờ khám <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="datetime-local"
-              name="appointmentDate"
-              value={form.appointmentDate}
-              onChange={handleChange}
-              required
-              className="w-full border-2 border-blue-200 rounded-lg px-3 py-2 text-gray-800 font-medium outline-none cursor-pointer"
-              placeholder="Chọn ngày giờ khám"
-            />
-          </div>
-        </div>
-        {/* Cột phải */}
-        <div className="space-y-5">
-          <div>
-            <label className="block font-semibold mb-1 text-gray-800">
-              Phòng khám <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="clinicRoom"
-              value={form.clinicRoom}
-              onChange={handleChange}
-              required
-              className="w-full border-2 border-blue-200 rounded-lg px-3 py-2 text-gray-800 font-medium outline-none"
-              placeholder="Nhập phòng khám (VD: 101)"
-            />
-          </div>
-          <div>
-            <label className="block font-semibold mb-1 text-gray-800">
-              Loại khám
-            </label>
-            <select
-              name="appointmentType"
-              value={form.appointmentType}
-              onChange={handleChange}
-              className="w-full border-2 border-blue-200 rounded-lg px-3 py-2 bg-white text-gray-800 font-medium outline-none cursor-pointer appearance-none"
-            >
-              {appointmentTypes.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block font-semibold mb-1 text-gray-800">
-              Ghi chú
-            </label>
-            <textarea
-              name="patientNote"
-              value={form.patientNote}
-              onChange={handleChange}
-              className="w-full border-2 border-blue-200 rounded-lg 
-              px-3 py-2 text-gray-800 font-medium outline-none min-h-[44px]"
-              placeholder="Nhập ghi chú cho bác sĩ (nếu có)"
-            />
-          </div>
-        </div>
-        {/* Nút submit chiếm 2 cột */}
-        <div className="md:col-span-2">
-          <Button
-            className="w-full bg-gradient-to-r !duration-300
-          from-blue-600 to-blue-500 hover:from-blue-700
-           hover:to-blue-600 text-white font-bold py-3 rounded-xl 
-           shadow-lg !text-lg tracking-wide
-            disabled:opacity-60 disabled:cursor-not-allowed"
+
+          {/* Các trường phụ thuộc */}
+          <div
+            className={`transition-all duration-500 ease-in-out ${
+              selectedHospital
+                ? "max-h-screen opacity-100"
+                : "max-h-0 opacity-0 overflow-hidden"
+            }`}
           >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  viewBox="0 0 24 24"
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+              {/* Chọn Bác sĩ */}
+              <div>
+                <label
+                  htmlFor="doctorId"
+                  className="block font-semibold mb-2 text-gray-700"
                 >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="none"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8z"
-                  />
-                </svg>
-                Đang đặt lịch...
-              </span>
-            ) : (
-              <>Đặt lịch khám</>
-            )}
-          </Button>
-        </div>
-      </form>
+                  Chọn Bác sĩ <span className="text-red-500">*</span>
+                </label>
+                <InputBar
+                  type="select"
+                  name="doctorId"
+                  value={form.doctorId}
+                  onChange={handleChange}
+                  className="w-full border-gray-300 border-1
+                  rounded-lg px-4 py-3 bg-white outline-none
+                  text-gray-800 focus:border-blue-500 "
+                  disabled={
+                    loadingDoctors || !selectedHospital || doctors.length === 0
+                  }
+                  options={doctors.map((d) => ({
+                    label: d.fullName,
+                    value: d.id.toString(),
+                  }))}
+                  placeholder={
+                    loadingDoctors
+                      ? "Đang tải bác sĩ..."
+                      : doctors.length > 0
+                      ? "Chọn bác sĩ"
+                      : "Không có bác sĩ tại bệnh viện này"
+                  }
+                />
+                {/* <option value="" disabled>
+                    {loadingDoctors
+                      ? "Đang tải bác sĩ..."
+                      : doctors.length > 0
+                      ? "-- Chọn một bác sĩ --"
+                      : "Không có bác sĩ tại bệnh viện này"}
+                  </option>
+                  {doctors.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.fullName}
+                    </option>
+                  ))} */}
+              </div>
+
+              {/* Loại hình khám */}
+              <div>
+                <label
+                  htmlFor="appointmentType"
+                  className="block font-semibold mb-2 text-gray-700"
+                >
+                  Loại hình khám
+                </label>
+                <InputBar
+                  type="select"
+                  name="appointmentType"
+                  value={form.appointmentType}
+                  onChange={handleChange}
+                  className="w-full border-gray-300 border-1
+                  rounded-lg px-4 py-3 bg-white outline-none
+                  text-gray-800 focus:border-blue-500
+                   "
+                  options={appointmentTypes}
+                  placeholder="Chọn loại hình khám"
+                >
+                  {/* {appointmentTypes.map((t) => (
+                    <option key={t.value} value={t.value}>
+                      {t.label}
+                    </option>
+                  ))} */}
+                </InputBar>
+              </div>
+
+              {/* Ngày giờ khám */}
+              <div className="md:col-span-2">
+                <label
+                  htmlFor="appointmentDate"
+                  className="block font-semibold mb-2 text-gray-700"
+                >
+                  Chọn ngày giờ khám <span className="text-red-500">*</span>
+                </label>
+                <InputBar
+                  type="datetime-local"
+                  name="appointmentDate"
+                  value={form.appointmentDate}
+                  onChange={handleChange}
+                  className="w-full border-gray-300 border-1
+                   rounded-lg px-4 py-3 text-gray-800 outline-none
+                    focus:border-blue-500 !pr-5"
+                />
+              </div>
+            </div>
+
+            {/* Lý do khám */}
+            <div className="">
+              <label
+                htmlFor="patientNote"
+                className="block font-semibold mb-2 text-gray-700"
+              >
+                Triệu chứng hoặc lý do khám
+              </label>
+              <InputBar
+                type="textarea"
+                name="patientNote"
+                value={form.patientNote}
+                onChange={handleChange}
+                rows={3}
+                // className="w-full border-gray-300 border-1
+                // rounded-lg px-4 py-3 text-gray-800 outline-none
+                //  focus:border-blue-500 min-h-12"
+                placeholder="Vui lòng mô tả ngắn gọn tình trạng của bạn (ví dụ: ho, sốt, đau đầu...)"
+              />
+            </div>
+          </div>
+
+          {/* Nút submit */}
+          <div className="pt-4">
+            <Button isLoading={loading} className="w-full" size="lg">
+              Xác nhận đặt lịch
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

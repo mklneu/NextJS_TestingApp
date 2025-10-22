@@ -57,6 +57,25 @@ const getDoctorById = async (doctorId: number) => {
   }
 };
 
+const getDoctorsByHospitalId = async (hospitalId: string) => {
+  try {
+    const response = await axiosInstance.get(`/doctors/company/${hospitalId}`);
+    return response.data.data;
+  } catch (error) {
+    const err = error as AxiosError<ErrorResponse>;
+    console.error("❌ Error in getDoctorById:", err);
+
+    if (err.response?.data?.message) {
+      toast.error(err.response.data.message);
+    } else {
+      toast.error(
+        `❌ Không thể lấy thông tin bác sĩ của bệnh viện ID: ${hospitalId}!`
+      );
+    }
+    throw err;
+  }
+};
+
 // Tạo bác sĩ mới
 const createDoctor = async (doctorData: Omit<Doctor, "id">) => {
   try {
@@ -162,6 +181,7 @@ const deleteDoctorById = async (doctorId: number, callback: () => void) => {
 export {
   getAllDoctors,
   getDoctorById,
+  getDoctorsByHospitalId,
   createDoctor,
   updateDoctor,
   deleteDoctor,

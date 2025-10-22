@@ -388,26 +388,29 @@ const PrescriptionDetailPage = () => {
                 </p>
               )}
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-slate-800 mb-2">
-                Lời dặn của bác sĩ
-              </h2>
-              {isEditing ? (
-                <textarea
-                  name="advice"
-                  value={editableData.advice}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border outline-none
-                  border-gray-300 rounded-md 
-                  text-slate-700 min-h-24"
-                  rows={4}
-                />
-              ) : (
-                <p className="text-slate-700 whitespace-pre-wrap">
-                  {prescription.advice}
-                </p>
-              )}
-            </div>
+            {editableData.advice && (
+              <div>
+                <h2 className="text-lg font-semibold text-slate-800 mb-2">
+                  Lời dặn của bác sĩ
+                </h2>
+                {isEditing ? (
+                  <textarea
+                    name="advice"
+                    value={editableData.advice}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border outline-none
+                    border-gray-300 rounded-md 
+                    text-slate-700 min-h-24"
+                    rows={4}
+                  />
+                ) : (
+                  <p className="text-slate-700 whitespace-pre-wrap">
+                    {prescription.advice}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* 5. Thêm phần hiển thị/chỉnh sửa Test Result */}
             <div>
               <h2 className="text-lg font-semibold text-slate-800 mb-2">
@@ -612,6 +615,17 @@ const PrescriptionDetailPage = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
+            <div className="mt-3">
+              <span className="text-sm text-gray-500">
+                Tổng chi phí:{" "}
+                <span className="font-semibold text-gray-700">
+                  {prescription.totalCost.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </span>
+              </span>
             </div>
           </div>
         </div>
