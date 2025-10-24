@@ -34,7 +34,7 @@ export default function DoctorsPage() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const doctorsPerPage = 8;
+  const doctorsPerPage = 5;
   const [totalDoctors, setTotalDoctors] = useState(0);
 
   // Danh sách chuyên khoa mẫu

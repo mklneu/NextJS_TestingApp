@@ -22,12 +22,14 @@ const AboutPage = () => {
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Hero Section */}
-      <section className="relative 
+      <section
+        className="relative 
       bg-gradient-to-br from-gray-900 via-gray-900 to-slate-800
-      py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
+      py-20 overflow-hidden"
+      >
+        <div className="absolute inset-0 opacity-30">
           <Image
-            src="/images/health-pattern.jpg"
+            src="/images/health-pattern.png"
             alt="Medical pattern background"
             fill
             style={{ objectFit: "cover" }}
@@ -46,8 +48,8 @@ const AboutPage = () => {
         </div>
 
         {/* Decorative elements */}
-        <div className="hidden md:block absolute -right-16 -bottom-16 h-64 w-64 bg-blue-500 rounded-full opacity-20"></div>
-        <div className="hidden md:block absolute left-10 top-10 h-20 w-20 bg-blue-300 rounded-full opacity-20"></div>
+        {/* <div className="hidden md:block absolute -right-16 -bottom-16 h-64 w-64 bg-blue-500 rounded-full opacity-20"></div>
+        <div className="hidden md:block absolute left-10 top-10 h-20 w-20 bg-blue-300 rounded-full opacity-20"></div> */}
       </section>
 
       {/* Our Story Section */}
@@ -415,7 +417,7 @@ const AboutPage = () => {
               </div>
               <div className="p-4">
                 <h3 className="font-bold text-xl text-gray-800">
-                  Nguyễn Văn A
+                  Lê Minh Khang
                 </h3>
                 <p className="text-blue-600">Giám đốc điều hành</p>
                 <p className="text-gray-600 mt-2 text-sm">
@@ -441,7 +443,9 @@ const AboutPage = () => {
                 />
               </div>
               <div className="p-4">
-                <h3 className="font-bold text-xl text-gray-800">Trần Thị B</h3>
+                <h3 className="font-bold text-xl text-gray-800">
+                  Nguyễn Ngọc Lan Anh
+                </h3>
                 <p className="text-blue-600">Giám đốc công nghệ</p>
                 <p className="text-gray-600 mt-2 text-sm">
                   Chuyên gia về AI và hệ thống phần mềm y tế
@@ -466,7 +470,9 @@ const AboutPage = () => {
                 />
               </div>
               <div className="p-4">
-                <h3 className="font-bold text-xl text-gray-800">Lê Văn C</h3>
+                <h3 className="font-bold text-xl text-gray-800">
+                  Phạm Tuấn Hùng
+                </h3>
                 <p className="text-blue-600">Giám đốc y tế</p>
                 <p className="text-gray-600 mt-2 text-sm">
                   Bác sĩ với chuyên môn sâu về quản lý y tế
@@ -491,7 +497,9 @@ const AboutPage = () => {
                 />
               </div>
               <div className="p-4">
-                <h3 className="font-bold text-xl text-gray-800">Phạm Thị D</h3>
+                <h3 className="font-bold text-xl text-gray-800">
+                  Hoàng Phương Thảo
+                </h3>
                 <p className="text-blue-600">Trưởng nhóm thiết kế</p>
                 <p className="text-gray-600 mt-2 text-sm">
                   Chuyên gia UX/UI với kinh nghiệm về ứng dụng y tế
@@ -514,14 +522,18 @@ const AboutPage = () => {
               SmartHealth có thể giúp cơ sở y tế của bạn hoạt động hiệu quả hơn
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-white text-blue-600 cursor-pointer
+              <button
+                className="bg-white text-blue-600 cursor-pointer
               hover:bg-blue-50 px-8 py-3 rounded-lg font-medium 
-              shadow-lg hover:shadow-xl duration-300">
+              shadow-lg hover:shadow-xl duration-300"
+              >
                 Liên hệ tư vấn
               </button>
-              <button className="bg-transparent border cursor-pointer
+              <button
+                className="bg-transparent border cursor-pointer
               border-white text-white hover:bg-white/10 
-              px-8 py-3 rounded-lg font-medium duration-300">
+              px-8 py-3 rounded-lg font-medium duration-300"
+              >
                 Xem demo
               </button>
             </div>

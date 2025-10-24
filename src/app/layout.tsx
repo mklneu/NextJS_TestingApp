@@ -52,7 +52,7 @@ export default function RootLayout({
               pauseOnFocusLoss
               draggable
               pauseOnHover
-              theme="dark"
+              // theme="dark"
               transition={Slide}
             />
             {/* <ThemeSwitch /> */}

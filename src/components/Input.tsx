@@ -4,7 +4,14 @@ interface IOption {
 }
 
 interface IInputProps {
-  type?: "text" | "email" | "password" | "textarea" | "select" | "date" | "datetime-local";
+  type?:
+    | "text"
+    | "email"
+    | "password"
+    | "textarea"
+    | "select"
+    | "date"
+    | "datetime-local";
   placeholder?: string;
   value: string | number;
   disabled?: boolean;
@@ -19,6 +26,7 @@ interface IInputProps {
   options?: IOption[]; // Chỉ dùng cho type select
   label?: string; // Chỉ dùng cho input bình thường
   name?: string; // Chỉ dùng cho input bình thường
+  required?: boolean; // Chỉ dùng cho input bình thường
 }
 
 const InputBar = ({
@@ -33,31 +41,33 @@ const InputBar = ({
   onClick,
   label,
   name,
+  required = false,
 }: IInputProps) => {
   const baseClasses =
-    "w-full h-full bg-transparent rounded-xl pl-5 pr-14 placeholder:text-gray-700 border border-cyan-950 duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md placeholder-opacity-70 focus:placeholder-opacity-40";
+    "w-full h-full bg-transparent rounded-xl pl-5 pr-14 text-gray-900 placeholder:text-gray-500 border border-gray-300 duration-300 outline-none focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md placeholder-opacity-70 focus:placeholder-opacity-40";
 
   const textareaClasses =
-    "w-full min-h-15 h-full bg-transparent rounded-xl pl-5 pr-14 pt-3 text-gray-900 placeholder:text-gray-500 border border-gray-300 duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md placeholder-opacity-70 focus:placeholder-opacity-40";
+    "w-full min-h-15 h-full bg-transparent rounded-xl pl-5 pr-14 pt-3 text-gray-900 placeholder:text-gray-500 border border-gray-300 duration-300 outline-none focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md placeholder-opacity-70 focus:placeholder-opacity-40";
 
   const selectClasses =
-    "w-full h-full bg-white rounded-xl pl-5 pr-10 text-gray-700 border border-cyan-950 duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md cursor-pointer";
+    "w-full h-full bg-white rounded-xl pl-5 pr-10 text-gray-700 border border-gray-300 duration-300 outline-none focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md cursor-pointer";
 
   if (type === "textarea") {
     return (
-      <div className="flex mb-4 mx-auto">
+      <div className="flex min-h-10 mb-4 mx-auto relative">
         {label && (
-          <label className="text-sm
-          font-medium text-gray-700 
-          px-1 absolute -top-[10.5px] 
-          left-3 bg-white">
+          <label
+            className="text-sm 
+        font-medium text-gray-700 
+        px-1 absolute -top-3 left-3 bg-white"
+          >
             {label}
           </label>
         )}
         <textarea
           placeholder={placeholder}
-          required
           name={name}
+          required={required}
           value={value}
           disabled={disabled}
           onChange={onChange}
@@ -84,7 +94,7 @@ const InputBar = ({
         <select
           name={name}
           value={value}
-          required
+          required={required}
           disabled={disabled}
           onChange={onChange}
           className={`${selectClasses} ${className} appearance-none `}
@@ -127,9 +137,11 @@ const InputBar = ({
     return (
       <div className="flex h-12 mb-4 mx-auto relative">
         {label && (
-          <label className="text-sm 
+          <label
+            className="text-sm 
           font-medium text-gray-700 
-          px-1 absolute -top-3 left-3 bg-white">
+          px-1 absolute -top-3 left-3 bg-white"
+          >
             {label}
           </label>
         )}
@@ -137,7 +149,7 @@ const InputBar = ({
           type="date"
           name={name}
           placeholder={placeholder}
-          required
+          required={required}
           value={value}
           disabled={disabled}
           onChange={onChange}
@@ -152,17 +164,19 @@ const InputBar = ({
     return (
       <div className="flex h-12 mb-4 mx-auto relative">
         {label && (
-          <label className="text-sm 
+          <label
+            className="text-sm 
           font-medium text-gray-700 
-          px-1 absolute -top-3 left-3 bg-white">
+          px-1 absolute -top-3 left-3 bg-white"
+          >
             {label}
           </label>
         )}
         <input
           type="datetime-local"
           name={name}
+          required={required}
           placeholder={placeholder}
-          required
           value={value}
           disabled={disabled}
           onChange={onChange}
@@ -186,8 +200,8 @@ const InputBar = ({
       )}
       <input
         type={type}
+        required={required}
         placeholder={placeholder}
-        required
         value={value}
         disabled={disabled}
         onChange={onChange}

@@ -33,6 +33,11 @@ export interface CompleteAppointmentBody {
   prescriptionIds: number[];
 }
 
+export interface ConfirmAppointmentPayload {
+  clinicRoom: string;
+  doctorNote?: string; // Để là optional nếu ghi chú không bắt buộc
+}
+
 const createAppointment = async (body: AppointmentBody) => {
   try {
     const res = await axiosInstance.post("/appointments", body);
@@ -115,14 +120,11 @@ const getAppointmentByPatientId = async (
 
 const confirmAppointment = async (
   appointmentId: number,
-  doctorNote: string
+  payload: ConfirmAppointmentPayload
 ) => {
   return await axiosInstance.patch(
     `/appointments/${appointmentId}/confirm`,
-    null,
-    {
-      params: { doctorNote },
-    }
+    payload // <-- Gửi payload làm body của request
   );
 };
 

@@ -37,7 +37,10 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { getDoctorById } from "@/services/DoctorServices";
 import DoctorOnly from "@/components/DoctorOnly";
-import { formatAppointmentDate, formatTotalCost } from "@/services/OtherServices";
+import {
+  formatAppointmentDate,
+  formatTotalCost,
+} from "@/services/OtherServices";
 
 const ExaminationDetailPage = () => {
   const params = useParams();
@@ -280,7 +283,7 @@ const ExaminationDetailPage = () => {
                 {formatAppointmentDate(appointment.appointmentDate)}
               </div>
               <div className="text-gray-500 text-sm">
-                Phòng khám: {appointment.clinicRoom}
+                {appointment.clinicRoom}
               </div>
             </div>
           </div>
@@ -435,18 +438,21 @@ const ExaminationDetailPage = () => {
                   Chưa có kết quả xét nghiệm nào được tạo cho buổi khám này.
                 </p>
               )}
-              <div className="w-full">
-                <div className="w-fit mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="flex justify-between items-baseline space-x-1 text-sm">
-                    <span className="font-medium text-gray-700">
-                      Tổng chi phí thuốc:
-                    </span>
-                    <span className="font-bold text-green-600">
-                      {formatTotalCost(prescriptions)}
-                    </span>
+              {prescriptions.length > 0 && (
+                <div className="w-full">
+                  <div className="w-fit mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex justify-between items-baseline space-x-1 text-sm">
+                      <span className="font-medium text-gray-700">
+                        Tổng chi phí thuốc:
+                      </span>
+                      <span className="font-bold text-green-600">
+                        {formatTotalCost(prescriptions)}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+
               {!["COMPLETED", "CANCELLED"].includes(appointment.status) && (
                 <DoctorOnly userRole={userRole}>
                   <div className="pt-2">

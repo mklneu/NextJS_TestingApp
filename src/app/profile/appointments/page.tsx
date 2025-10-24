@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaCalendarCheck } from "react-icons/fa6";
+import InputBar from "@/components/Input";
 
 // Fake loading skeleton
 const SkeletonRow = () => (
@@ -73,12 +74,13 @@ const AppointmentsTab = () => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const appointmentsPerPage = 10; // Số lượng lịch hẹn mỗi trang
+  const appointmentsPerPage = 8; // Số lượng lịch hẹn mỗi trang
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
   const [modalDoctorNote, setModalDoctorNote] = useState("");
+  const [modalClinicRoom, setModalClinicRoom] = useState("");
   const [modalPatientNote, setModalPatientNote] = useState("");
 
   useEffect(() => {
@@ -142,8 +144,14 @@ const AppointmentsTab = () => {
     if (!selectedAppointment) return;
     try {
       let newStatus = selectedAppointment.status;
+
+      const fullClinicRoom = "Phòng khám " + modalClinicRoom;
+
       if (action === "confirm") {
-        await confirmAppointment(selectedAppointment.id, modalDoctorNote);
+        await confirmAppointment(selectedAppointment.id, {
+          clinicRoom: fullClinicRoom,
+          doctorNote: modalDoctorNote,
+        });
         newStatus = "CONFIRMED";
         toast.success("Xác nhận lịch hẹn thành công!");
       }
@@ -173,9 +181,11 @@ const AppointmentsTab = () => {
                     doctorNote:
                       userRole === "doctor" ? modalDoctorNote : a.doctorNote,
                     patientNote:
-                      userRole === "patient" || "admin"
+                      userRole === "patient" || userRole === "admin"
                         ? modalPatientNote
                         : a.patientNote,
+                    clinicRoom:
+                      userRole === "doctor" ? fullClinicRoom : a.clinicRoom,
                   }
                 : a
             )
@@ -372,12 +382,32 @@ const AppointmentsTab = () => {
               Cập nhật trạng thái lịch hẹn
             </h3>
             {userRole === "doctor" ? (
-              <textarea
-                className="w-full border rounded p-2 mb-4 min-h-[80px] resize-y text-gray-700 outline-none"
-                placeholder="Nhập ghi chú bác sĩ"
-                value={modalDoctorNote}
-                onChange={(e) => setModalDoctorNote(e.target.value)}
-              />
+              <div className="space-y-8">
+                {" "}
+                {/* Bọc trong div để dễ quản lý khoảng cách */}
+                {/* Thêm Input cho Số phòng */}
+                <div>
+                  <InputBar
+                    type="text"
+                    label="Phòng khám"
+                    required
+                    placeholder="Nhập số phòng (VD: 101, 205...)"
+                    value={modalClinicRoom} // << Giả sử bạn có state này
+                    onChange={(e) => setModalClinicRoom(e.target.value)} // << Giả sử bạn có hàm set state này
+                  />
+                </div>
+                {/* Textarea cho Ghi chú bác sĩ */}
+                <div>
+                  <InputBar
+                    type="textarea"
+                    label="Ghi chú bác sĩ"
+                    placeholder="Nhập ghi chú (nếu có)"
+                    value={modalDoctorNote}
+                    onChange={(e) => setModalDoctorNote(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+              </div>
             ) : (
               <textarea
                 className="w-full border rounded p-2 mb-4 min-h-[80px] resize-y text-gray-700 outline-none"

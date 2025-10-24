@@ -154,7 +154,7 @@ export default function BookingPage() {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen p-4 sm:p-8 flex  justify-center">
+    <div className="bg-slate-50 min-h-screen p-4 sm:p-8 flex justify-center">
       <div
         className="max-w-4xl w-full mx-auto h-fit
       bg-white rounded-2xl shadow-xl p-8 md:p-12 

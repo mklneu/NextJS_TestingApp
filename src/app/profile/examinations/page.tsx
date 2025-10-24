@@ -3,11 +3,14 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAppointmentByDoctorId } from "@/services/AppointmentServices";
-import { formatAppointmentDate, formatDateToDMY } from "@/services/OtherServices";
+import {
+  formatAppointmentDate
+} from "@/services/OtherServices";
 import { FaUserClock, FaSearch } from "react-icons/fa";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
+import { translateAppointmentType } from "@/utils/translateEnums";
 
 // Skeleton component for loading state
 const PatientSkeletonCard = () => (
@@ -79,18 +82,21 @@ const ExaminationsPage = () => {
                 key={app.id}
                 className="block"
               >
-                <div className="bg-white p-4 rounded-lg 
+                <div
+                  className="bg-white p-4 rounded-lg 
                 shadow-md hover:shadow-lg hover:-translate-y-1
-                duration-300 cursor-pointer">
+                duration-300 cursor-pointer"
+                >
                   <div className="flex flex-col sm:flex-row items-center gap-4">
                     {/* <img
                       src={app.patient.avatar || "/default-avatar.png"}
                       alt={app.patient.fullName}
                       className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
                     /> */}
-                    <div className="text-gray-500">St.
-                       <span className="text-sm">{app.id}</span>
-                       </div>
+                    <div className="text-gray-500">
+                      St.
+                      <span className="text-sm">{app.id}</span>
+                    </div>
                     <div className="flex-1 text-center sm:text-left">
                       <h2 className="text-lg font-semibold text-gray-800">
                         {app.patient.fullName}
@@ -102,7 +108,8 @@ const ExaminationsPage = () => {
                         {formatAppointmentDate(app.appointmentDate)}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {formatDateToDMY(app.appointmentDate)}
+                        
+                        {translateAppointmentType(app.appointmentType)}
                       </p>
                     </div>
                   </div>
