@@ -409,8 +409,9 @@ const AppointmentsTab = () => {
                 </div>
               </div>
             ) : (
-              <textarea
-                className="w-full border rounded p-2 mb-4 min-h-[80px] resize-y text-gray-700 outline-none"
+              <InputBar
+                type="textarea"
+                label="Ghi chú bệnh nhân"
                 placeholder="Nhập ghi chú bệnh nhân"
                 value={modalPatientNote}
                 onChange={(e) => setModalPatientNote(e.target.value)}

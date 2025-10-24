@@ -16,6 +16,7 @@ import { translateSpecialty } from "@/utils/translateEnums";
 import { getAllDoctors } from "@/services/DoctorServices";
 import { AxiosError } from "axios";
 import { Pagination } from "@/services/OtherServices";
+import Button from "@/components/Button";
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -204,12 +205,12 @@ export default function DoctorsPage() {
               </div>
 
               {/* Add doctor button */}
-              <button
+              <Button
                 onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition-colors shadow-sm whitespace-nowrap"
+                className="!h-11"
               >
                 <FaPlus /> Thêm bác sĩ
-              </button>
+              </Button>
             </div>
           </div>
         </div>

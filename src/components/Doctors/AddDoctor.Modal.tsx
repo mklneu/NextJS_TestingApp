@@ -88,56 +88,58 @@ const AddDoctorModal = (props: IAddModalProps) => {
             <h1 className="px-5 py-4 text-2xl">Thêm bác sĩ mới</h1>
             <hr className="mb-6 text-gray-200" />
 
-            <InputBar
-              label="Họ và tên"
-              value={name}
-              placeholder="Nhập họ tên bác sĩ"
-              onChange={(e) => setName(e.target.value)}
-            />
+            <div className="w-11/12 mx-auto">
+              <InputBar
+                label="Họ và tên"
+                value={name}
+                placeholder="Nhập họ tên bác sĩ"
+                onChange={(e) => setName(e.target.value)}
+              />
 
-            <InputBar
-              type="select"
-              label="Chuyên khoa"
-              value={specialization}
-              placeholder="Chọn chuyên khoa"
-              onChange={(e) => setSpecialization(e.target.value)}
-              options={specializationOptions}
-            />
+              <InputBar
+                type="select"
+                label="Chuyên khoa"
+                value={specialization}
+                placeholder="Chọn chuyên khoa"
+                onChange={(e) => setSpecialization(e.target.value)}
+                options={specializationOptions}
+              />
 
-            <InputBar
-              label="Email"
-              type="email"
-              value={email}
-              placeholder="Nhập email"
-              onChange={(e) => setEmail(e.target.value)}
-            />
+              <InputBar
+                label="Email"
+                type="email"
+                value={email}
+                placeholder="Nhập email"
+                onChange={(e) => setEmail(e.target.value)}
+              />
 
-            <InputBar
-              label="Số điện thoại"
-              value={phone}
-              placeholder="Nhập số điện thoại"
-              onChange={(e) => setPhone(e.target.value)}
-            />
+              <InputBar
+                label="Số điện thoại"
+                value={phone}
+                placeholder="Nhập số điện thoại"
+                onChange={(e) => setPhone(e.target.value)}
+              />
 
-            <InputBar
-              label="Số năm kinh nghiệm"
-              value={experience}
-              placeholder="Nhập số năm kinh nghiệm"
-              onChange={(e) => setExperience(Number(e.target.value))}
-            />
+              <InputBar
+                label="Số năm kinh nghiệm"
+                value={experience}
+                placeholder="Nhập số năm kinh nghiệm"
+                onChange={(e) => setExperience(Number(e.target.value))}
+              />
 
-            <InputBar
-              type="select"
-              label="Giới tính"
-              value={gender}
-              placeholder="Chọn giới tính"
-              onChange={(e) => setGender(e.target.value)}
-              options={[
-                { label: "Nam", value: "MALE" },
-                { label: "Nữ", value: "FEMALE" },
-                { label: "Khác", value: "OTHER" },
-              ]}
-            />
+              <InputBar
+                type="select"
+                label="Giới tính"
+                value={gender}
+                placeholder="Chọn giới tính"
+                onChange={(e) => setGender(e.target.value)}
+                options={[
+                  { label: "Nam", value: "MALE" },
+                  { label: "Nữ", value: "FEMALE" },
+                  { label: "Khác", value: "OTHER" },
+                ]}
+              />
+            </div>
 
             <div className="flex justify-end mx-auto gap-2 mt-6 mb-8 w-11/12">
               <Button variant="secondary" size="md" onClick={handleClose}>

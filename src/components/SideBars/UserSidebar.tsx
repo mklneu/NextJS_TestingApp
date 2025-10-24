@@ -6,7 +6,7 @@ import { IoCalendarClear } from "react-icons/io5";
 import { IoIosFolderOpen } from "react-icons/io";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { scrollToTop } from "../../components/ScrollToTopButton";
+import { scrollToTop } from "../ScrollToTopButton";
 import { FaUserClock } from "react-icons/fa";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -25,7 +25,7 @@ const userLinks = [
     href: "/profile/testResult",
     label: "Hồ sơ bệnh án",
     icon: <IoIosFolderOpen />,
-    roles: ["patient", "admin"]// Hiển thị cho bệnh nhân và admin
+    roles: ["patient", "admin"], // Hiển thị cho bệnh nhân và admin
   },
   {
     href: "/profile/examinations", // Sửa lại đường dẫn cho đúng
@@ -58,7 +58,7 @@ const UserSidebar = () => {
         style={{ minWidth: open ? 256 : 64 }}
       >
         <button
-          className="absolute top-4 right-4 bg-blue-800 cursor-pointer
+          className="absolute top-4 right-4 bg-blue-800 cursor-pointer outline-none
         hover:bg-blue-900 rounded-full p-2 transition-colors z-40"
           onClick={() => setOpen((prev) => !prev)}
           aria-label={open ? "Thu gọn sidebar" : "Mở rộng sidebar"}
@@ -68,7 +68,7 @@ const UserSidebar = () => {
         <h2
           className={`absolute top-4 text-2xl px-4 font-bold text-center
              tracking-wide duration-300 ${
-               open ? "opacity-100" : "opacity-0 h-0 overflow-hidden"
+               open ? "opacity-100 delay-150" : "opacity-0 h-0 overflow-hidden"
              }`}
         >
           {""} Người dùng
@@ -79,9 +79,13 @@ const UserSidebar = () => {
               key={link.href}
               href={link.href}
               className={`flex items-center rounded-lg duration-300
-                font-medium text-md hover:bg-blue-800 h-12 ${
-                  open ? "justify-start px-4 py-3" : "justify-center p-3"
-                }`}
+                font-medium text-md hover:bg-blue-800 hover:translate-x-1 h-12 ${
+                  open
+                    ? "justify-start px-4 py-3 goes-in"
+                    : "justify-center p-3 goes-out"
+                } ${
+                pathname === link.href ? "bg-blue-800" : "" // Logic active state giữ nguyên
+              }`}
               title={link.label}
               onClick={(e) => {
                 if (pathname === link.href) {

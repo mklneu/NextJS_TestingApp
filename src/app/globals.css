@@ -19,7 +19,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -53,4 +52,32 @@ body {
 
 .animation-delay-1000 {
   animation-delay: 1s;
+}
+
+@keyframes goesIn {
+  from {
+    translate: -400%;
+  }
+
+  to {
+    translate: 0;
+  }
+}
+
+.goes-in {
+  animation: goesIn 1s;
+}
+
+@keyframes goesOut {
+  from {
+    translate: -200%;
+  }
+
+  to {
+    translate: 0;
+  }
+}
+
+.goes-out {
+  animation: goesOut 1s;
 }

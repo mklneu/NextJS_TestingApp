@@ -214,7 +214,7 @@ const ExaminationDetailPage = () => {
             font-semibold mb-6 transition-colors duration-200 focus:outline-none"
         >
           <IoIosArrowBack size={20} />
-          {userRole !== "doctor" ? "Quay lại hồ sơ" : "Quay lại danh sách "}
+          {userRole !== "doctor" ? "Quay lại lịch hẹn" : "Quay lại danh sách "}
         </button>
       </div>
       <div className="mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4">

@@ -7,10 +7,12 @@ import {
   FaUsers,
   FaBars,
   FaChevronLeft,
+  FaFileMedicalAlt,
 } from "react-icons/fa";
+import { FaRegCalendarCheck, FaPrescriptionBottleMedical } from "react-icons/fa6";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { scrollToTop } from "./ScrollToTopButton";
+import { scrollToTop } from "../ScrollToTopButton";
 
 const adminLinks = [
   {
@@ -27,6 +29,21 @@ const adminLinks = [
     href: "/admin/patients",
     label: "Bệnh nhân",
     icon: <FaUsers />,
+  },
+  {
+    href: "/admin/appointments",
+    label: "Lịch hẹn",
+    icon: <FaRegCalendarCheck />,
+  },
+  {
+    href: "/admin/testResults",
+    label: "Kết quả xét nghiệm",
+    icon: <FaFileMedicalAlt />,
+  },
+  {
+    href: "/admin/prescriptions",
+    label: "Đơn thuốc",
+    icon: <FaPrescriptionBottleMedical />,
   },
 ];
 
@@ -46,7 +63,7 @@ const AdminSidebar = () => {
         style={{ minWidth: open ? 256 : 64 }}
       >
         <button
-          className="absolute top-4 right-4 bg-blue-800 cursor-pointer
+          className="absolute top-4 right-4 bg-blue-800 cursor-pointer outline-none
         hover:bg-blue-900 rounded-full p-2 transition-colors z-40"
           onClick={() => setOpen((prev) => !prev)}
           aria-label={open ? "Thu gọn sidebar" : "Mở rộng sidebar"}
@@ -56,21 +73,26 @@ const AdminSidebar = () => {
         <h2
           className={`absolute top-4 text-2xl px-4 font-bold text-center
              tracking-wide duration-300 ${
-               open ? "opacity-100" : "opacity-0 h-0 overflow-hidden"
+               open ? "opacity-100 delay-150" : "opacity-0 h-0 overflow-hidden"
              }`}
         >
           Quản trị
         </h2>
         <nav className="flex flex-col gap-2 mt-8">
-          {adminLinks.map((link) => (
+          {adminLinks.map((link, index) => (
             <Link
               key={link.href}
               href={link.href}
               className={`flex items-center rounded-lg duration-300
-                font-medium text-md hover:bg-blue-800 h-12 ${
-                  open ? "justify-start px-4 py-3" : "justify-center p-3"
-                }`}
+                font-medium text-md hover:bg-blue-800 hover:translate-x-1 h-12 ${
+                  open
+                    ? "justify-start px-4 py-3 goes-in"
+                    : "justify-center p-3 goes-out"
+                } ${
+                pathname === link.href ? "bg-blue-800" : "" // Logic active state giữ nguyên
+              }`}
               title={link.label}
+              style={{ transitionDelay: `${index * 0.1}s` }}
               onClick={(e) => {
                 if (pathname === link.href) {
                   e.preventDefault();

@@ -395,7 +395,12 @@ export default function Home() {
             hiện đại, tiết kiệm thời gian và tối ưu hóa quy trình.
           </p>
           <div className="flex justify-center">
-            <Button size="lg" variant="none" className="hover:bg-white/10">
+            <Button
+              size="lg"
+              variant="none"
+              className="hover:bg-white/10"
+              translate={false}
+            >
               Bắt đầu ngay
             </Button>
           </div>

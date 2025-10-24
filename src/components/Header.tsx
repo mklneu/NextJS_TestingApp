@@ -122,8 +122,8 @@ const Header = () => {
       <div className="container mx-auto">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2 group">
-            <MdHealthAndSafety className="text-3xl text-white group-hover:text-blue-200 transition-colors duration-300" />
-            <span className="font-bold text-xl tracking-tight text-white group-hover:text-blue-200 transition-colors duration-300">
+            <MdHealthAndSafety className="text-3xl text-white group-hover:text-blue-200 duration-300" />
+            <span className="font-bold text-xl tracking-tight text-white group-hover:text-blue-200 duration-300">
               SmartHealth
             </span>
           </Link>

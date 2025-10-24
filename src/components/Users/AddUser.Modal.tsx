@@ -28,7 +28,15 @@ const AddNewUserModal = (props: IAddNewModalProps) => {
     }
 
     try {
-      await postPatient(username, fullName, email, password, gender, address, dob);
+      await postPatient(
+        username,
+        fullName,
+        email,
+        password,
+        gender,
+        address,
+        dob
+      );
 
       // Refresh the blogs list
       onSubmit(); // Call the onSubmit callback if provided
@@ -72,57 +80,59 @@ const AddNewUserModal = (props: IAddNewModalProps) => {
           >
             <h1 className="px-5 py-4 text-2xl">Thêm mới bệnh nhân</h1>
             <hr className="mb-6 text-gray-200" />
-            <InputBar
-              label="Họ và tên"
-              placeholder="Nhập họ và tên"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-            ></InputBar>
-            <InputBar
-              label="Tên tài khoản"
-              placeholder="Nhập tên tài khoản"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            ></InputBar>
-            <InputBar
-              label="Mật khẩu"
-              placeholder="Nhập mật khẩu"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            ></InputBar>
-            <InputBar
-              label="Email"
-              placeholder="Nhập email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            ></InputBar>
-            <InputBar
-              label="Ngày sinh"
-              placeholder="Nhập ngày sinh"
-              value={dob}
-              type="date"
-              onChange={(e) => setDob(e.target.value)}
-              className="!pr-5"
-            ></InputBar>
-            <InputBar
-              label="Địa chỉ"
-              placeholder="Nhập địa chỉ"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-            ></InputBar>
-            <InputBar
-              label="Giới tính"
-              type="select"
-              value={gender}
-              placeholder="Chọn giới tính"
-              onChange={(e) => setGender(e.target.value)}
-              options={[
-                { label: "Nam", value: "MALE" },
-                { label: "Nữ", value: "FEMALE" },
-                { label: "Khác", value: "OTHER" },
-              ]}
-            ></InputBar>
+            <div className="w-11/12 mx-auto">
+              <InputBar
+                label="Họ và tên"
+                placeholder="Nhập họ và tên"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+              ></InputBar>
+              <InputBar
+                label="Tên tài khoản"
+                placeholder="Nhập tên tài khoản"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              ></InputBar>
+              <InputBar
+                label="Mật khẩu"
+                placeholder="Nhập mật khẩu"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              ></InputBar>
+              <InputBar
+                label="Email"
+                placeholder="Nhập email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              ></InputBar>
+              <InputBar
+                label="Ngày sinh"
+                placeholder="Nhập ngày sinh"
+                value={dob}
+                type="date"
+                onChange={(e) => setDob(e.target.value)}
+                className="!pr-5"
+              ></InputBar>
+              <InputBar
+                label="Địa chỉ"
+                placeholder="Nhập địa chỉ"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+              ></InputBar>
+              <InputBar
+                label="Giới tính"
+                type="select"
+                value={gender}
+                placeholder="Chọn giới tính"
+                onChange={(e) => setGender(e.target.value)}
+                options={[
+                  { label: "Nam", value: "MALE" },
+                  { label: "Nữ", value: "FEMALE" },
+                  { label: "Khác", value: "OTHER" },
+                ]}
+              ></InputBar>
+            </div>
             <div className="flex justify-end mx-auto gap-2 mt-6 mb-8 w-11/12">
               <Button
                 variant="secondary"
