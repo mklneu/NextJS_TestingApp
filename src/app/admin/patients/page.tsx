@@ -9,6 +9,7 @@ import { getAllHospitals } from "@/services/HospitalServices";
 import { formatDateToDMY, Pagination } from "@/services/OtherServices";
 import { deletePatientById, getAllPatients } from "@/services/PatientServices";
 import Button from "@/components/Button";
+import { ErrorResponse, Hospital, resUser } from "@/types/frontend";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<resUser[]>([]);
@@ -157,7 +158,7 @@ export default function UsersPage() {
                 className="bg-gray-50 border outline-none
                 border-gray-300 text-gray-900 text-sm
                  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
-                placeholder="Tìm kiếm bệnh nhân..."
+                placeholder="Tìm kiếm bệnh nhân"
                 value={searchTerm}
                 onChange={handleSearchChange}
               />

@@ -1,32 +1,71 @@
 import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
 import { AxiosError } from "axios";
+import { Doctor, ErrorResponse, PaginatedResponse } from "@/types/frontend";
+
+interface DoctorQueryParams {
+  page: number;
+  size: number;
+  sort?: string;
+  search?: string;
+  filterSpecialization?: string;
+  filterStatus?: string;
+}
 
 // Lấy tất cả bác sĩ
 const getAllDoctors = async (
-  page: number,
-  size: number,
-  searchTerm?: string,
-  filterSpecialization?: string,
-  filterStatus?: string
-) => {
+  params: DoctorQueryParams
+): Promise<PaginatedResponse<Doctor>> => {
   try {
-    // Tạo query string động
-    let query = `/doctors?page=${page}&size=${size}`;
-    if (searchTerm && searchTerm.trim() !== "") {
-      query += `&search=${encodeURIComponent(searchTerm)}`;
-    }
-    if (filterSpecialization && filterSpecialization !== "ALL") {
-      query += `&specialization=${encodeURIComponent(filterSpecialization)}`;
-    }
-    if (filterStatus && filterStatus !== "ALL") {
-      query += `&status=${encodeURIComponent(filterStatus)}`;
+    // 2. Chuẩn bị các tham số cơ bản
+    const apiParams: Record<string, string | number> = {
+      page: params.page, // Chuyển page 1-based sang 0-based
+      size: params.size,
+    };
+
+    if (params.sort) {
+      apiParams.sort = params.sort;
     }
 
-    const response = await axiosInstance.get(query);
-    // console.log("Response from getAllDoctors:", response);
+    // 3. Xây dựng mảng các điều kiện lọc (filter)
+    const filterParts: string[] = [];
+
+    // 4. Thêm logic lọc cho 'searchTerm' (với cú pháp OR)
+    if (params.search && params.search.trim() !== "") {
+      const safeSearchTerm = params.search.trim().replace(/'/g, "''");
+      // Dùng logic OR từ code cũ của bạn
+      filterParts.push(
+        `(phoneNumber~'${safeSearchTerm}' or email~'${safeSearchTerm}' or fullName~'${safeSearchTerm}')`
+      );
+    }
+
+    // 5. Thêm logic lọc cho 'filterSpecialization'
+    if (params.filterSpecialization && params.filterSpecialization !== "ALL") {
+      // Giả sử tên trường là 'specialization' và dùng toán tử '==' (hoặc '~' nếu bạn muốn)
+      filterParts.push(`specialty~'${params.filterSpecialization}'`);
+    }
+    
+    // 6. Thêm logic lọc cho 'filterStatus'
+    if (params.filterStatus && params.filterStatus !== "ALL") {
+      filterParts.push(`status~'${params.filterStatus}'`);
+    }
+
+    // 7. Nối tất cả các điều kiện lọc lại bằng ' and '
+    if (filterParts.length > 0) {
+      apiParams.filter = filterParts.join(" and ");
+    }
+
+    // 8. Gửi request
+    // URL cuối cùng sẽ có dạng: /doctors?page=0&size=10&filter=(...) and (...)
+    const response = await axiosInstance.get("/doctors", {
+      params: apiParams,
+    });
+
+    // 9. Trả về toàn bộ DTO phân trang (giả sử nằm trong response.data.data)
     return response.data.data;
+
   } catch (error) {
+    // 10. Xử lý lỗi
     const err = error as AxiosError<ErrorResponse>;
     console.error("❌ Error in getAllDoctors:", err);
 
@@ -35,7 +74,12 @@ const getAllDoctors = async (
     } else {
       toast.error("❌ Không thể lấy danh sách bác sĩ!");
     }
-    return [];
+    
+    // Trả về một cấu trúc rỗng để tránh lỗi crash component
+    return {
+        meta: { page: 1, pageSize: params.size, pages: 0, total: 0 },
+        data: []
+    };
   }
 };
 

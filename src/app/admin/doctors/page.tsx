@@ -7,6 +7,7 @@ import {
   FaTrash,
   FaSearch,
   FaFilter,
+  FaUndoAlt,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 import AddDoctorModal from "@/components/Doctors/AddDoctor.Modal";
@@ -14,9 +15,10 @@ import UpdateDoctorModal from "@/components/Doctors/UpdateDoctor.Modal";
 import ViewDoctorModal from "@/components/Doctors/ViewDoctor.Modal";
 import { translateSpecialty } from "@/utils/translateEnums";
 import { getAllDoctors } from "@/services/DoctorServices";
-import { AxiosError } from "axios";
 import { Pagination } from "@/services/OtherServices";
 import Button from "@/components/Button";
+import { Doctor } from "@/types/frontend";
+import { specialtyOptions } from "@/utils/map";
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -35,61 +37,62 @@ export default function DoctorsPage() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const doctorsPerPage = 5;
-  const [totalDoctors, setTotalDoctors] = useState(0);
-
-  // Danh sách chuyên khoa mẫu
-  const specializations = [
-    "CARDIOLOGY",
-    "DERMATOLOGY",
-    "ENDOCRINOLOGY",
-    "GASTROENTEROLOGY",
-    "GENERAL_PRACTICE",
-    "HEMATOLOGY",
-    "NEUROLOGY",
-    "OBSTETRICS_GYNECOLOGY",
-    "ONCOLOGY",
-    "OPHTHALMOLOGY",
-    "ORTHOPEDICS",
-    "OTOLARYNGOLOGY",
-    "PEDIATRICS",
-    "PSYCHIATRY",
-    "PULMONOLOGY",
-    "RADIOLOGY",
-    "UROLOGY",
-  ];
+  // const [sortOrder, setSortOrder] = useState("fullName,asc");
+  const [total, setTotal] = useState(0);
+  const pageSize = 5;
 
   // Fetch doctors from backend with filters and pagination
-  const fetchDoctors = async (page = 1) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const params = {
+          page: currentPage,
+          size: pageSize,
+          sort: "",
+          search: searchTerm,
+          filterSpecialization: filterSpecialization,
+          filterStatus: filterStatus,
+        };
+        // Gọi API với tham số
+        const responseData = await getAllDoctors(params);
+
+        setDoctors(responseData.data); // Cập nhật danh sách kết quả
+        setTotalPages(responseData.meta.pages);
+        setTotal(responseData.meta.total);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [currentPage, searchTerm, filterSpecialization, filterStatus]);
+
+  const fetchDoctors = async () => {
     setLoading(true);
     try {
-      // getAllDoctors(page, limit, searchTerm, filterSpecialization, filterStatus)
-      const res = await getAllDoctors(
-        page,
-        doctorsPerPage,
-        searchTerm,
-        filterSpecialization,
-        filterStatus
-      );
-      // Expecting res = { data: Doctor[], total: number, totalPages: number }
-      setDoctors(res.data);
-      console.log("Fetched doctors:", res.data);
-      setTotalDoctors(res.meta.total || 0);
-      setTotalPages(res.meta.pages || 1);
+      const params = {
+        page: currentPage,
+        size: pageSize,
+        sort: "",
+        search: searchTerm,
+        filterSpecialization: filterSpecialization,
+        filterStatus: filterStatus,
+      };
+      // Gọi API với tham số
+      const responseData = await getAllDoctors(params);
+
+      setDoctors(responseData.data); // Cập nhật danh sách kết quả
+      setTotalPages(responseData.meta.pages);
+      setTotal(responseData.meta.total);
     } catch (error) {
-      const err = error as AxiosError<ErrorResponse>;
-      toast.error("Lỗi khi tải dữ liệu bác sĩ");
-      console.error("Error fetching doctors:", err.message);
+      console.error("Failed to fetch data:", error);
     } finally {
       setLoading(false);
     }
   };
-
-  // Fetch doctors on mount and whenever filters/page change
-  useEffect(() => {
-    fetchDoctors(currentPage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, searchTerm, filterSpecialization, filterStatus]);
 
   // Reset to page 1 when filters/search change
   useEffect(() => {
@@ -108,7 +111,7 @@ export default function DoctorsPage() {
       setDoctors((prev) => prev.filter((doctor) => doctor.id !== doctorId));
       toast.success("Đã xóa bác sĩ thành công");
       // Optionally, refresh list from backend
-      fetchDoctors(currentPage);
+      fetchDoctors();
     }
   };
 
@@ -120,6 +123,15 @@ export default function DoctorsPage() {
   const handleView = (doctorId: number) => {
     setSelectedDoctorId(doctorId);
     setShowViewModal(true);
+  };
+
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setFilterSpecialization("ALL");
+    setFilterStatus("ALL");
+    // setTestTypeFilter("ALL");
+    setCurrentPage(1); // Quay về trang 1
+    // setSortOrder("prescriptionDate,desc"); // Reset cả sắp xếp (tùy chọn)
   };
 
   return (
@@ -139,7 +151,7 @@ export default function DoctorsPage() {
                 <div className="mr-3 text-3xl">👨‍⚕️</div>
                 <div>
                   <p className="text-xs text-blue-100">Tổng số bác sĩ</p>
-                  <p className="text-2xl font-bold">{totalDoctors}</p>
+                  <p className="text-2xl font-bold">{total}</p>
                 </div>
               </div>
             </div>
@@ -150,66 +162,79 @@ export default function DoctorsPage() {
         <div className="bg-white rounded-xl p-4 mb-6 shadow-md">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             {/* Search bar */}
-            <div className="relative flex-grow max-w-md">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <FaSearch className="text-gray-400" />
-              </div>
+            <div className="relative lg:col-span-1 lg:col-start-1 w-fit">
+              <FaSearch className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400" />
               <input
-                type="text"
-                className="bg-gray-50 border border-gray-300 outline-none
-                text-gray-900 text-sm rounded-lg focus:ring-blue-500
-                 focus:border-blue-500 block w-full pl-10 p-2.5"
-                placeholder="Tìm kiếm bác sĩ..."
                 value={searchTerm}
+                type="text"
+                placeholder="Tìm kiếm bác sĩ"
+                className="w-full pl-10 p-2.5 border text-gray-700 focus:border-blue-500 border-gray-300 rounded-lg bg-gray-50 outline-none text-sm"
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 items-center">
-              {/* Filter by specialization */}
-              <div className="relative">
-                <div className="flex items-center">
-                  <FaFilter className="text-gray-400 mr-2" />
-                  <select
-                    className="bg-gray-50 border outline-none
-                    border-gray-300 text-gray-900 text-sm 
-                    rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-                    value={filterSpecialization}
-                    onChange={(e) => setFilterSpecialization(e.target.value)}
-                  >
-                    <option value="ALL">Tất cả chuyên khoa</option>
-                    {specializations.map((spec, index) => (
-                      <option key={index} value={spec}>
-                        {translateSpecialty(spec)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+            <div className="flex flex-row gap-4 ">
+              <div className="relative lg:justify-end w-fit">
+                <button
+                  onClick={handleResetFilters}
+                  className="w-full h-full px-4 cursor-pointer
+                  py-2.5 border text-gray-700 duration-300
+                  hover:bg-gray-100 border-gray-300 active:bg-gray-200
+                  rounded-lg bg-gray-50 outline-none 
+                  text-sm flex items-center justify-center gap-2"
+                  title="Xóa bộ lọc"
+                >
+                  <FaUndoAlt className="text-gray-500" />
+                  Xóa bộ lọc
+                </button>
               </div>
 
-              {/* Filter by status */}
-              <div className="relative">
-                <div className="flex items-center">
-                  <select
-                    className="bg-gray-50 border outline-none
-                    border-gray-300 text-gray-900 
-                    text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                  >
-                    <option value="ALL">Tất cả trạng thái</option>
-                    <option value="ACTIVE">Đang hoạt động</option>
-                    <option value="INACTIVE">Tạm ngưng</option>
-                  </select>
+              <div className="flex flex-col sm:flex-row gap-3 items-center">
+                {/* Filter by specialization */}
+                <div className="relative">
+                  <div className="flex items-center w-50">
+                    <FaFilter className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400" />
+                    <select
+                      className="w-full pl-10 p-2.5 
+                    border text-gray-700 border-gray-300 
+                    rounded-lg bg-gray-50 focus:border-blue-500 
+                    outline-none appearance-none text-sm"
+                      value={filterSpecialization}
+                      onChange={(e) => setFilterSpecialization(e.target.value)}
+                    >
+                      <option value="ALL">Tất cả chuyên khoa</option>
+                      {specialtyOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Filter by status */}
+                <div className="relative">
+                  <div className="flex items-center w-45">
+                    <FaFilter className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400" />
+                    <select
+                      className="w-full pl-10 p-2.5 
+                    border text-gray-700 border-gray-300 
+                    rounded-lg bg-gray-50 focus:border-blue-500 
+                    outline-none appearance-none text-sm"
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                    >
+                      <option value="ALL">Tất cả trạng thái</option>
+                      <option value="ACTIVE">Đang hoạt động</option>
+                      <option value="INACTIVE">Tạm ngưng</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
               {/* Add doctor button */}
-              <Button
-                onClick={() => setShowAddModal(true)}
-                className="!h-11"
-              >
-                <FaPlus /> Thêm bác sĩ
+              <Button onClick={() => setShowAddModal(true)} icon={<FaPlus />}
+              className="h-fit">
+                Thêm bác sĩ
               </Button>
             </div>
           </div>

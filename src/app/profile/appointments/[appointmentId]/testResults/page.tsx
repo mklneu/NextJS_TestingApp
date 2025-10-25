@@ -13,6 +13,10 @@ import { getInitialGmt7Time } from "@/services/OtherServices";
 import { getAppointmentById } from "@/services/AppointmentServices";
 import { AxiosError } from "axios";
 import Button from "@/components/Button";
+import { uploadFile } from "@/services/FileServices";
+import { useAuth } from "@/contexts/AuthContext";
+import { ErrorResponse } from "@/types/frontend";
+import { testTypeOptions } from "@/utils/map";
 
 // Định nghĩa kiểu dữ liệu cho một chỉ số xét nghiệm
 interface TestItem {
@@ -24,26 +28,12 @@ interface TestItem {
   notes: string;
 }
 
-// Định nghĩa các loại xét nghiệm
-const testTypeMap: Record<string, string> = {
-  HEMATOLOGY_BLOOD_CHEMISTRY: "Xét nghiệm Huyết học - Sinh hóa máu",
-  URINALYSIS: "Xét nghiệm Nước tiểu",
-  STOOL_TEST: "Xét nghiệm Phân",
-  IMAGING_RADIOLOGY: "Chẩn đoán Hình ảnh X-Quang",
-  PATHOLOGY_BIOPSY: "Giải phẫu bệnh - Sinh thiết",
-  FUNCTIONAL_TEST: "Xét nghiệm Chức năng",
-  MICROBIOLOGY: "Vi sinh vật học",
-};
-
-const testTypeOptions = Object.entries(testTypeMap).map(([value, label]) => ({
-  label,
-  value,
-}));
-
 const CreateTestResultPage = () => {
   const router = useRouter();
   const params = useParams();
   const appointmentId = params.appointmentId;
+
+  const { folderName } = useAuth();
 
   // State cho các trường chính
   const [testType, setTestType] = useState("HEMATOLOGY_BLOOD_CHEMISTRY");
@@ -133,13 +123,37 @@ const CreateTestResultPage = () => {
       }
 
       // --- BƯỚC 2: Xử lý upload file (nếu có) ---
-      let attachmentFileUrl = "";
+      let attachmentFileName = ""; // Đổi tên biến để rõ nghĩa hơn
       if (file) {
-        // const formData = new FormData();
-        // formData.append("file", file);
-        // const uploadResponse = await uploadFileApi(formData);
-        // attachmentFileUrl = uploadResponse.data.url;
-        attachmentFileUrl = `https://example.com/uploads/${file.name}`; // URL giả
+        try {
+          console.log("Uploading file:", file.name);
+          const uploadResponse = await uploadFile(file, folderName); // Lấy fileName từ response mới
+
+          if (
+            uploadResponse &&
+            uploadResponse.data &&
+            uploadResponse.data.fileName
+          ) {
+            attachmentFileName = uploadResponse.data.fileName; // <-- Sửa ở đây
+            console.log(
+              "File uploaded successfully, fileName:",
+              attachmentFileName
+            );
+          } else {
+            console.warn(
+              "Upload response did not contain a valid fileName:",
+              uploadResponse
+            );
+            toast.warn(
+              "Tải file lên thành công nhưng không nhận được tên file."
+            );
+          }
+        } catch (uploadError) {
+          console.error("File upload failed:", uploadError);
+          toast.error("Tải file đính kèm thất bại. Vui lòng thử lại.");
+          setLoading(false);
+          return;
+        }
       }
 
       // --- BƯỚC 3: Chuẩn bị payload với dữ liệu đã được xác thực ---
@@ -151,7 +165,7 @@ const CreateTestResultPage = () => {
         testType,
         testTime: new Date(testTime).toISOString(),
         generalConclusion,
-        attachmentFile: attachmentFileUrl,
+        attachmentFile: attachmentFileName,
         detailedTestItems: detailedTestItems.map((item) => ({
           itemName: item.itemName,
           value: parseFloat(item.value) || 0,

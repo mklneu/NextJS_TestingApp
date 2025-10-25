@@ -1,3 +1,5 @@
+import { AppointmentStatus } from "@/services/AppointmentServices";
+
 interface IButton {
   label: string;
   onClick: () => void;
@@ -69,7 +71,7 @@ interface Appointment {
   clinicRoom: string;
   appointmentType: string;
   notificationSent: boolean;
-  status: string;
+  status: AppointmentStatus;
   createdBy: string;
   updatedBy: string;
   patient: { id: number; fullName: string };
@@ -81,4 +83,14 @@ interface PaginationMeta {
   pageSize: number;
   pages: number;
   total: number;
+}
+
+interface PaginatedResponse<T> {
+  meta: {
+    page: number;
+    pageSize: number;
+    pages: number;
+    total: number;
+  };
+  data: T[];
 }

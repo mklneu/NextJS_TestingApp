@@ -1,3 +1,4 @@
+import { PaginationMeta } from "@/types/frontend";
 import axiosInstance from "./axiosInstance";
 /**
  * Đại diện cho một lựa chọn đóng gói trong chuỗi JSON

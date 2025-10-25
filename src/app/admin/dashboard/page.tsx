@@ -8,6 +8,7 @@ import { BiDollar } from "react-icons/bi";
 import { Chart, registerables } from "chart.js";
 import { Pie, Bar, Line } from "react-chartjs-2";
 import { getAllPatients, PatientRequestParams } from "@/services/PatientServices";
+import { resUser } from "@/types/frontend";
 
 Chart.register(...registerables);
 

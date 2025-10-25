@@ -72,3 +72,4 @@ export const translateTestType = (testType: string): string => {
   };
   return translations[testType] || testType.replace(/_/g, " ");
 };
+

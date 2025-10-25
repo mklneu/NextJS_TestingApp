@@ -22,6 +22,7 @@ import {
   getPrescriptionsByPatientId,
   Prescription,
 } from "@/services/PrescriptionServices";
+import { ErrorResponse } from "@/types/frontend";
 
 // Component Skeleton cho trạng thái loading
 const SkeletonCard = () => (

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { IoIosArrowBack } from "react-icons/io";
-import { FaStethoscope, FaEdit } from "react-icons/fa";
+import { FaStethoscope, FaEdit, FaFileUpload } from "react-icons/fa";
 import { MdOutlineSaveAlt, MdOutlineCancel } from "react-icons/md";
 import {
   getTestResultById,
@@ -16,13 +16,15 @@ import { translateTestType } from "@/utils/translateEnums";
 import Button from "@/components/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import DoctorOnly from "@/components/DoctorOnly";
+import { sanitizeFileName, uploadFile } from "@/services/FileServices";
+import { ErrorResponse } from "@/types/frontend";
 
 const TestResultDetailPage = () => {
   const params = useParams();
   const router = useRouter();
   const testResultId = params.testResultId as string;
 
-  const { userRole } = useAuth();
+  const { userRole, STORAGE_BASE_URL, folderName } = useAuth();
 
   const [testResult, setTestResult] = useState<TestResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,6 +33,9 @@ const TestResultDetailPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editableData, setEditableData] = useState<TestResult | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  const [newFile, setNewFile] = useState<File | null>(null);
+  const fileUrl = `${STORAGE_BASE_URL}/${folderName}/${testResult?.attachmentFile}`;
 
   useEffect(() => {
     if (!testResultId) return;
@@ -73,18 +78,74 @@ const TestResultDetailPage = () => {
     setEditableData({ ...editableData, detailedTestItems: updatedDetails });
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const originalFile = e.target.files[0];
+
+      // 1. Lấy tên file gốc
+      const originalName = originalFile.name;
+
+      // 2. Tạo tên file "sạch"
+      const sanitizedName = sanitizeFileName(originalName);
+
+      // 3. Tạo một đối tượng File MỚI với tên đã được làm sạch
+      // File object là bất biến, nên chúng ta phải tạo một file mới
+      // new File([nội dung file], [tên file mới], { type: [kiểu file] })
+      const newFileWithSanitizedName = new File([originalFile], sanitizedName, {
+        type: originalFile.type,
+        lastModified: originalFile.lastModified,
+      });
+
+      // 4. Lưu file MỚI này vào state
+      setNewFile(newFileWithSanitizedName);
+
+      console.log("Original Filename:", originalName);
+      console.log("Sanitized Filename:", sanitizedName);
+    }
+  };
+
   // 4. Hàm xử lý cập nhật
   const handleUpdate = async () => {
     if (!editableData) return;
     setIsUpdating(true);
     try {
-      const updatedResult = await updateTestResult(
-        editableData.id,
-        editableData
-      );
-      setTestResult(updatedResult); // Cập nhật state gốc
-      setEditableData(JSON.parse(JSON.stringify(updatedResult))); // Cập nhật state chỉnh sửa
+      let finalAttachmentName = editableData.attachmentFile; // Tên file mặc định là tên cũ
+
+      // BƯỚC 1: Nếu có file mới, upload file đó trước
+      if (newFile) {
+        try {
+          const uploadResponse = await uploadFile(newFile, folderName);
+          if (
+            uploadResponse &&
+            uploadResponse.data &&
+            uploadResponse.data.fileName
+          ) {
+            finalAttachmentName = uploadResponse.data.fileName; // Lấy tên file mới từ API
+          } else {
+            throw new Error("API upload không trả về fileName.");
+          }
+        } catch (uploadError) {
+          console.error("File upload failed:", uploadError);
+          toast.error("Tải file đính kèm mới thất bại.");
+          setIsUpdating(false);
+          return; // Dừng nếu upload lỗi
+        }
+      }
+
+      // BƯỚC 2: Chuẩn bị payload để cập nhật TestResult
+      const payload = {
+        ...editableData,
+        attachmentFile: finalAttachmentName, // Gán tên file (mới hoặc cũ)
+      };
+
+      // BƯỚC 3: Gọi API updateTestResult
+      const updatedResult = await updateTestResult(editableData.id, payload);
+
+      setTestResult(updatedResult);
+      setEditableData(JSON.parse(JSON.stringify(updatedResult)));
+      setNewFile(null); // Reset state file mới
       setIsEditing(false);
+      // toast.success("Cập nhật thành công!");
     } catch (error) {
       const err = error as AxiosError<ErrorResponse>;
       console.error("Error updating test result:", err.message);
@@ -96,7 +157,8 @@ const TestResultDetailPage = () => {
 
   // 5. Hàm hủy chỉnh sửa
   const handleCancel = () => {
-    setEditableData(JSON.parse(JSON.stringify(testResult))); // Reset lại dữ liệu
+    setEditableData(JSON.parse(JSON.stringify(testResult)));
+    setNewFile(null); // Reset file mới khi hủy
     setIsEditing(false);
   };
 
@@ -300,6 +362,64 @@ const TestResultDetailPage = () => {
                 </tbody>
               </table>
             </div>
+          </div>
+
+          <div className="border-t pt-6">
+            {" "}
+            <h2 className="text-xl font-semibold mb-3 text-slate-800">
+              Tệp đính kèm{" "}
+            </h2>{" "}
+            {isEditing ? (
+              // --- Chế độ CHỈNH SỬA ---
+              <div className="space-y-3">
+                <p className="text-sm text-slate-600">
+                  Tệp hiện tại:{" "}
+                  {editableData.attachmentFile ? (
+                    // Biến nó thành link để xem file hiện tại
+                    <a
+                      href={`${STORAGE_BASE_URL}/${folderName}/${editableData.attachmentFile}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-sky-600 hover:underline"
+                    >
+                      Xem tệp hiện tại ({editableData.attachmentFile})
+                    </a>
+                  ) : (
+                    <span className="text-slate-500 italic">Không có</span>
+                  )}
+                </p>
+                <label
+                  htmlFor="file_input"
+                  className="cursor-pointer bg-white border border-gray-300 text-gray-700 duration-300 px-4 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2 w-fit"
+                >
+                  <FaFileUpload />
+                  {newFile ? "Thay đổi tệp" : "Tải lên tệp mới"}
+                </label>
+                <input
+                  className="hidden"
+                  id="file_input"
+                  type="file"
+                  onChange={handleFileChange}
+                />
+                {newFile && (
+                  <span className="text-sm text-green-600 font-medium">
+                    Đã chọn: {newFile.name}
+                  </span>
+                )}
+              </div>
+            ) : // --- Chế độ XEM ---
+            testResult.attachmentFile ? (
+              <a
+                href={fileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sky-600 hover:underline break-all"
+              >
+                Xem file đính kèm{" "}
+              </a>
+            ) : (
+              <p className="text-slate-700">Không có tệp đính kèm.</p>
+            )}{" "}
           </div>
         </div>
       </div>

@@ -41,6 +41,7 @@ import {
   formatAppointmentDate,
   formatTotalCost,
 } from "@/services/OtherServices";
+import { Appointment, Doctor, ErrorResponse, resUser } from "@/types/frontend";
 
 const ExaminationDetailPage = () => {
   const params = useParams();
@@ -141,7 +142,7 @@ const ExaminationDetailPage = () => {
       bg-gray-50 rounded-lg border"
       onClick={() =>
         router.push(
-          `/profile/appointments/${appointmentId}/testResult/${result.id}`
+          `/profile/appointments/${appointmentId}/testResults/${result.id}`
         )
       }
     >
@@ -169,7 +170,7 @@ const ExaminationDetailPage = () => {
       bg-gray-50 rounded-lg border"
       onClick={() =>
         router.push(
-          `/profile/appointments/${appointmentId}/prescription/${result.id}`
+          `/profile/appointments/${appointmentId}/prescriptions/${result.id}`
         )
       }
     >
@@ -359,7 +360,7 @@ const ExaminationDetailPage = () => {
                     <Button
                       onClick={() =>
                         router.push(
-                          `/profile/appointments/${appointmentId}/testResult`
+                          `/profile/appointments/${appointmentId}/testResults`
                         )
                       }
                       icon={<FaPlus />}
@@ -459,7 +460,7 @@ const ExaminationDetailPage = () => {
                     <Button
                       onClick={() =>
                         router.push(
-                          `/profile/appointments/${appointmentId}/prescription`
+                          `/profile/appointments/${appointmentId}/prescriptions`
                         )
                       }
                       variant="green"

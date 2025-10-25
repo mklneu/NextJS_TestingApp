@@ -1,12 +1,15 @@
 import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
+import { AxiosError } from "axios";
+import { ErrorResponse, PaginatedResponse } from "@/types/frontend";
 
 type TestStatus = "PENDING" | "COMPLETED" | "REVIEWED";
 
 export interface TestResult {
   id: number;
-  patient: { id: number; name?: string };
-  doctor: { id: number; name?: string };
+  patient: { id: number; name: string };
+  doctor: { id: number; name: string };
+  appointment: { id: number };
   status: TestStatus;
   testType: string;
   testTime: string;
@@ -49,6 +52,16 @@ export interface DetailedTestItemBody {
   notes?: string;
 }
 
+// --- 1. Định nghĩa interface cho các tham số ---
+// Định nghĩa các tham số đầu vào cho việc chia trang và sắp xếp
+interface QueryParams {
+  page: number; // Số trang hiện tại (bắt đầu từ 1)
+  size: number; // Số lượng kết quả trên mỗi trang
+  sort?: string; // Chuỗi sắp xếp, ví dụ: "createdAt,desc"
+  search?: string; // Thêm: Lọc theo từ khóa tìm kiếm (từ ô input)
+  testType?: string; // Thêm: Lọc theo loại xét nghiệm (từ dropdown)
+}
+
 const createTestResult = async (body: TestResultBody) => {
   try {
     const response = await axiosInstance.post("/test-results", body);
@@ -58,6 +71,73 @@ const createTestResult = async (body: TestResultBody) => {
     console.error("❌ Error creating test result:", error);
     toast.error("Có lỗi xảy ra khi tạo kết quả xét nghiệm.");
     throw error;
+  }
+};
+
+const getAllTestResults = async (
+  params: QueryParams
+): Promise<PaginatedResponse<TestResult>> => {
+  // Giữ nguyên kiểu trả về
+  try {
+    // 1. Chuẩn bị các tham số cơ bản
+    const apiParams: Record<string, string | number> = {
+      page: params.page,
+      size: params.size,
+    };
+
+    if (params.sort) {
+      apiParams.sort = params.sort;
+    }
+
+    // 2. Xây dựng mảng các điều kiện lọc (filter)
+    const filterParts: string[] = [];
+
+    // 3. Thêm logic lọc cho 'search' (với cú pháp OR)
+    if (params.search && params.search.trim() !== "") {
+      // Làm sạch input để tránh lỗi cú pháp (ví dụ: nếu người dùng gõ dấu ')
+      const safeSearchTerm = params.search.trim().replace(/'/g, "''");
+
+      // Xây dựng chuỗi OR theo đúng cú pháp BE của bạn
+      // (patient.fullName~'term' or doctor.fullName~'term')
+      const searchOrLogic = `(patient.fullName~'${safeSearchTerm}' or doctor.fullName~'${safeSearchTerm}')`;
+      filterParts.push(searchOrLogic);
+    }
+
+    // 4. Thêm logic lọc cho 'testType' (nối bằng AND)
+    // Giả sử cú pháp lọc testType là testType=='VALUE' (hoặc ~ nếu bạn muốn)
+    if (params.testType && params.testType !== "ALL") {
+      filterParts.push(`testType = '${params.testType}'`);
+    }
+
+    // 5. Nối tất cả các điều kiện lọc lại bằng ' and '
+    if (filterParts.length > 0) {
+      apiParams.filter = filterParts.join(" and ");
+    }
+
+    // 6. Gửi request
+    // Axios sẽ tự động tạo URL, ví dụ:
+    // ...?page=0&size=10&filter=(patient.fullName~'khánh' or doctor.fullName~'khánh') and testType=='BLOOD_TEST'
+    const response = await axiosInstance.get("/test-results", {
+      params: apiParams,
+    });
+
+    return response.data.data;
+  } catch (error) {
+    // 5. Thêm xử lý lỗi với toast (giống getAllDoctors)
+    const err = error as AxiosError<ErrorResponse>;
+    console.error("❌ Error fetching all test results:", err);
+
+    if (err.response?.data?.message) {
+      toast.error(err.response.data.message);
+    } else {
+      toast.error("❌ Không thể lấy danh sách kết quả xét nghiệm!");
+    }
+
+    // Trả về một cấu trúc rỗng để tránh lỗi ở component
+    return {
+      meta: { page: 1, pageSize: params.size, pages: 0, total: 0 },
+      data: [],
+    };
   }
 };
 
@@ -151,6 +231,7 @@ const deleteTestResult = async (
 };
 
 export {
+  getAllTestResults,
   getTestResultsByPatientId,
   getTestResultById,
   getTestResultsByAppointmentId,

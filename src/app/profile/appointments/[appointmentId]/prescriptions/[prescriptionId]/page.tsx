@@ -25,6 +25,7 @@ import {
 } from "@/services/TestResultServices";
 import DoctorOnly from "@/components/DoctorOnly";
 import { useAuth } from "@/contexts/AuthContext";
+import { ErrorResponse } from "@/types/frontend";
 
 // Cập nhật interface để `quantity` có thể là chuỗi rỗng
 interface EditablePrescriptionItem

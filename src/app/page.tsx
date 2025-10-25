@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { getAllPatients } from "@/services/PatientServices";
 import Button from "@/components/Button";
+import { resUser } from "@/types/frontend";
 
 interface StatCardProps {
   title: string;
@@ -406,6 +407,23 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <div className="flex flex-row space-x-1 justify-center">
+        <div className="card w-full">
+          <div className="card-content">card</div>
+        </div>
+        <div className="card w-full">
+          <div className="card-content">card</div>
+        </div>
+        <div className="card w-full">
+          <div className="card-content">card</div>
+        </div>
+        <div className="card w-full">
+          <div className="card-content">card</div>
+        </div>
+        <div className="card w-full">
+          <div className="card-content">card</div>
+        </div>
+      </div>
     </div>
   );
 }

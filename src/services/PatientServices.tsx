@@ -2,6 +2,7 @@ import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
 import Button from "@/components/Button";
 import { AxiosError } from "axios";
+import { ErrorResponse } from "@/types/frontend";
 
 export interface PatientRequestParams {
   page: number;
@@ -41,7 +42,7 @@ const getAllPatients = async (
     // Thêm điều kiện tìm kiếm
     if (searchTerm) {
       filters.push(
-        `(username : '${searchTerm}' OR email : '${searchTerm}' OR fullName : '${searchTerm}')`
+        `(username ~ '${searchTerm}' OR email ~ '${searchTerm}' OR fullName ~ '${searchTerm}')`
       );
     }
 

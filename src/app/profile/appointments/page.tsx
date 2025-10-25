@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaCalendarCheck } from "react-icons/fa6";
 import InputBar from "@/components/Input";
+import { Appointment, ErrorResponse } from "@/types/frontend";
 
 // Fake loading skeleton
 const SkeletonRow = () => (

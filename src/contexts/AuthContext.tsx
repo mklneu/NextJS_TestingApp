@@ -3,6 +3,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { getAccount, isAuthenticated } from "@/services/AuthServices";
 import { getPatientById } from "@/services/PatientServices";
+import { Appointment, resUser } from "@/types/frontend";
 
 // Định nghĩa kiểu dữ liệu cho context
 type AuthContextType = {
@@ -20,6 +21,8 @@ type AuthContextType = {
   setAppointmentsUpdateTrigger: React.Dispatch<React.SetStateAction<number>>;
   appointments: Appointment[];
   setAppointments: React.Dispatch<React.SetStateAction<Appointment[]>>;
+  STORAGE_BASE_URL: string;
+  folderName: string;
 };
 
 // Tạo context với giá trị mặc định
@@ -47,6 +50,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<resUser | null>(null);
   const [appointmentsUpdateTrigger, setAppointmentsUpdateTrigger] = useState(0);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+
+  const STORAGE_BASE_URL = process.env.NEXT_PUBLIC_STORAGE_BASE_URL || "http://localhost:8080/storage";
+  const folderName = "test-results";
 
   // Luôn fetch lại user info mỗi khi isLoggedIn chuyển thành true
   useEffect(() => {
@@ -93,6 +99,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setAppointmentsUpdateTrigger,
         appointments,
         setAppointments,
+        STORAGE_BASE_URL,
+        folderName,
       }}
     >
       {children}

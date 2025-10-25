@@ -12,6 +12,7 @@ import {
 } from "react-icons/fa";
 import { getPatientById, updatePatient } from "@/services/PatientServices";
 import Button from "@/components/Button";
+import { reqUser } from "@/types/frontend";
 
 const InfoTab = () => {
   const { userRole, userId, user, setUser } = useAuth();

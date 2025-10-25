@@ -1,4 +1,7 @@
+import { ErrorResponse, PaginatedResponse } from "@/types/frontend";
 import axiosInstance from "./axiosInstance";
+import { AxiosError } from "axios";
+import { toast } from "react-toastify";
 
 // Body chính để tạo hoặc cập nhật một đơn thuốc
 export interface PrescriptionBody {
@@ -24,8 +27,8 @@ export interface PrescriptionItemBody {
 // Dữ liệu trả về hoàn chỉnh cho một đơn thuốc
 export interface Prescription {
   id: number;
-  patient: { id: number ; name: string};
-  doctor: { id: number ; name: string};
+  patient: { id: number; name: string };
+  doctor: { id: number; name: string };
   appointment: { id: number };
   prescriptionDate: string;
   diagnosis: string;
@@ -55,6 +58,13 @@ export interface TestResultItem {
   testTime: string;
 }
 
+interface PrescriptionQueryParams {
+  page: number; // Số trang (VD: 1, 2, 3...)
+  size: number; // Kích thước trang
+  sort?: string; // Sắp xếp (VD: "prescriptionDate,desc")
+  search?: string; // Lọc theo tên bệnh nhân hoặc bác sĩ
+  diagnosis?: string; // (TÙY CHỌN) Lọc theo chẩn đoán
+}
 // --- 2. Các hàm gọi API ---
 
 /**
@@ -71,6 +81,70 @@ const createPrescription = async (
   } catch (error) {
     console.error("❌ Error creating prescription:", error);
     throw error;
+  }
+};
+
+const getAllPrescriptions = async (
+  params: PrescriptionQueryParams
+): Promise<PaginatedResponse<Prescription>> => {
+  try {
+    // 2. Chuẩn bị các tham số cơ bản
+    const apiParams: Record<string, string | number> = {
+      page: params.page,
+      size: params.size,
+    };
+
+    if (params.sort) {
+      apiParams.sort = params.sort;
+    }
+
+    // 3. Xây dựng mảng các điều kiện lọc (filter)
+    const filterParts: string[] = [];
+
+    // 4. Thêm logic lọc cho 'search' (tìm theo tên BN hoặc BS)
+    if (params.search && params.search.trim() !== "") {
+      const safeSearchTerm = params.search.trim().replace(/'/g, "''");
+      // Dùng logic OR (giống hệt TestResults và Appointments)
+      filterParts.push(
+        `(patient.fullName~'${safeSearchTerm}' or doctor.fullName~'${safeSearchTerm}')`
+      );
+    }
+
+    // 5. (Tùy chọn) Thêm logic lọc cho 'diagnosis'
+    if (params.diagnosis && params.diagnosis.trim() !== "") {
+      const safeSearchTerm = params.diagnosis.trim().replace(/'/g, "''");
+      filterParts.push(`diagnosis~'${safeSearchTerm}'`);
+    }
+
+    // 6. Nối tất cả các điều kiện lọc lại bằng ' and '
+    if (filterParts.length > 0) {
+      apiParams.filter = filterParts.join(" and ");
+    }
+
+    // 7. Gửi request
+    // URL cuối cùng sẽ có dạng: /prescriptions?page=0&size=10&sort=...&filter=(...) and (...)
+    const response = await axiosInstance.get("/prescriptions", {
+      params: apiParams,
+    });
+
+    // 8. Trả về toàn bộ DTO phân trang (giả sử nằm trong response.data.data)
+    return response.data.data;
+  } catch (error) {
+    // 9. Xử lý lỗi
+    const err = error as AxiosError<ErrorResponse>;
+    console.error("❌ Error fetching all prescriptions:", err);
+
+    if (err.response?.data?.message) {
+      toast.error(err.response.data.message);
+    } else {
+      toast.error("❌ Không thể lấy danh sách đơn thuốc!");
+    }
+
+    // Trả về một cấu trúc rỗng để tránh lỗi crash component
+    return {
+      meta: { page: 1, pageSize: params.size, pages: 0, total: 0 },
+      data: [],
+    };
   }
 };
 
@@ -150,6 +224,7 @@ const updatePrescription = async (
 
 export {
   createPrescription,
+  getAllPrescriptions,
   getPrescriptionById,
   getPrescriptionsByPatientId,
   getPrescriptionsByAppointmentId,

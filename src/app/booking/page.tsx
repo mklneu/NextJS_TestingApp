@@ -9,6 +9,7 @@ import Button from "@/components/Button";
 import { AxiosError } from "axios";
 import { getAllHospitals } from "@/services/HospitalServices";
 import InputBar from "@/components/Input";
+import { ErrorResponse, Hospital } from "@/types/frontend";
 
 const appointmentTypes = [
   { value: "KHAM_TONG_QUAT", label: "Khám tổng quát" },

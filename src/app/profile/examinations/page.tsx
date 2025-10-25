@@ -11,6 +11,7 @@ import Link from "next/link";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
 import { translateAppointmentType } from "@/utils/translateEnums";
+import { Appointment, ErrorResponse } from "@/types/frontend";
 
 // Skeleton component for loading state
 const PatientSkeletonCard = () => (
