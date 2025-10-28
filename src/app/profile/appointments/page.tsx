@@ -288,10 +288,16 @@ const AppointmentsTab = () => {
             {loading ? (
               Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} />)
             ) : appointments && appointments.length > 0 ? (
-              appointments.map((a) => (
-                <tr
-                  key={a.id}
-                  className={`hover:bg-blue-50 duration-300
+              appointments.map((a) => {
+                const isDisabled =
+                  a.status === "COMPLETED" ||
+                  a.status === "CANCELLED" ||
+                  a.status === "CONFIRMED";
+
+                return (
+                  <tr
+                    key={a.id}
+                    className={`hover:bg-blue-50 duration-300
                   text-gray-600 border-b border-b-gray-300
                   ${
                     a.status === "PENDING"
@@ -299,51 +305,48 @@ const AppointmentsTab = () => {
                       : "cursor-pointer hover:bg-blue-50"
                   }
                   `}
-                  onClick={() => {
-                    if (a.status !== "PENDING") {
-                      router.push(`/profile/appointments/${a.id}`);
-                    }
-                  }}
-                >
-                  <td className="py-3 px-2 text-center font-mono text-xs text-gray-500 w-20">
-                    {a.id}
-                  </td>
-                  <td className="py-3 px-2 text-center">
-                    {userRole === "doctor"
-                      ? a.patient.fullName
-                      : a.doctor.fullName}
-                  </td>
-                  <td className="py-3 px-2 text-center">
-                    {formatAppointmentDate(a.appointmentDate)}
-                  </td>
-                  <td className="py-3 px-2 text-center">{a.clinicRoom}</td>
-                  <td className="py-3 px-2 text-center">
-                    {translateAppointmentType(a.appointmentType)}
-                  </td>
-                  <td className="py-3 px-2 text-center text-gray-600 max-w-[180px] truncate">
-                    {a.patientNote}
-                  </td>
-                  <td className="py-3 px-2 text-center text-gray-600 max-w-[180px] truncate">
-                    {a.doctorNote}
-                  </td>
-                  <td className="py-3 px-2 text-center font-semibold ">
-                    <button
-                      className={`px-3 py-1 rounded transition ${getStatusButtonClass(
-                        a.status
-                      )} disabled:cursor-not-allowed cursor-pointer`}
-                      onClick={() => openModal(a)}
-                      disabled={
-                        a.status === "COMPLETED" ||
-                        a.status === "CANCELLED" ||
-                        // (userRole !== "doctor" && a.status === "CONFIRMED")
-                        a.status === "CONFIRMED"
+                    onClick={() => {
+                      if (a.status !== "PENDING") {
+                        router.push(`/profile/appointments/${a.id}`);
                       }
-                    >
-                      {translateAppointmentStatus(a.status) || "-"}
-                    </button>
-                  </td>
-                </tr>
-              ))
+                    }}
+                  >
+                    <td className="py-3 px-2 text-center font-mono text-xs text-gray-500 w-20">
+                      {a.id}
+                    </td>
+                    <td className="py-3 px-2 text-center">
+                      {userRole === "doctor"
+                        ? a.patient.fullName
+                        : a.doctor.fullName}
+                    </td>
+                    <td className="py-3 px-2 text-center">
+                      {formatAppointmentDate(a.appointmentDate)}
+                    </td>
+                    <td className="py-3 px-2 text-center">{a.clinicRoom}</td>
+                    <td className="py-3 px-2 text-center">
+                      {translateAppointmentType(a.appointmentType)}
+                    </td>
+                    <td className="py-3 px-2 text-center text-gray-600 max-w-[180px] truncate">
+                      {a.patientNote}
+                    </td>
+                    <td className="py-3 px-2 text-center text-gray-600 max-w-[180px] truncate">
+                      {a.doctorNote}
+                    </td>
+                    <td className="py-3 px-2 text-center font-semibold ">
+                      <Button
+                        className={`px-3 py-1 rounded transition ${getStatusButtonClass(
+                          a.status
+                        )} disabled:cursor-not-allowed cursor-pointer`}
+                        onClick={() => openModal(a)}
+                        disabled={isDisabled}
+                        translate={!isDisabled}
+                      >
+                        {translateAppointmentStatus(a.status) || "-"}
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan={8} className="text-center py-8 text-gray-400">
@@ -437,21 +440,13 @@ const AppointmentsTab = () => {
                       </button>
                     </>
                   )}
-                  {selectedAppointment.status === "CONFIRMED" && (
-                    <button
-                      className="px-3 py-1 bg-blue-100 cursor-pointer duration-300 text-blue-700 rounded hover:bg-blue-200 text-sm"
-                      onClick={() => handleModalAction("complete")}
-                    >
-                      Hoàn thành
-                    </button>
-                  )}
                 </>
               ) : (
                 <>
-                  {/* Sửa điều kiện từ CONFIRMED thành PENDING */}
                   {selectedAppointment?.status === "PENDING" && (
                     <button
-                      className="px-3 py-1 bg-red-100 cursor-pointer duration-300 text-red-700 rounded hover:bg-red-200 text-sm"
+                      className="px-3 py-1 bg-red-100 cursor-pointer 
+                      duration-300 text-red-700 rounded hover:bg-red-200 text-sm"
                       onClick={() => handleModalAction("cancel")}
                     >
                       Hủy lịch

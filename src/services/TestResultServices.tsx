@@ -1,16 +1,14 @@
 import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
 import { AxiosError } from "axios";
-import { ErrorResponse, PaginatedResponse } from "@/types/frontend";
-
-type TestStatus = "PENDING" | "COMPLETED" | "REVIEWED";
+import { ErrorResponse, PaginatedResponse, TestResultStatus } from "@/types/frontend";
 
 export interface TestResult {
   id: number;
   patient: { id: number; name: string };
   doctor: { id: number; name: string };
   appointment: { id: number };
-  status: TestStatus;
+  status: TestResultStatus;
   testType: string;
   testTime: string;
   generalConclusion: string;
@@ -29,7 +27,7 @@ export interface TestResultBody {
   patient: { id: number };
   doctor: { id: number };
   appointment: { id: number };
-  status: TestStatus;
+  status: TestResultStatus;
   testType: string;
   testTime: string; // ISO 8601 format date string e.g., "2025-10-12T10:30:00Z"
   generalConclusion: string;
@@ -38,7 +36,7 @@ export interface TestResultBody {
 }
 
 export interface UpdateTestResultBody {
-  status?: TestStatus;
+  status?: TestResultStatus;
   generalConclusion?: string;
   attachmentFile?: string;
   detailedTestItems?: DetailedTestItemBody[];

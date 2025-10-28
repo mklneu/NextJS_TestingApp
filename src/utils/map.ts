@@ -45,6 +45,22 @@ export const appointmentStatusOptions = Object.entries(
   value,
 }));
 
+export const testResultStatusMap: Record<string, string> = {
+  REQUESTED: "Yêu cầu đã được gửi", // Yêu cầu đã được gửi
+  IN_PROGRESS: "Đang tiến hành", // Đang tiến hành
+  PRELIMINARY: "Kết quả sơ bộ", // Kết quả sơ bộ
+  COMPLETED: "Kết quả hoàn thành", // Kết quả hoàn thành
+  REVIEWED: "Đã xem xét", // Đã xem xét
+  CANCELLED: "Đã hủy", // Đã hủy
+};
+
+export const testResultStatusOptions = Object.entries(testResultStatusMap).map(
+  ([value, label]) => ({
+    label,
+    value,
+  })
+);
+
 export const specializationsMap: Record<string, string> = {
   CARDIOLOGY: "Tim mạch",
   DERMATOLOGY: "Da liễu",

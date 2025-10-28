@@ -94,3 +94,11 @@ interface PaginatedResponse<T> {
   };
   data: T[];
 }
+
+type TestResultStatus =
+  "REQUESTED" |
+  "IN_PROGRESS" |
+  "PRELIMINARY" |
+  "COMPLETED" |
+  "REVIEWED" |
+  "CANCELLED";

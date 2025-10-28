@@ -1,4 +1,6 @@
+import { translateTestResultStatus } from "@/utils/translateEnums";
 import { Prescription } from "./PrescriptionServices";
+import { TestResultStatus } from "@/types/frontend";
 
 // Pagination component
 const Pagination = ({
@@ -124,16 +126,47 @@ const scrollToTop = () => {
 const getStatusButtonClass = (status: string) => {
   switch (status) {
     case "PENDING":
-      return "bg-yellow-100 text-yellow-700 hover:bg-yellow-200";
+      return "bg-yellow-100 w-full !text-yellow-700 hover:bg-yellow-200";
     case "CONFIRMED":
-      return "bg-green-100 text-green-700 hover:bg-green-200";
+      return "bg-green-100 w-full !text-green-700 hover:bg-green-200";
     case "CANCELLED":
-      return "bg-red-100 text-red-700 hover:bg-red-200";
+      return "bg-red-100 w-full !text-red-700 hover:bg-red-200";
     case "COMPLETED":
-      return "bg-blue-100 text-blue-700 hover:bg-blue-200";
+      return "bg-blue-100 w-full !text-white hover:bg-blue-200";
+    case "REQUESTED":
+      return "bg-indigo-100 w-full !text-indigo-700 hover:bg-indigo-200";
+    case "IN_PROGRESS":
+      return "bg-purple-100 w-full !text-purple-700 hover:bg-purple-200";
+    case "PRELIMINARY":
+      return "bg-teal-100 w-full !text-teal-700 hover:bg-teal-200";
+    case "REVIEWED":
+      return "bg-gray-100 w-full !text-gray-700 hover:bg-gray-200";
     default:
-      return "bg-gray-100 text-gray-700 hover:bg-gray-200";
+      return "bg-gray-100 w-full !text-gray-700 hover:bg-gray-200";
   }
+};
+
+const TestResultStatusBadge = ({ status }: { status: TestResultStatus }) => {
+  // Định nghĩa màu sắc cho từng trạng thái
+  const statusStyles: Record<TestResultStatus, string> = {
+    REQUESTED: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    IN_PROGRESS: "bg-blue-100 text-blue-800 border-blue-200",
+    PRELIMINARY: "bg-purple-100 text-purple-800 border-purple-200",
+    COMPLETED: "bg-green-500 text-white border-green-200",
+    REVIEWED: "bg-indigo-100 text-indigo-800 border-indigo-200",
+    CANCELLED: "bg-red-100 text-red-800 border-red-200",
+  };
+
+  const style =
+    statusStyles[status] || "bg-gray-100 text-gray-800 border-gray-200";
+
+  return (
+    <span
+      className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-br-lg rounded-tl-lg border ${style}`}
+    >
+      {translateTestResultStatus(status) || status}
+    </span>
+  );
 };
 
 // Hàm khởi tạo giá trị thời gian mặc định là GMT+7
@@ -177,4 +210,5 @@ export {
   getStatusButtonClass,
   getInitialGmt7Time,
   formatTotalCost,
+  TestResultStatusBadge,
 };

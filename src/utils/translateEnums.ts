@@ -7,6 +7,17 @@ export const translateAppointmentStatus = (status: string): string => {
   };
   return statusMap[status] || status;
 };
+export const translateTestResultStatus = (status: string): string => {
+  const statusMap: Record<string, string> = {
+    REQUESTED: "Yêu cầu đã được gửi",
+    IN_PROGRESS: "Đang tiến hành",
+    PRELIMINARY: "Kết quả sơ bộ",
+    COMPLETED: "Kết quả hoàn thành",
+    REVIEWED: "Đã xem xét",
+    CANCELLED: "Đã hủy",
+  };
+  return statusMap[status] || status;
+};
 export const translateAppointmentType = (type: string): string => {
   const typeMap: Record<string, string> = {
     KHAM_TONG_QUAT: "Khám tổng quát",
@@ -72,4 +83,3 @@ export const translateTestType = (testType: string): string => {
   };
   return translations[testType] || testType.replace(/_/g, " ");
 };
-

@@ -40,6 +40,7 @@ import DoctorOnly from "@/components/DoctorOnly";
 import {
   formatAppointmentDate,
   formatTotalCost,
+  TestResultStatusBadge,
 } from "@/services/OtherServices";
 import { Appointment, Doctor, ErrorResponse, resUser } from "@/types/frontend";
 
@@ -135,7 +136,7 @@ const ExaminationDetailPage = () => {
   const renderResultItem = (result: TestResult) => (
     <div
       key={result.id}
-      className="flex items-center
+      className="flex items-center min-h-20
        cursor-pointer -translate-y-1
       hover:shadow-inner hover:-translate-y-[2px]
       justify-between p-3 duration-300 
@@ -146,15 +147,19 @@ const ExaminationDetailPage = () => {
         )
       }
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 w-full relative">
         <FaFileMedicalAlt className="text-blue-500 text-lg" />
         <div>
           <p className="font-semibold text-gray-800">
             {translateTestType(result.testType) || "Xét nghiệm khác"}
           </p>
+
           <p className="text-xs text-gray-500">
             Ngày: {new Date(result.testTime).toLocaleDateString("vi-VN")}
           </p>
+          <div className="absolute -right-2 -bottom-4">
+            {result.status && <TestResultStatusBadge status={result.status} />}
+          </div>
         </div>
       </div>
     </div>
@@ -177,8 +182,9 @@ const ExaminationDetailPage = () => {
       <div className="flex items-center gap-3">
         <FaFileMedicalAlt className="text-green-500" />
         <div>
+          {/* SỬA LỖI LOGIC HIỂN THỊ */}
           <p className="font-semibold text-gray-800">
-            {translateTestType(result.diagnosis) || "Đơn thuốc khác"}
+            {result.diagnosis || "Đơn thuốc"}
           </p>
           <p className="text-xs text-gray-500">
             Ngày:{" "}
@@ -190,9 +196,10 @@ const ExaminationDetailPage = () => {
   );
 
   if (loading) {
+    // CẢI THIỆN GIAO DIỆN TẢI TRANG
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p>Đang tải thông tin buổi khám...</p>
+      <div className="flex justify-center items-center h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
       </div>
     );
   }
@@ -218,7 +225,7 @@ const ExaminationDetailPage = () => {
           {userRole !== "doctor" ? "Quay lại lịch hẹn" : "Quay lại danh sách "}
         </button>
       </div>
-      <div className="mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="mx-auto grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Cột thông tin bệnh nhân */}
         <div className="lg:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit">
           <h2 className="text-xl font-bold text-sky-700 mb-4 flex items-baseline gap-2">
@@ -269,7 +276,7 @@ const ExaminationDetailPage = () => {
         </div>
 
         {/* Cột chính cho việc khám bệnh */}
-        <div className="h-fit lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+        <div className="h-fit lg:col-span-3 bg-white p-6 rounded-lg shadow-md">
           <div>
             <div className="flex items-baseline text-xl font-bold text-sky-700 mb-1 gap-2">
               <FaCalendarCheck />
@@ -350,7 +357,7 @@ const ExaminationDetailPage = () => {
                   )}
                 </div>
               ) : (
-                <p className="text-sm text-center text-gray-500 py-4">
+                <p className="text-sm text-left text-gray-500 py-2">
                   Chưa có kết quả xét nghiệm nào được tạo cho buổi khám này.
                 </p>
               )}
@@ -382,8 +389,9 @@ const ExaminationDetailPage = () => {
               {prescriptions.length > 0 ? (
                 <div>
                   <div className="space-y-3">
+                    {/* SỬA LỖI HIỂN THỊ VĂN BẢN */}
                     <p className="text-sm font-medium text-gray-600">
-                      Các kết quả đã tạo:
+                      Các đơn thuốc đã tạo:
                     </p>
                     {/* Luôn hiển thị các mục ban đầu */}
                     {prescriptions
@@ -435,8 +443,9 @@ const ExaminationDetailPage = () => {
                   )}
                 </div>
               ) : (
-                <p className="text-sm text-center text-gray-500 py-4">
-                  Chưa có kết quả xét nghiệm nào được tạo cho buổi khám này.
+                // SỬA LỖI HIỂN THỊ VĂN BẢN
+                <p className="text-sm text-left text-gray-500 py-2">
+                  Chưa có đơn thuốc nào được tạo cho buổi khám này.
                 </p>
               )}
               {prescriptions.length > 0 && (
@@ -493,6 +502,17 @@ const ExaminationDetailPage = () => {
                 !cursor-default"
               >
                 Buổi khám đã bị hủy
+              </Button>
+            </div>
+          ) : appointment.status === "CONFIRMED" ? (
+            <div className="flex mt-4 justify-end">
+              <Button
+                variant="alarm"
+                translate={false}
+                className="hover:-translate-x-[2px] 
+                !cursor-default"
+              >
+                Buổi khám đang chờ bắt đầu
               </Button>
             </div>
           ) : (
