@@ -141,11 +141,22 @@ const ExaminationDetailPage = () => {
       hover:shadow-inner hover:-translate-y-[2px]
       justify-between p-3 duration-300 
       bg-gray-50 rounded-lg border"
-      onClick={() =>
-        router.push(
-          `/profile/appointments/${appointmentId}/testResults/${result.id}`
-        )
-      }
+      onClick={() => {
+        if (result.status === "REQUESTED") {
+          // toast.info("Kết quả xét nghiệm đang chờ xử lý.");
+          router.push(
+            `/profile/appointments/${appointmentId}/testResults/${result.id}`
+          );
+          return;
+        } else if (result.status === "CANCELLED") {
+          toast.info("Kết quả xét nghiệm đã bị hủy.");
+          return;
+        } else {
+          router.push(
+            `/profile/appointments/${appointmentId}/testResults/${result.id}`
+          );
+        }
+      }}
     >
       <div className="flex items-center gap-3 w-full relative">
         <FaFileMedicalAlt className="text-blue-500 text-lg" />
@@ -299,8 +310,8 @@ const ExaminationDetailPage = () => {
           <div className=" lg:space-x-3 lg:flex lg:flex-row w-full">
             {/* Khu vực tạo kết quả xét nghiệm */}
             <div className="mt-3 p-4 border rounded-lg space-y-3 lg:w-1/2 h-fit">
-              <h3 className="font-semibold text-lg flex items-center gap-2 text-gray-600">
-                <FaNotesMedical /> Chỉ định xét nghiệm
+              <h3 className="font-semibold text-lg flex gap-2 text-gray-600 items-baseline">
+                <FaNotesMedical /> <p>Chỉ định xét nghiệm</p>
               </h3>
 
               {testResults.length > 0 ? (
@@ -309,13 +320,11 @@ const ExaminationDetailPage = () => {
                     <p className="text-sm font-medium text-gray-600">
                       Các kết quả đã tạo:
                     </p>
-                    {/* Luôn hiển thị các mục ban đầu */}
                     {testResults
                       .slice(0, itemsToShowInitially)
                       .map(renderResultItem)}
                   </div>
 
-                  {/* 1. Phần tử có thể đóng mở mượt mà */}
                   <div
                     className={`grid transition-all duration-500 ease-in-out ${
                       showAllResults
@@ -325,14 +334,12 @@ const ExaminationDetailPage = () => {
                   >
                     <div className="overflow-hidden">
                       <div className="space-y-3 pt-3">
-                        {/* Render các mục còn lại ở đây */}
                         {testResults
                           .slice(itemsToShowInitially)
                           .map(renderResultItem)}
                       </div>
                     </div>
                   </div>
-                  {/* Nút điều khiển */}
                   {testResults.length > itemsToShowInitially && (
                     <Button
                       onClick={() => setShowAllResults(!showAllResults)}
@@ -372,7 +379,7 @@ const ExaminationDetailPage = () => {
                       }
                       icon={<FaPlus />}
                     >
-                      Tạo kết quả xét nghiệm mới
+                      Yêu cầu xét nghiệm mới
                     </Button>
                   </div>
                 </DoctorOnly>
@@ -381,25 +388,22 @@ const ExaminationDetailPage = () => {
 
             {/* Khu vực kê đơn thuốc */}
             <div className="mt-3 p-4 border rounded-lg space-y-3 lg:w-1/2 h-fit">
-              <h3 className="font-semibold text-lg flex items-center gap-2 text-gray-600">
+              <h3 className="font-semibold text-lg flex items-baseline gap-2 text-gray-600">
                 <FaPrescriptionBottle />
-                Kê đơn thuốc
+                <p>Kê đơn thuốc</p>
               </h3>
 
               {prescriptions.length > 0 ? (
                 <div>
                   <div className="space-y-3">
-                    {/* SỬA LỖI HIỂN THỊ VĂN BẢN */}
                     <p className="text-sm font-medium text-gray-600">
                       Các đơn thuốc đã tạo:
                     </p>
-                    {/* Luôn hiển thị các mục ban đầu */}
                     {prescriptions
                       .slice(0, itemsToShowInitially)
                       .map(renderPrescriptionItem)}
                   </div>
 
-                  {/* 1. Phần tử có thể đóng mở mượt mà */}
                   <div
                     className={`grid transition-all duration-500 ease-in-out ${
                       showAllPrescriptions
@@ -409,14 +413,12 @@ const ExaminationDetailPage = () => {
                   >
                     <div className="overflow-hidden">
                       <div className="space-y-3 pt-3">
-                        {/* Render các mục còn lại ở đây */}
                         {prescriptions
                           .slice(itemsToShowInitially)
                           .map(renderPrescriptionItem)}
                       </div>
                     </div>
                   </div>
-                  {/* Nút điều khiển */}
                   {prescriptions.length > itemsToShowInitially && (
                     <Button
                       onClick={() =>
@@ -443,7 +445,6 @@ const ExaminationDetailPage = () => {
                   )}
                 </div>
               ) : (
-                // SỬA LỖI HIỂN THỊ VĂN BẢN
                 <p className="text-sm text-left text-gray-500 py-2">
                   Chưa có đơn thuốc nào được tạo cho buổi khám này.
                 </p>
@@ -463,23 +464,27 @@ const ExaminationDetailPage = () => {
                 </div>
               )}
 
-              {!["COMPLETED", "CANCELLED"].includes(appointment.status) && (
-                <DoctorOnly userRole={userRole}>
-                  <div className="pt-2">
-                    <Button
-                      onClick={() =>
-                        router.push(
-                          `/profile/appointments/${appointmentId}/prescriptions`
-                        )
-                      }
-                      variant="green"
-                      icon={<FaPlus />}
-                    >
-                      Tạo đơn thuốc mới
-                    </Button>
-                  </div>
-                </DoctorOnly>
-              )}
+              {!["COMPLETED", "CANCELLED"].includes(appointment.status) &&
+                (testResults.length === 0 ||
+                  testResults.every(
+                    (result) => result.status === "REVIEWED"
+                  )) && (
+                  <DoctorOnly userRole={userRole}>
+                    <div className="pt-2">
+                      <Button
+                        onClick={() =>
+                          router.push(
+                            `/profile/appointments/${appointmentId}/prescriptions`
+                          )
+                        }
+                        variant="green"
+                        icon={<FaPlus />}
+                      >
+                        Tạo đơn thuốc mới
+                      </Button>
+                    </div>
+                  </DoctorOnly>
+                )}
             </div>
           </div>
           {appointment.status === "COMPLETED" ? (

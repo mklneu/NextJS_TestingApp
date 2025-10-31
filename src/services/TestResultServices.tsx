@@ -1,7 +1,11 @@
 import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
 import { AxiosError } from "axios";
-import { ErrorResponse, PaginatedResponse, TestResultStatus } from "@/types/frontend";
+import {
+  ErrorResponse,
+  PaginatedResponse,
+  TestResultStatus,
+} from "@/types/frontend";
 
 export interface TestResult {
   id: number;
@@ -13,14 +17,21 @@ export interface TestResult {
   testTime: string;
   generalConclusion: string;
   attachmentFile?: string;
-  detailedTestItems: {
-    id: number;
-    itemName: string;
-    value: number;
-    unit: string;
-    referenceRange: string;
-    notes?: string;
-  }[];
+  detailedTestItems: detailedTestItems[];
+}
+
+export interface detailedTestItems {
+  id: number;
+  itemName: string;
+  value: number | string;
+  unit: string;
+  referenceRange: string;
+  notes?: string;
+}
+
+export interface RequsetTestResult {
+  appointmentId: number;
+  testTypes: string[];
 }
 
 export interface TestResultBody {
@@ -44,10 +55,15 @@ export interface UpdateTestResultBody {
 
 export interface DetailedTestItemBody {
   itemName: string;
-  value: number;
+  value: number | string;
   unit: string;
   referenceRange: string;
   notes?: string;
+}
+
+// 1. Định nghĩa interface cho body của API review
+export interface ReviewTestResultBody {
+  generalConclusion: string;
 }
 
 // --- 1. Định nghĩa interface cho các tham số ---
@@ -58,6 +74,7 @@ interface QueryParams {
   sort?: string; // Chuỗi sắp xếp, ví dụ: "createdAt,desc"
   search?: string; // Thêm: Lọc theo từ khóa tìm kiếm (từ ô input)
   testType?: string; // Thêm: Lọc theo loại xét nghiệm (từ dropdown)
+  status?: TestResultStatus; // Thêm: Lọc theo trạng thái kết quả xét nghiệm
 }
 
 const createTestResult = async (body: TestResultBody) => {
@@ -68,6 +85,18 @@ const createTestResult = async (body: TestResultBody) => {
   } catch (error) {
     console.error("❌ Error creating test result:", error);
     toast.error("Có lỗi xảy ra khi tạo kết quả xét nghiệm.");
+    throw error;
+  }
+};
+
+const requestTestResult = async (body: RequsetTestResult) => {
+  try {
+    const response = await axiosInstance.post("/test-results/request", body);
+    toast.success("Yêu cầu kết quả xét nghiệm thành công!");
+    return response.data.data || []; // Giả sử API trả về dữ liệu trong 'data.data'
+  } catch (error) {
+    console.error("❌ Error creating test result:", error);
+    toast.error("Có lỗi xảy ra khi yêu cầu kết quả xét nghiệm.");
     throw error;
   }
 };
@@ -89,6 +118,10 @@ const getAllTestResults = async (
 
     // 2. Xây dựng mảng các điều kiện lọc (filter)
     const filterParts: string[] = [];
+
+    if (params.status) {
+      filterParts.push(`status~'${params.status}'`);
+    }
 
     // 3. Thêm logic lọc cho 'search' (với cú pháp OR)
     if (params.search && params.search.trim() !== "") {
@@ -205,6 +238,25 @@ const updateTestResult = async (
   }
 };
 
+// 2. Tạo hàm API mới để review kết quả
+const reviewTestResult = async (
+  testResultId: number,
+  body: ReviewTestResultBody
+): Promise<TestResult> => {
+  try {
+    const response = await axiosInstance.post(
+      `/test-results/${testResultId}/review`,
+      body
+    );
+    toast.success("Bác sĩ đã xác nhận và đưa ra kết luận cuối cùng.");
+    return response.data.data;
+  } catch (error) {
+    console.error(`❌ Error reviewing test result ${testResultId}:`, error);
+    toast.error("Có lỗi xảy ra khi xác nhận kết quả.");
+    throw error;
+  }
+};
+
 const deleteTestResult = async (
   testResultId: number,
   onSuccess?: () => void
@@ -233,7 +285,9 @@ export {
   getTestResultsByPatientId,
   getTestResultById,
   getTestResultsByAppointmentId,
+  requestTestResult,
   createTestResult,
   updateTestResult,
+  reviewTestResult, // 3. Export hàm mới
   deleteTestResult,
 };

@@ -232,8 +232,8 @@ export default function DoctorsPage() {
               </div>
 
               {/* Add doctor button */}
-              <Button onClick={() => setShowAddModal(true)} icon={<FaPlus />}
-              className="h-fit">
+              <Button onClick={() => setShowAddModal(true)} icon={<FaPlus /> }
+              className="!h-11">
                 Thêm bác sĩ
               </Button>
             </div>

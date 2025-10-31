@@ -2,13 +2,15 @@ import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
 import Button from "@/components/Button";
 import { AxiosError } from "axios";
-import { ErrorResponse } from "@/types/frontend";
+import { ErrorResponse, PaginatedResponse, resUser } from "@/types/frontend";
 
-export interface PatientRequestParams {
+export interface PatientQueryParams {
   page: number;
   size: number;
+  sort?: string;
   searchTerm: string;
   filterGender: string;
+  role: string;
 }
 
 interface PatientAxiosRequestParams {
@@ -18,15 +20,10 @@ interface PatientAxiosRequestParams {
 }
 
 const getAllPatients = async (
-  params: PatientRequestParams = {
-    page: 1,
-    size: 8,
-    searchTerm: "",
-    filterGender: "ALL",
-  }
-) => {
+  params: PatientQueryParams
+): Promise<PaginatedResponse<resUser>> => {
   try {
-    const { page, size, searchTerm, filterGender } = params;
+    const { page, size, filterGender, role } = params;
 
     // Xây dựng các query params cho API
     const queryParams: PatientAxiosRequestParams = {
@@ -35,15 +32,23 @@ const getAllPatients = async (
     };
 
     const filters = [];
+
+    filters.push(`role.name~'${role}'`);
+
     // Thêm điều kiện lọc theo giới tính
     if (filterGender !== "ALL") {
       filters.push(`gender = '${filterGender}'`);
     }
     // Thêm điều kiện tìm kiếm
-    if (searchTerm) {
+    if (params.searchTerm && params.searchTerm.trim() !== "") {
+      const safeSearchTerm = params.searchTerm.trim().replace(/'/g, "''");
       filters.push(
-        `(username ~ '${searchTerm}' OR email ~ '${searchTerm}' OR fullName ~ '${searchTerm}')`
+        `(username~'${safeSearchTerm}' OR email~'${safeSearchTerm}' OR fullName~'${safeSearchTerm}')`
       );
+    }
+
+    if (params.filterGender && params.filterGender !== "ALL") {
+      filters.push(`gender~'${params.filterGender}'`);
     }
 
     if (filters.length > 0) {
@@ -60,18 +65,6 @@ const getAllPatients = async (
     throw error;
   }
 };
-
-// const getAllPatients = async () => {
-//   try {
-//     const response = await axiosInstance.get("/patients");
-
-//     return response.data.data.data || [];
-//   } catch (error) {
-//     console.error("❌ Error in getAllPatients:", error);
-//     // toast.error("Failed to fetch Patients");
-//     throw error; // Re-throw để component handle được
-//   }
-// };
 
 const getPatientById = async (patientId: number) => {
   try {
@@ -91,7 +84,8 @@ const postPatient = async (
   password: string,
   gender: string,
   address: string,
-  dob: string
+  dob: string,
+  roleId: number
 ) => {
   try {
     // Uncomment dòng dưới khi có backend
@@ -103,6 +97,7 @@ const postPatient = async (
       gender,
       address,
       dob,
+      role: { id: Number(roleId) },
     });
     toast.success(response.data.message);
     console.log(">>>>>> data Patient", response.data);

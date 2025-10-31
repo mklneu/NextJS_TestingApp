@@ -97,7 +97,7 @@ const AdminPrescriptionsPage = () => {
         <div className="bg-white rounded-xl p-4 mb-6 shadow-md flex flex-col md:flex-row">
           <div className="flex lg:flex-row flex-col justify-between w-full gap-4 md:gap-0">
             <div className="relative md:col-span-1">
-              <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
+              <FaSearch className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Tìm bệnh nhân, bác sĩ"

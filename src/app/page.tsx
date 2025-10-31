@@ -73,8 +73,15 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await getAllPatients();
-        setUserData(res?.data);
+        const params = {
+          page: 1,
+          size: 1000,
+          searchTerm: "",
+          filterGender: "ALL",
+          role: "PATIENT",
+        };
+        const res = await getAllPatients(params);
+        setUserData(res?.data || []);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {

@@ -20,6 +20,7 @@ const userLinks = [
     href: "/profile/appointments",
     label: "Lịch hẹn",
     icon: <IoCalendarClear />,
+    roles: ["patient", "doctor", "admin"], // Hiển thị cho bệnh nhân, bác sĩ và nhân viên
   },
   {
     href: "/profile/testResults",
@@ -32,6 +33,12 @@ const userLinks = [
     label: "Chờ khám",
     icon: <FaUserClock />,
     roles: ["doctor"], // Chỉ hiển thị cho bác sĩ
+  },
+  {
+    href: "/lab", // Sửa lại đường dẫn cho đúng
+    label: "Yêu cầu xét nghiệm",
+    icon: <FaUserClock />,
+    roles: ["staff"], // Chỉ hiển thị cho bác sĩ
   },
 ];
 

@@ -3,6 +3,7 @@ import Button from "../Button";
 import { toast } from "react-toastify";
 import InputBar from "../Input";
 import { getPatientById, updatePatient } from "@/services/PatientServices";
+import { genderOptions } from "@/utils/map";
 
 interface Option {
   label: string;
@@ -109,7 +110,7 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
             <hr className="mb-6 text-gray-200" />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-8">
               {/* Cột 1 */}
-              <div className="flex flex-col gap-4 min-w-0">
+              <div className="flex flex-col gap-4">
                 <InputBar
                   label="Tên tài khoản"
                   value={username}
@@ -133,7 +134,7 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
                 />
               </div>
               {/* Cột 2 */}
-              <div className="flex flex-col gap-4 min-w-0">
+              <div className="flex flex-col gap-4 ">
                 <InputBar
                   label="Ngày sinh"
                   type="date"
@@ -141,7 +142,6 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
                   placeholder="Ngày sinh"
                   disabled={true}
                   onChange={(e) => setDob(e.target.value)}
-                  className="!pr-5"
                 />
                 <InputBar
                   label="Địa chỉ"
@@ -157,15 +157,11 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
                   placeholder="Chọn giới tính"
                   disabled={true}
                   onChange={(e) => setGender(e.target.value)}
-                  options={[
-                    { label: "Nam", value: "MALE" },
-                    { label: "Nữ", value: "FEMALE" },
-                    { label: "Khác", value: "OTHER" },
-                  ]}
+                  options={genderOptions}
                 />
               </div>
               {/* Cột 3 */}
-              <div className="flex flex-col gap-4 min-w-0">
+              <div className="flex flex-col gap-4">
                 <InputBar
                   label="Vai trò"
                   type="select"
@@ -176,6 +172,7 @@ const UpdateUserModal = (props: IUpdateModalProps) => {
                     ...opt,
                     value: String(opt.value),
                   }))}
+                  className="!w-full"
                 />
                 <InputBar
                   label="Bệnh viện"

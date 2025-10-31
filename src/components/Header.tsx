@@ -221,6 +221,23 @@ const Header = () => {
                             Trang quản trị
                           </Link>
                         )}
+                        {userRole === "staff" && (
+                          <Link
+                            href="/lab"
+                            className="block px-4 py-2 text-gray-800 
+                            hover:bg-blue-100 transition-colors duration-150"
+                            tabIndex={0}
+                            onClick={(e) => {
+                              setIsMenuOpen(false);
+                              if (pathname === "/lab") {
+                                e.preventDefault();
+                                scrollToTop();
+                              }
+                            }}
+                          >
+                            Trang xét nghiệm
+                          </Link>
+                        )}
                         <button
                           onClick={(e) => {
                             handleLogout(e);

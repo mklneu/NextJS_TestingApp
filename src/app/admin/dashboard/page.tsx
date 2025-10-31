@@ -7,7 +7,7 @@ import { IoMdTrendingUp, IoMdTrendingDown } from "react-icons/io";
 import { BiDollar } from "react-icons/bi";
 import { Chart, registerables } from "chart.js";
 import { Pie, Bar, Line } from "react-chartjs-2";
-import { getAllPatients, PatientRequestParams } from "@/services/PatientServices";
+import { getAllPatients, PatientQueryParams } from "@/services/PatientServices";
 import { resUser } from "@/types/frontend";
 
 Chart.register(...registerables);
@@ -20,11 +20,12 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const params: PatientRequestParams = {
+        const params: PatientQueryParams = {
           page: 1,
           size: 1000, // Lấy tối đa 1000 user cho thống kê
           searchTerm: "",
           filterGender: "",
+          role: "PATIENT",
         };
         const response = await getAllPatients(params);
         // 2. Dữ liệu trả về nằm trong thuộc tính 'data'

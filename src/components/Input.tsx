@@ -1,6 +1,6 @@
 interface IOption {
   label: string;
-  value: string;
+  value: string | number;
 }
 
 interface IInputProps {
@@ -17,7 +17,7 @@ interface IInputProps {
   disabled?: boolean;
   onChange?: (
     e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement 
     >
   ) => void;
   className?: string;
@@ -54,7 +54,7 @@ const InputBar = ({
 
   if (type === "textarea") {
     return (
-      <div className="flex min-h-10 mb-4 mx-auto relative">
+      <div className="flex min-h-10 mb-4  relative">
         {label && (
           <label
             className="text-sm 
@@ -80,7 +80,7 @@ const InputBar = ({
 
   if (type === "select") {
     return (
-      <div className="flex h-12 mb-4 mx-auto relative ">
+      <div className="flex h-12 mb-4  relative ">
         {label && (
           <label
             className="text-sm 
@@ -135,7 +135,7 @@ const InputBar = ({
   // Xử lý riêng cho type="date"
   if (type === "date") {
     return (
-      <div className="flex h-12 mb-4 mx-auto relative">
+      <div className="flex h-12 mb-4  relative">
         {label && (
           <label
             className="text-sm 
@@ -162,7 +162,7 @@ const InputBar = ({
 
   if (type === "datetime-local") {
     return (
-      <div className="flex h-12 mb-4 mx-auto relative">
+      <div className="flex h-12 mb-4  relative">
         {label && (
           <label
             className="text-sm 
@@ -188,7 +188,7 @@ const InputBar = ({
   }
 
   return (
-    <div className="flex h-12 mb-4 mx-auto relative">
+    <div className="flex h-12 mb-4  relative">
       {label && (
         <label
           className="text-sm 

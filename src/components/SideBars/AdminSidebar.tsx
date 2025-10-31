@@ -8,8 +8,12 @@ import {
   FaBars,
   FaChevronLeft,
   FaFileMedicalAlt,
+  FaUserNurse,
 } from "react-icons/fa";
-import { FaRegCalendarCheck, FaPrescriptionBottleMedical } from "react-icons/fa6";
+import {
+  FaRegCalendarCheck,
+  FaPrescriptionBottleMedical,
+} from "react-icons/fa6";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { scrollToTop } from "../ScrollToTopButton";
@@ -24,6 +28,11 @@ const adminLinks = [
     href: "/admin/doctors",
     label: "Bác sĩ",
     icon: <FaUserMd />,
+  },
+  {
+    href: "/admin/staffs",
+    label: "Nhân viên",
+    icon: <FaUserNurse />,
   },
   {
     href: "/admin/patients",

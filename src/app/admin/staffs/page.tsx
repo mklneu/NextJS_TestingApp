@@ -13,7 +13,7 @@ import { ErrorResponse, Hospital, resUser } from "@/types/frontend";
 import { roleOptions } from "@/services/RoleServices";
 import { translateRole } from "@/utils/translateEnums";
 
-export default function UsersPage() {
+export default function StaffsPage() {
   const [users, setUsers] = useState<resUser[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -27,7 +27,6 @@ export default function UsersPage() {
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
 
   // Pagination
-  const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); // State để lưu tổng số trang từ API
   const usersPerPage = 8;
@@ -41,15 +40,14 @@ export default function UsersPage() {
         size: usersPerPage,
         searchTerm,
         filterGender,
-        role: "PATIENT",
+        role: "STAFF",
       };
       const response = await getAllPatients(params);
       setUsers(response.data || []); // Dữ liệu người dùng
       setTotalPages(response.meta?.pages || 1); // Dữ liệu phân trang
-      setTotal(response.meta?.total || 0);
     } catch (error) {
       const err = error as AxiosError<ErrorResponse>;
-      toast.error("Lỗi khi tải dữ liệu bệnh nhân");
+      toast.error("Lỗi khi tải dữ liệu nhân viên");
       console.error("Error fetching users:", err.message);
     } finally {
       setLoading(false);
@@ -78,14 +76,14 @@ export default function UsersPage() {
           size: usersPerPage,
           searchTerm,
           filterGender,
-          role: "PATIENT",
+          role: "STAFF",
         };
         const response = await getAllPatients(params);
         setUsers(response.data || []); // Dữ liệu người dùng
         setTotalPages(response.meta?.pages || 1); // Dữ liệu phân trang
       } catch (error) {
         const err = error as AxiosError<ErrorResponse>;
-        toast.error("Lỗi khi tải dữ liệu bệnh nhân");
+        toast.error("Lỗi khi tải dữ liệu nhân viên");
         console.error("Error fetching users:", err.message);
       } finally {
         setLoading(false);
@@ -134,17 +132,17 @@ export default function UsersPage() {
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-6 mb-8 text-white shadow-lg">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
-              <h1 className="text-3xl font-bold">Quản lý bệnh nhân</h1>
+              <h1 className="text-3xl font-bold">Quản lý nhân viên</h1>
               <p className="mt-2 text-blue-100">
-                Quản lý thông tin và quyền truy cập của bệnh nhân trong hệ thống
+                Quản lý thông tin và quyền truy cập của nhân viên trong hệ thống
               </p>
             </div>
             <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 mt-4 md:mt-0">
               <div className="flex items-center">
                 <div className="mr-3 text-3xl">👥</div>
                 <div>
-                  <p className="text-xs text-blue-100">Tổng số bệnh nhân</p>
-                  <p className="text-2xl font-bold">{total}</p>
+                  <p className="text-xs text-blue-100">Tổng số nhân viên</p>
+                  <p className="text-2xl font-bold">{users.length}</p>
                 </div>
               </div>
             </div>
@@ -156,8 +154,8 @@ export default function UsersPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             {/* Search bar */}
             <div className="relative flex-grow max-w-md">
-              <div className="absolute inset-y-0 left-0 flex 
-              items-center pl-3.5 pointer-events-none">
+              <div className="absolute inset-y-0 
+              left-0 flex items-center pl-3.5 pointer-events-none">
                 <FaSearch className="text-gray-400" />
               </div>
               <input
@@ -166,7 +164,7 @@ export default function UsersPage() {
                 border-gray-300 text-gray-900 text-sm
                  rounded-lg focus:ring-blue-500 
                  focus:border-blue-500 block w-full pl-10 p-2.5"
-                placeholder="Tìm kiếm bệnh nhân"
+                placeholder="Tìm kiếm nhân viên"
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
@@ -194,7 +192,7 @@ export default function UsersPage() {
 
               {/* Add user button */}
               <Button onClick={() => setShowAddModal(true)} className="!h-11">
-                <FaPlus /> Thêm bệnh nhân
+                <FaPlus /> Thêm nhân viên
               </Button>
             </div>
           </div>
@@ -203,16 +201,16 @@ export default function UsersPage() {
         {loading ? (
           <div className="bg-white rounded-xl shadow-md p-20 flex flex-col items-center justify-center">
             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mb-4"></div>
-            <p className="text-gray-500">Đang tải dữ liệu bệnh nhân...</p>
+            <p className="text-gray-500">Đang tải dữ liệu nhân viên...</p>
           </div>
         ) : users.length === 0 ? (
           <div className="bg-white rounded-xl shadow-md p-20 text-center">
             <div className="text-gray-400 text-5xl mb-4">🔍</div>
             <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              Không tìm thấy bệnh nhân
+              Không tìm thấy nhân viên
             </h3>
             <p className="text-gray-500 mb-4">
-              Không có bệnh nhân nào khớp với điều kiện tìm kiếm của bạn
+              Không có nhân viên nào khớp với điều kiện tìm kiếm của bạn
             </p>
             <button
               onClick={() => {
@@ -405,7 +403,7 @@ export default function UsersPage() {
         show={showAddModal}
         setShow={setShowAddModal}
         onSubmit={fetchUsers}
-        role={"bệnh nhân"}
+        role={"nhân viên"}
       />
 
       {/* Update User Modal */}

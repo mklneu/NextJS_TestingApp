@@ -4,20 +4,28 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { IoIosArrowBack } from "react-icons/io";
-import { FaStethoscope, FaEdit, FaFileUpload } from "react-icons/fa";
+import {
+  FaStethoscope,
+  FaEdit,
+  FaFileUpload,
+  FaTrash,
+  FaPlus,
+} from "react-icons/fa";
 import { MdOutlineSaveAlt, MdOutlineCancel } from "react-icons/md";
 import {
   getTestResultById,
   updateTestResult, // 1. Import hàm update
   TestResult,
+  detailedTestItems,
+  reviewTestResult,
 } from "@/services/TestResultServices";
 import { AxiosError } from "axios";
 import { translateTestType } from "@/utils/translateEnums";
 import Button from "@/components/Button";
 import { useAuth } from "@/contexts/AuthContext";
-import DoctorOnly from "@/components/DoctorOnly";
 import { sanitizeFileName, uploadFile } from "@/services/FileServices";
 import { ErrorResponse } from "@/types/frontend";
+import StaffOrDoctorOnly from "@/components/StaffOrDoctorOnly";
 
 const TestResultDetailPage = () => {
   const params = useParams();
@@ -73,9 +81,55 @@ const TestResultDetailPage = () => {
   ) => {
     if (!editableData) return;
     const { name, value } = e.target;
+
     const updatedDetails = [...editableData.detailedTestItems];
+    const itemToUpdate = { ...updatedDetails[index] };
+
+    type EditableStringKey = "itemName" | "unit" | "referenceRange" | "notes";
+
+    if (name === "value") {
+      // Cho phép ô input rỗng, nếu không thì parse thành số
+      itemToUpdate.value = value === "" ? "" : parseFloat(value) || 0;
+    } else if (["itemName", "unit", "referenceRange", "notes"].includes(name)) {
+      // Giờ 'name' đã được thu hẹp, chúng ta có thể ép kiểu an toàn
+      itemToUpdate[name as EditableStringKey] = value;
+    }
+
     updatedDetails[index] = { ...updatedDetails[index], [name]: value };
     setEditableData({ ...editableData, detailedTestItems: updatedDetails });
+  };
+
+  const addItem = () => {
+    if (!editableData) return;
+    const newItem: detailedTestItems = {
+      id: Date.now(), // Key tạm
+      itemName: "",
+      value: "", // Bắt đầu là string rỗng
+      unit: "",
+      referenceRange: "",
+      notes: "",
+    };
+    setEditableData({
+      ...editableData,
+      detailedTestItems: [...editableData.detailedTestItems, newItem],
+    });
+  };
+
+  const removeItem = (index: number) => {
+    if (!editableData || editableData.detailedTestItems.length === 0) return;
+
+    if (editableData.detailedTestItems.length === 1) {
+      toast.info("Phải có ít nhất một chỉ số xét nghiệm.");
+      return;
+    }
+
+    const newItems = editableData.detailedTestItems.filter(
+      (_, i) => i !== index
+    );
+    setEditableData({
+      ...editableData,
+      detailedTestItems: newItems,
+    });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,14 +158,71 @@ const TestResultDetailPage = () => {
     }
   };
 
-  // 4. Hàm xử lý cập nhật
+  const confirmAndUpdate = () => {
+    if (!editableData) return;
+
+    // Xác định thông báo dựa trên sự thay đổi trạng thái tiềm năng
+    let confirmationMessage =
+      "Bạn có chắc chắn muốn lưu các thay đổi này không?";
+    if (editableData.status === "IN_PROGRESS") {
+      confirmationMessage =
+        "Lưu thay đổi sẽ cập nhật trạng thái thành 'Đã hoàn thành'. Bạn có chắc chắn?";
+    } else if (userRole === "doctor" && editableData.status === "COMPLETED") {
+      confirmationMessage =
+        "Lưu thay đổi sẽ cập nhật trạng thái thành 'Đã xem'. Bạn có chắc chắn?";
+    }
+
+    // Component nội dung của toast
+    const Confirmation = ({ closeToast }: { closeToast: () => void }) => (
+      <div>
+        <p className="text-sm">{confirmationMessage}</p>
+        <div className="flex justify-end gap-3 mt-3">
+          <button
+            onClick={() => {
+              handleUpdate();
+              closeToast();
+            }}
+            className="px-3 py-1 text-sm cursor-pointer duration-300
+            font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700"
+          >
+            Xác nhận
+          </button>
+          <button
+            onClick={closeToast}
+            className="px-3 py-1 text-sm cursor-pointer duration-300
+            font-semibold text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+          >
+            Hủy
+          </button>
+        </div>
+      </div>
+    );
+
+    // Hiển thị toast - sử dụng render-prop để toast cung cấp closeToast cho component
+    toast(({ closeToast }) => <Confirmation closeToast={closeToast} />, {
+      position: "top-center",
+      autoClose: false,
+      closeOnClick: false,
+      draggable: false,
+    });
+  };
+
   const handleUpdate = async () => {
     if (!editableData) return;
     setIsUpdating(true);
-    try {
-      let finalAttachmentName = editableData.attachmentFile; // Tên file mặc định là tên cũ
 
-      // BƯỚC 1: Nếu có file mới, upload file đó trước
+    const isItemsValid = editableData.detailedTestItems.every(
+      (item) => item.itemName && item.value !== "" && item.unit
+    );
+    if (!editableData.generalConclusion || !isItemsValid) {
+      toast.error("Vui lòng điền Kết luận chung và các chỉ số bắt buộc.");
+      setIsUpdating(false);
+      return;
+    }
+
+    try {
+      let finalAttachmentName = editableData.attachmentFile;
+
       if (newFile) {
         try {
           const uploadResponse = await uploadFile(newFile, folderName);
@@ -120,7 +231,7 @@ const TestResultDetailPage = () => {
             uploadResponse.data &&
             uploadResponse.data.fileName
           ) {
-            finalAttachmentName = uploadResponse.data.fileName; // Lấy tên file mới từ API
+            finalAttachmentName = uploadResponse.data.fileName;
           } else {
             throw new Error("API upload không trả về fileName.");
           }
@@ -128,24 +239,64 @@ const TestResultDetailPage = () => {
           console.error("File upload failed:", uploadError);
           toast.error("Tải file đính kèm mới thất bại.");
           setIsUpdating(false);
-          return; // Dừng nếu upload lỗi
+          return;
         }
       }
 
-      // BƯỚC 2: Chuẩn bị payload để cập nhật TestResult
+      // --- SỬA LỖI Ở ĐÂY: LOGIC CẬP NHẬT TRẠNG THÁI TỰ ĐỘNG ---
+      let nextStatus = editableData.status; // Giữ nguyên trạng thái mặc định
+
+      // Logic cho Nhân viên Lab / Y tá
+      if (userRole === "staff") {
+        // Chỉ tự động chuyển từ IN_PROGRESS -> COMPLETED
+        if (editableData.status === "IN_PROGRESS") {
+          nextStatus = "COMPLETED";
+          toast.info("Trạng thái đã được cập nhật thành 'Đã hoàn thành'.");
+        }
+      }
+      // Logic cho Bác sĩ
+      else if (userRole === "doctor") {
+        // SỬA LỖI LOGIC: Bổ sung trường hợp bác sĩ tự nhập kết quả
+        // if (editableData.status === "IN_PROGRESS") {
+        //   nextStatus = "COMPLETED";
+        //   toast.info("Trạng thái đã được cập nhật thành 'Đã hoàn thành'.");
+        // }
+        // Nếu bác sĩ đang xem lại kết quả đã hoàn thành
+        if (editableData.status === "COMPLETED") {
+          nextStatus = "REVIEWED";
+          toast.info("Trạng thái đã được cập nhật thành 'Đã xem'.");
+        }
+      }
+      // ---------------------------------------------------------
+
       const payload = {
         ...editableData,
-        attachmentFile: finalAttachmentName, // Gán tên file (mới hoặc cũ)
+        status: nextStatus, // Sử dụng trạng thái mới
+        attachmentFile: finalAttachmentName,
+        detailedTestItems: editableData.detailedTestItems.map((item) => ({
+          ...item,
+          value: parseFloat(String(item.value)) || 0,
+        })),
       };
+      let updatedResult: TestResult;
 
-      // BƯỚC 3: Gọi API updateTestResult
-      const updatedResult = await updateTestResult(editableData.id, payload);
+      if (userRole === "doctor" && editableData.status === "COMPLETED") {
+        // API review chỉ cần generalConclusion
+        const reviewPayload = {
+          generalConclusion: payload.generalConclusion,
+        };
+        updatedResult = await reviewTestResult(editableData.id, reviewPayload);
+      }
+      // Trường hợp 2: Các trường hợp còn lại là "cập nhật"
+      // (Nhân viên cập nhật, hoặc bác sĩ tự nhập kết quả)
+      else {
+        updatedResult = await updateTestResult(editableData.id, payload);
+      }
 
       setTestResult(updatedResult);
       setEditableData(JSON.parse(JSON.stringify(updatedResult)));
-      setNewFile(null); // Reset state file mới
+      setNewFile(null);
       setIsEditing(false);
-      // toast.success("Cập nhật thành công!");
     } catch (error) {
       const err = error as AxiosError<ErrorResponse>;
       console.error("Error updating test result:", err.message);
@@ -195,38 +346,41 @@ const TestResultDetailPage = () => {
               <FaStethoscope />
               Chi tiết kết quả xét nghiệm
             </h1>
-            <DoctorOnly userRole={userRole}>
-              {}
-              {!isEditing ? (
-                <Button
-                  size="sm"
-                  onClick={() => setIsEditing(true)}
-                  icon={<FaEdit />}
-                >
-                  Cập nhật
-                </Button>
-              ) : (
-                <div className="flex gap-2">
+            {(userRole === "staff" ||
+              (userRole === "doctor" && testResult.status === "COMPLETED")) && (
+              <StaffOrDoctorOnly userRole={userRole}>
+                {}
+                {!isEditing ? (
                   <Button
                     size="sm"
-                    variant="primary"
-                    onClick={handleUpdate}
-                    icon={<MdOutlineSaveAlt />}
-                    isLoading={isUpdating}
+                    onClick={() => setIsEditing(true)}
+                    icon={<FaEdit />}
                   >
-                    Lưu
+                    {userRole === "doctor" ? "Cập nhật" : "Thêm kết quả"}
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={handleCancel}
-                    icon={<MdOutlineCancel />}
-                  >
-                    Hủy
-                  </Button>
-                </div>
-              )}
-            </DoctorOnly>
+                ) : (
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      onClick={confirmAndUpdate}
+                      icon={<MdOutlineSaveAlt />}
+                      isLoading={isUpdating}
+                    >
+                      Lưu
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={handleCancel}
+                      icon={<MdOutlineCancel />}
+                    >
+                      Hủy
+                    </Button>
+                  </div>
+                )}
+              </StaffOrDoctorOnly>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-base">
@@ -248,7 +402,7 @@ const TestResultDetailPage = () => {
             <h2 className="text-xl font-semibold mb-3 text-slate-800">
               Kết luận chung
             </h2>
-            {isEditing ? (
+            {isEditing && userRole === "doctor" ? (
               <textarea
                 name="generalConclusion"
                 value={editableData.generalConclusion}
@@ -288,12 +442,23 @@ const TestResultDetailPage = () => {
                     <th className="p-3 font-semibold text-slate-700 w-1/5">
                       Ghi chú
                     </th>
+                    {isEditing && <th className="p-3 w-[50px]"></th>}
                   </tr>
                 </thead>
                 <tbody>
+                  {editableData.detailedTestItems.length === 0 && isEditing && (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="p-4 text-center text-gray-500 italic"
+                      >
+                        Chưa có chỉ số nào. Bấm Thêm chỉ số để bắt đầu.
+                      </td>
+                    </tr>
+                  )}
                   {editableData.detailedTestItems.map((item, index) => (
                     <tr key={item.id || index} className="border-b">
-                      {isEditing ? (
+                      {isEditing && userRole === "staff" ? (
                         <>
                           <td className="p-1 border-r">
                             <input
@@ -305,7 +470,7 @@ const TestResultDetailPage = () => {
                           </td>
                           <td className="p-1 border-r">
                             <input
-                              type="number"
+                              type="text"
                               name="value"
                               value={item.value}
                               onChange={(e) => handleDetailChange(index, e)}
@@ -337,6 +502,18 @@ const TestResultDetailPage = () => {
                               rows={1}
                             />
                           </td>
+                          <td className="p-1 text-center">
+                            <button
+                              type="button"
+                              onClick={() => removeItem(index)}
+                              className="text-red-500 duration-300
+                            hover:text-red-700 p-2 rounded-full 
+                            hover:bg-red-50 cursor-pointer"
+                              title="Xóa chỉ số"
+                            >
+                              <FaTrash />
+                            </button>
+                          </td>
                         </>
                       ) : (
                         <>
@@ -362,6 +539,19 @@ const TestResultDetailPage = () => {
                 </tbody>
               </table>
             </div>
+            {/* 12. Thêm nút "Thêm chỉ số" chỉ khi isEditing */}
+            {isEditing && userRole === "staff" && (
+              <div className="mt-4">
+                <Button
+                  onClick={addItem}
+                  icon={<FaPlus />}
+                  size="sm"
+                  variant="secondary"
+                >
+                  Thêm chỉ số
+                </Button>
+              </div>
+            )}
           </div>
 
           <div className="border-t pt-6">
@@ -369,7 +559,7 @@ const TestResultDetailPage = () => {
             <h2 className="text-xl font-semibold mb-3 text-slate-800">
               Tệp đính kèm{" "}
             </h2>{" "}
-            {isEditing ? (
+            {isEditing && userRole === "staff" ? (
               // --- Chế độ CHỈNH SỬA ---
               <div className="space-y-3">
                 <p className="text-sm text-slate-600">
@@ -419,7 +609,7 @@ const TestResultDetailPage = () => {
               </a>
             ) : (
               <p className="text-slate-700">Không có tệp đính kèm.</p>
-            )}{" "}
+            )}
           </div>
         </div>
       </div>

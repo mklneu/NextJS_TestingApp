@@ -83,3 +83,15 @@ export const translateTestType = (testType: string): string => {
   };
   return translations[testType] || testType.replace(/_/g, " ");
 };
+
+export const translateRole = (role: string): string => {
+  const roleMap: Record<string, string> = {
+    ADMIN: "Quản trị viên",
+    DOCTOR: "Bác sĩ",
+    NURSE: "Y tá",
+    STAFF: "Nhân viên",
+    PATIENT: "Bệnh nhân",
+  };
+
+  return roleMap[role] || role;
+};
