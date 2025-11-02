@@ -2,11 +2,12 @@ import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
 import Button from "@/components/Button";
 import { AxiosError } from "axios";
+import { ErrorResponse } from "@/types/frontend";
 
 // Lấy tất cả bệnh viện
 const getAllHospitals = async () => {
   try {
-    const response = await axiosInstance.get("/companies");
+    const response = await axiosInstance.get("/hospitals");
     return response.data.data.data || [];
   } catch (error) {
     console.error("❌ Error in getAllHospitals:", error);
@@ -17,7 +18,7 @@ const getAllHospitals = async () => {
 // Lấy bệnh viện theo id
 const getHospitalById = async (hospitalId: number) => {
   try {
-    const response = await axiosInstance.get(`/companies/${hospitalId}`);
+    const response = await axiosInstance.get(`/hospitals/${hospitalId}`);
     return response.data.data;
   } catch (error) {
     console.error("❌ Error in getHospitalById:", error);
@@ -29,7 +30,7 @@ const getHospitalById = async (hospitalId: number) => {
 // Thêm bệnh viện mới
 const postHospital = async (name: string, address: string, phone: string) => {
   try {
-    const response = await axiosInstance.post("/companies", {
+    const response = await axiosInstance.post("/hospitals", {
       name,
       address,
       phone,
@@ -52,7 +53,7 @@ const updateHospital = async (
   phone: string
 ) => {
   try {
-    const response = await axiosInstance.put(`/companies/${hospitalId}`, {
+    const response = await axiosInstance.put(`/hospitals/${hospitalId}`, {
       name,
       address,
       phone,
@@ -84,7 +85,7 @@ const deleteHospitalById = async (hospitalId: number, onDelete: () => void) => {
                 closeToast();
                 try {
                   const response = await axiosInstance.delete(
-                    `/companies/${hospitalId}`
+                    `/hospitals/${hospitalId}`
                   );
                   onDelete();
                   toast.success(response.data.message);
