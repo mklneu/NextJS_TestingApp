@@ -78,7 +78,7 @@ export default function Home() {
           size: 1000,
           searchTerm: "",
           filterGender: "ALL",
-          role: "PATIENT",
+          role: "ALL",
         };
         const res = await getAllPatients(params);
         setUserData(res?.data || []);

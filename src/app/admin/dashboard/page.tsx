@@ -7,13 +7,15 @@ import { IoMdTrendingUp, IoMdTrendingDown } from "react-icons/io";
 import { BiDollar } from "react-icons/bi";
 import { Chart, registerables } from "chart.js";
 import { Pie, Bar, Line } from "react-chartjs-2";
-import { getAllPatients, PatientQueryParams } from "@/services/PatientServices";
 import { resUser } from "@/types/frontend";
+import { getOverviewStatistics, Overview } from "@/services/StatisticServices";
+import { getAllPatients, PatientQueryParams } from "@/services/PatientServices";
 
 Chart.register(...registerables);
 
 const Dashboard = () => {
   const [users, setUsers] = useState<resUser[]>([]);
+  const [overview, setOverview] = useState<Overview>();
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState("week");
 
@@ -24,13 +26,15 @@ const Dashboard = () => {
           page: 1,
           size: 1000, // Lấy tối đa 1000 user cho thống kê
           searchTerm: "",
-          filterGender: "",
-          role: "PATIENT",
+          filterGender: "ALL",
+          role: "ALL",
         };
-        const response = await getAllPatients(params);
+        const usersResponse = await getAllPatients(params);
+        const overviewResponse = await getOverviewStatistics();
         // 2. Dữ liệu trả về nằm trong thuộc tính 'data'
-        setUsers(response?.data || []);
-        console.log("Fetched users:", response?.data || []);
+        setUsers(usersResponse.data);
+        setOverview(overviewResponse);
+        console.log("Fetched overview:", overviewResponse);
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {
@@ -43,14 +47,14 @@ const Dashboard = () => {
 
   // Lưu ý: Dữ liệu mẫu - trong ứng dụng thực, dữ liệu này sẽ đến từ API
   const statsData = {
-    totalUsers: users.length,
-    totalPatients: 1245,
-    totalAppointments: 324,
-    totalDoctors: 48,
-    revenue: 42567000,
-    pendingAppointments: 18,
-    completedAppointments: 43,
-    cancelledAppointments: 7,
+    totalUsers: overview?.totalUsers || 0,
+    totalPatients: overview?.totalPatients || 0,
+    totalAppointments: overview?.totalAppointments || 0,
+    totalDoctors: overview?.totalDoctors || 0,
+    revenue: overview?.revenue || 0,
+    pendingAppointments: overview?.pendingAppointments || 0,
+    completedAppointments: overview?.completedAppointments || 0,
+    cancelledAppointments: overview?.cancelledAppointments || 0,
   };
 
   // Phân bổ giới tính
@@ -451,7 +455,7 @@ const Dashboard = () => {
               <h2 className="text-lg font-bold text-gray-800">
                 Lịch hẹn gần đây
               </h2>
-              <a href="#" className="text-blue-600 text-sm hover:underline">
+              <a href="/admin/appointments" className="text-blue-600 text-sm hover:underline">
                 Xem tất cả
               </a>
             </div>

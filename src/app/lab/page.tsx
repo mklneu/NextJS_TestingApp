@@ -170,6 +170,7 @@ const LabDashboardPage = () => {
                 <option value="REQUESTED">Yêu cầu xét nghiệm</option>
                 <option value="IN_PROGRESS">Đang tiến hành</option>
                 <option value="COMPLETED">Hoàn thành</option>
+                <option value="REVIEWED">Đã xem xét</option>
               </select>
             </div>
           </div>
@@ -240,51 +241,54 @@ const LabDashboardPage = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {allTestResults.map((result) => (
-                    <tr
-                      key={result.id}
-                      className="hover:bg-teal-50 transition-colors duration-200"
-                    >
-                      <td className="px-4 py-4 whitespace-nowrap font-medium text-gray-900">
-                        {formatAppointmentDate(result.testTime)}
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-gray-700">
-                        {result.patient.name}
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-gray-700">
-                        {result.doctor.name}
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-center text-gray-700">
-                        {translateTestType(result.testType)}
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-center">
-                        <StatusBadge status={result.status} />
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-center">
-                        <Button
-                          onClick={() => {
-                            if (result.status !== "COMPLETED") {
-                              handleStartProcessing(result);
-                              router.push(
-                                `/profile/appointments/${result.appointment.id}/testResults/${result.id}`
-                              );
-                            }
-                          }}
-                          className="text-teal-600 hover:text-teal-800 
+                  {allTestResults.map((result) => {
+                    const isDone =
+                      result.status === "COMPLETED" ||
+                      result.status === "REVIEWED";
+                    return (
+                      <tr
+                        key={result.id}
+                        className="hover:bg-teal-50 transition-colors duration-200"
+                      >
+                        <td className="px-4 py-4 whitespace-nowrap font-medium text-gray-900">
+                          {formatAppointmentDate(result.testTime)}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-gray-700">
+                          {result.patient.name}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-gray-700">
+                          {result.doctor.name}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-center text-gray-700">
+                          {translateTestType(result.testType)}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-center">
+                          <StatusBadge status={result.status} />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-center">
+                          <Button
+                            onClick={() => {
+                              if (!isDone) {
+                                handleStartProcessing(result);
+                                router.push(
+                                  `/profile/appointments/${result.appointment.id}/testResults/${result.id}`
+                                );
+                              }
+                            }}
+                            className="text-teal-600 hover:text-teal-800 
                           p-2 rounded-full hover:bg-gray-200 flex items-center 
                           gap-2 mx-auto cursor-pointer duration-300"
-                          disabled={result.status === "COMPLETED"}
-                          translate={
-                            result.status !== "COMPLETED" ? true : false
-                          }
-                          icon={<FaEdit />}
-                          variant="secondary"
-                        >
-                          {" "}
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
+                            disabled={isDone}
+                            translate={!isDone}
+                            icon={<FaEdit />}
+                            variant="secondary"
+                          >
+                            {" "}
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

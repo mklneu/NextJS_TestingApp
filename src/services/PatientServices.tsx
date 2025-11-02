@@ -33,11 +33,12 @@ const getAllPatients = async (
 
     const filters = [];
 
-    filters.push(`role.name~'${role}'`);
-
+    if (role && role !== "ALL") {
+      filters.push(`role.name~'${role}'`);
+    }
     // Thêm điều kiện lọc theo giới tính
-    if (filterGender !== "ALL") {
-      filters.push(`gender = '${filterGender}'`);
+    if (filterGender && filterGender !== "ALL") {
+      filters.push(`gender~'${filterGender}'`);
     }
     // Thêm điều kiện tìm kiếm
     if (params.searchTerm && params.searchTerm.trim() !== "") {
@@ -52,7 +53,7 @@ const getAllPatients = async (
     }
 
     if (filters.length > 0) {
-      queryParams.filter = filters.join(" AND ");
+      queryParams.filter = filters.join("&");
     }
 
     const response = await axiosInstance.get("/patients", {
