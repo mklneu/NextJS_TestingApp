@@ -316,11 +316,11 @@ const AppointmentsTab = () => {
                     </td>
                     <td className="py-3 px-2 text-center">
                       {userRole === "doctor"
-                        ? a.patient.fullName
-                        : a.doctor.fullName}
+                        ? a.patient?.fullName
+                        : a.doctor?.fullName}
                     </td>
                     <td className="py-3 px-2 text-center">
-                      {formatAppointmentDate(a.appointmentDate)}
+                      {a.appointmentTime} - {formatAppointmentDate(a.appointmentDate)}
                     </td>
                     <td className="py-3 px-2 text-center">{a.clinicRoom}</td>
                     <td className="py-3 px-2 text-center">

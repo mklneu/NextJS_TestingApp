@@ -66,6 +66,7 @@ interface Appointment {
   createdAt: string;
   updatedAt: string;
   appointmentDate: string;
+  appointmentTime: string;
   patientNote: string;
   doctorNote: string;
   clinicRoom: string;

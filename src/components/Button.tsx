@@ -28,6 +28,7 @@ interface IButtonProps {
   isLoading?: boolean;
   translate?: boolean;
   disabled?: boolean;
+  type?: "button" | "submit" | "reset";
 }
 
 const Button = ({
@@ -40,6 +41,7 @@ const Button = ({
   isLoading = false,
   translate = true,
   disabled = false,
+  type = "button",
 }: IButtonProps) => {
   const baseClasses =
     "shadow-md hover:shadow-lg rounded-lg font-medium duration-300 cursor-pointer outline-none flex items-center justify-center gap-2";
@@ -82,6 +84,7 @@ const Button = ({
       ${translateClass}`}
       onClick={onClick}
       disabled={isLoading || disabled} // Vô hiệu hóa nút khi đang loading
+      type={type}
     >
       {/* 3. Hiển thị spinner hoặc icon + children */}
       {isLoading ? (

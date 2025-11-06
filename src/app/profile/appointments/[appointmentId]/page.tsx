@@ -509,18 +509,7 @@ const ExaminationDetailPage = () => {
                 Buổi khám đã bị hủy
               </Button>
             </div>
-          ) : appointment.status === "CONFIRMED" ? (
-            <div className="flex mt-4 justify-end">
-              <Button
-                variant="alarm"
-                translate={false}
-                className="hover:-translate-x-[2px] 
-                !cursor-default"
-              >
-                Buổi khám đang chờ bắt đầu
-              </Button>
-            </div>
-          ) : (
+          ) : appointment.status === "CONFIRMED" && prescriptions.length > 0 ? (
             <DoctorOnly userRole={userRole}>
               <div className="flex mt-4 justify-end">
                 <Button
@@ -533,7 +522,18 @@ const ExaminationDetailPage = () => {
                 </Button>
               </div>
             </DoctorOnly>
-          )}
+          ) : appointment.status === "CONFIRMED" ? (
+            <div className="flex mt-4 justify-end">
+              <Button
+                variant="alarm"
+                translate={false}
+                className="hover:-translate-x-[2px] 
+                !cursor-default"
+              >
+                Buổi khám đã được xác nhận
+              </Button>
+            </div>
+          ) : null}
         </div>
       </div>
       {isCompleteModalOpen && (

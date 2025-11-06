@@ -234,11 +234,11 @@ export default function Home() {
                   </Link>
                 </div>
               ) : userRole === "doctor" ? null : userRole === "patient" ? (
-                <div className="flex flex-wrap gap-4 z-10">
+                <div className="flex flex-wrap gap-4 ">
                   <Link
                     href="/booking"
                     className="px-6 py-3 bg-transparent duration-300
-                     text-white font-medium rounded-lg 
+                     text-white font-medium rounded-lg z-100
                      border border-blue-400 hover:bg-white/10"
                   >
                     Đặt lịch khám
@@ -414,7 +414,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <div className="flex flex-row space-x-1 justify-center">
+      {/* <div className="flex flex-row space-x-1 justify-center">
         <div className="card w-full">
           <div className="card-content">card</div>
         </div>
@@ -430,7 +430,7 @@ export default function Home() {
         <div className="card w-full">
           <div className="card-content">card</div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

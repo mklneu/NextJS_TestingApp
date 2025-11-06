@@ -3,23 +3,28 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "react-toastify";
-import { createAppointment } from "@/services/AppointmentServices";
 import { getAllHospitals } from "@/services/HospitalServices";
 import Button from "@/components/Button";
 import InputBar from "@/components/Input";
 import { AxiosError } from "axios";
 import { ErrorResponse, Hospital } from "@/types/frontend";
-import { getSpecialtiesByHospitalId } from "@/services/SpecialtyServices";
 import {
+  getSpecialtiesByHospitalId,
+  Specialty,
+} from "@/services/SpecialtyServices";
+import {
+  DoctorTimeSlotGroup, // <--- Import kiểu dữ liệu mới
   getAvailableDates,
   getAvailableTimeSlots,
 } from "@/services/ScheduleServices";
+import { translateSpecialty } from "@/utils/translateEnums";
+import { bookAppointment } from "@/services/AppointmentServices";
 
-const appointmentTypes = [
-  { value: "KHAM_TONG_QUAT", label: "Khám tổng quát" },
-  { value: "KHAM_CHUYEN_KHOA", label: "Khám chuyên khoa" },
-  { value: "TAI_KHAM", label: "Tái khám" },
-];
+// const appointmentTypes = [
+//   { value: "KHAM_TONG_QUAT", label: "Khám tổng quát" },
+//   { value: "KHAM_CHUYEN_KHOA", label: "Khám chuyên khoa" },
+//   { value: "TAI_KHAM", label: "Tái khám" },
+// ];
 
 export default function BookingPage() {
   const router = useRouter();
@@ -37,7 +42,9 @@ export default function BookingPage() {
   const [loadingDates, setLoadingDates] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>("");
 
-  const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([]);
+  const [availableTimeSlots, setAvailableTimeSlots] = useState<
+    DoctorTimeSlotGroup[]
+  >([]); // <--- Sửa kiểu dữ liệu của state
   const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
   const [selectedTimeSlotId, setSelectedTimeSlotId] = useState<number | null>(
     null
@@ -45,7 +52,7 @@ export default function BookingPage() {
 
   // States for the form data
   const [patientNote, setPatientNote] = useState("");
-  const [appointmentType, setAppointmentType] = useState("KHAM_CHUYEN_KHOA");
+  // const [appointmentType, setAppointmentType] = useState("KHAM_CHUYEN_KHOA");
 
   const [loading, setLoading] = useState(false);
 
@@ -162,30 +169,15 @@ export default function BookingPage() {
       return;
     }
 
-    const selectedSlot = availableTimeSlots.find(
-      (slot) => slot.id === selectedTimeSlotId
-    );
-    if (!selectedSlot) {
-      toast.error("Khung giờ đã chọn không hợp lệ. Vui lòng chọn lại.");
-      return;
-    }
-
     setLoading(true);
     try {
-      const appointmentDateTime = `${selectedDate}T${selectedSlot.startTime}`;
-      const isoDateString = new Date(appointmentDateTime).toISOString();
-
       const body = {
-        patient: { id: user.id },
-        doctor: { id: selectedSlot.doctor.id },
-        scheduleId: selectedSlot.id,
-        appointmentDate: isoDateString,
+        appointmentId: selectedTimeSlotId,
+        patientId: user.id,
         patientNote: patientNote,
-        appointmentType: appointmentType,
-        notificationSent: true,
       };
 
-      const res = await createAppointment(body);
+      const res = await bookAppointment(body);
       toast.success(res.message || "Đặt lịch thành công!");
       router.push("/profile/appointments");
     } catch (error) {
@@ -257,7 +249,7 @@ export default function BookingPage() {
                 onChange={(e) => setSelectedSpecialtyId(e.target.value)}
                 disabled={loadingSpecialties || specialties.length === 0}
                 options={specialties.map((s) => ({
-                  label: s.name,
+                  label: translateSpecialty(s.specialtyName),
                   value: s.id.toString(),
                 }))}
                 placeholder={
@@ -282,18 +274,22 @@ export default function BookingPage() {
               ) : availableDates.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {availableDates.map((date) => (
-                    <button
+                    <Button
                       key={date}
-                      type="button"
                       onClick={() => setSelectedDate(date)}
-                      className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                      className={`${
                         selectedDate === date
                           ? "bg-blue-600 text-white border-blue-600"
-                          : "bg-white hover:bg-blue-50 hover:border-blue-400"
+                          : ""
                       }`}
                     >
-                      {format(parseISO(date), "EEEE, dd/MM", { locale: vi })}
-                    </button>
+                      {new Date(date).toLocaleDateString("vi-VN", {
+                        weekday: "short",
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}
+                    </Button>
                   ))}
                 </div>
               ) : (
@@ -313,20 +309,32 @@ export default function BookingPage() {
               {loadingTimeSlots ? (
                 <p className="text-gray-500">Đang tìm khung giờ trống...</p>
               ) : availableTimeSlots.length > 0 ? (
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                  {availableTimeSlots.map((slot) => (
-                    <button
-                      key={slot.id}
-                      type="button"
-                      onClick={() => setSelectedTimeSlotId(slot.id)}
-                      className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
-                        selectedTimeSlotId === slot.id
-                          ? "bg-blue-600 text-white border-blue-600"
-                          : "bg-white hover:bg-blue-50 hover:border-blue-400"
-                      }`}
-                    >
-                      {slot.startTime.substring(0, 5)}
-                    </button>
+                <div className="space-y-4">
+                  {/* Lặp qua từng nhóm bác sĩ */}
+                  {availableTimeSlots.map((doctorGroup) => (
+                    <div key={doctorGroup.doctorId}>
+                      <h4 className="font-semibold text-gray-800 mb-2">
+                        {doctorGroup.groupName}
+                      </h4>
+                      {/* Hiển thị các khung giờ của bác sĩ đó */}
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                        {doctorGroup.timeSlots.map((slot) => (
+                          <Button
+                            key={slot.appointmentId}
+                            onClick={() =>
+                              setSelectedTimeSlotId(slot.appointmentId)
+                            }
+                            className={`${
+                              selectedTimeSlotId === slot.appointmentId
+                                ? "bg-blue-600 text-white border-blue-600"
+                                : ""
+                            }`}
+                          >
+                            {slot.time}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -340,7 +348,7 @@ export default function BookingPage() {
           {/* --- Additional Info --- */}
           {selectedTimeSlotId && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-              <div>
+              {/* <div>
                 <label className="block font-semibold mb-2 text-gray-700">
                   Loại hình khám
                 </label>
@@ -350,7 +358,7 @@ export default function BookingPage() {
                   onChange={(e) => setAppointmentType(e.target.value)}
                   options={appointmentTypes}
                 />
-              </div>
+              </div> */}
               <div className="md:col-span-2">
                 <label className="block font-semibold mb-2 text-gray-700">
                   Triệu chứng hoặc lý do khám
@@ -373,6 +381,7 @@ export default function BookingPage() {
               className="w-full"
               size="lg"
               disabled={!selectedTimeSlotId || loading}
+              type="submit"
             >
               Xác nhận đặt lịch
             </Button>
