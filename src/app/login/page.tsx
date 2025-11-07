@@ -7,6 +7,7 @@ import { login } from "@/services/AuthServices";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { AxiosError } from "axios";
+import { ErrorResponse } from "@/types/frontend";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -50,7 +51,7 @@ export default function LoginPage() {
       // router.push("/");
     } catch (error) {
       const err = error as AxiosError<ErrorResponse>;
-      toast.error(err?.response?.data?.message || "Đăng nhập thất bại!");
+      toast.error(err?.response?.data?.error || "Đăng nhập thất bại!");
       console.error("Lỗi đăng nhập:", error);
     } finally {
       setLoading(false);
