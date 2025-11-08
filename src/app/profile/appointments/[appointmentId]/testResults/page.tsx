@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { IoIosArrowBack } from "react-icons/io";
-import { FaStethoscope, FaVial } from "react-icons/fa";// 1. Import hàm API mới
+import { FaStethoscope, FaVial } from "react-icons/fa"; // 1. Import hàm API mới
 import { AxiosError } from "axios";
 import Button from "@/components/Button";
 import { ErrorResponse } from "@/types/frontend";
@@ -127,7 +127,12 @@ const IndicateTestResultPage = () => {
             <Button onClick={() => router.back()} variant="secondary" size="sm">
               Hủy
             </Button>
-            <Button isLoading={loading} size="sm" icon={<FaVial />}>
+            <Button
+              isLoading={loading}
+              size="sm"
+              icon={<FaVial />}
+              type="submit"
+            >
               {loading ? "Đang lưu..." : "Chỉ định"}
             </Button>
           </div>

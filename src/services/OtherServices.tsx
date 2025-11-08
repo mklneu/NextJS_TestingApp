@@ -117,6 +117,29 @@ const formatAppointmentDate = (dateStr: string) => {
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 };
 
+const formatAppointmentDateTime = (dateStr: string): string => {
+  const d = new Date(dateStr);
+
+  // Giữ nguyên logic kiểm tra date hợp lệ của bạn
+  if (isNaN(d.getTime())) {
+    console.error("Invalid date string provided:", dateStr);
+    return dateStr;
+  }
+
+  // Hàm pad (lấy từ code của bạn)
+  const pad = (n: number): string => n.toString().padStart(2, "0");
+
+  // Lấy các thành phần
+  const hours = pad(d.getHours());
+  const minutes = pad(d.getMinutes());
+  const day = pad(d.getDate());
+  const month = pad(d.getMonth() + 1); // getMonth() trả về 0-11
+  const year = d.getFullYear();
+
+  // Format: 14:00 - 04/10/2025
+  return `${hours}:${minutes} - ${day}/${month}/${year}`;
+};
+
 const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
@@ -204,6 +227,7 @@ export {
   Pagination,
   formatDateToDMY,
   formatAppointmentDate,
+  formatAppointmentDateTime,
   scrollToTop,
   getStatusButtonClass,
   getInitialGmt7Time,
