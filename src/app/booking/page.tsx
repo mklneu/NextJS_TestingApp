@@ -3,11 +3,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "react-toastify";
-import { getAllHospitals } from "@/services/HospitalServices";
+import { getAllHospitals, Hospital } from "@/services/HospitalServices";
 import Button from "@/components/Button";
 import InputBar from "@/components/Input";
 import { AxiosError } from "axios";
-import { ErrorResponse, Hospital } from "@/types/frontend";
+import { ErrorResponse } from "@/types/frontend";
 import {
   getSpecialtiesByHospitalId,
   Specialty,

@@ -2,8 +2,9 @@
 
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { getAccount, isAuthenticated } from "@/services/AuthServices";
-import { getPatientById } from "@/services/PatientServices";
+// import { getPatientById } from "@/services/PatientServices";
 import { Appointment, resUser } from "@/types/frontend";
+import { getMyProfile } from "@/services/UserServices";
 
 // Định nghĩa kiểu dữ liệu cho context
 type AuthContextType = {
@@ -51,7 +52,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [appointmentsUpdateTrigger, setAppointmentsUpdateTrigger] = useState(0);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
-  const STORAGE_BASE_URL = process.env.NEXT_PUBLIC_STORAGE_BASE_URL || "http://localhost:8080/storage";
+  const STORAGE_BASE_URL =
+    process.env.NEXT_PUBLIC_STORAGE_BASE_URL || "http://localhost:8080/storage";
   const folderName = "test-results";
 
   // Luôn fetch lại user info mỗi khi isLoggedIn chuyển thành true
@@ -66,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUserRole(account.user.role?.name || null);
 
         if (account?.user?.id) {
-          const resUserById = await getPatientById(account.user.id);
+          const resUserById = await getMyProfile();
           // console.log("Fetched user by ID:", resUserById);
           setUser(resUserById || null);
         }
@@ -82,27 +84,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [isLoggedIn]);
 
+  const providerValue: AuthContextType = {
+    isLoggedIn,
+    setIsLoggedIn,
+    userName,
+    setUserName,
+    userRole,
+    setUserRole,
+    userId,
+    setUserId,
+    user,
+    setUser,
+    appointmentsUpdateTrigger,
+    setAppointmentsUpdateTrigger,
+    appointments,
+    setAppointments,
+    STORAGE_BASE_URL,
+    folderName,
+  };
+
   return (
-    <AuthContext.Provider
-      value={{
-        isLoggedIn,
-        setIsLoggedIn,
-        userName,
-        setUserName,
-        userRole,
-        setUserRole,
-        userId,
-        setUserId,
-        user,
-        setUser,
-        appointmentsUpdateTrigger,
-        setAppointmentsUpdateTrigger,
-        appointments,
-        setAppointments,
-        STORAGE_BASE_URL,
-        folderName,
-      }}
-    >
+    <AuthContext.Provider value={providerValue}>
       {children}
     </AuthContext.Provider>
   );

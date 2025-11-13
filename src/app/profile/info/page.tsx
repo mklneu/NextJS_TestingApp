@@ -3,181 +3,355 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import UpdateInfoModal from "@/components/Users/UpdateInfo.Modal";
 import {
-  FaUser,
-  FaBirthdayCake,
-  FaUserTag,
+  FaIdCard,
+  FaHeartbeat,
+  FaFileMedical,
+  FaShieldAlt,
+  FaUserShield,
+  FaStethoscope,
+  FaHospital,
+  FaBriefcase,
+  FaIdBadge,
+  FaBuilding,
+  FaPhoneAlt,
   FaEnvelope,
-  FaTransgender,
+  FaBirthdayCake,
+  FaVenusMars,
   FaMapMarkerAlt,
 } from "react-icons/fa";
-import { getPatientById, updatePatient } from "@/services/PatientServices";
 import Button from "@/components/Button";
-import { reqUser } from "@/types/frontend";
+import {
+  getMyProfile,
+  ReqUpdateMyProfile,
+  updateMyProfile,
+  UserProfile,
+} from "@/services/UserServices";
+import { toast } from "react-toastify";
+import { PatientProfile } from "@/services/PatientServices";
+import { DoctorProfile } from "@/services/DoctorServices";
+import { StaffProfile } from "@/services/StaffServices";
+import { translateSpecialty } from "@/utils/translateEnums";
+
+// Helper để dịch các giá trị
+const translateGender = (gender: string) => {
+  if (gender === "MALE") return "Nam";
+  if (gender === "FEMALE") return "Nữ";
+  return "Khác";
+};
 
 const InfoTab = () => {
-  const { userRole, userId, user, setUser } = useAuth();
+  const { userRole, setUser } = useAuth();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [showEdit, setShowEdit] = useState<boolean>(false);
-  // Update user info handler
-  const handleUpdateInfo = async (data: Partial<reqUser>) => {
-    if (!user) return;
-    // Compose all required arguments for updateUser
-    const updated = await updatePatient(
-      user.id,
-      user.username,
-      data.fullName ?? user.fullName,
-      data.gender ?? user.gender,
-      data.address ?? user.address,
-      data.dob ?? user.dob,
-      user.company ? { id: user.company.id } : { id: 0 },
-      user.role ? { id: user.role.id } : { id: 0 }
-    );
-    setUser(updated);
+
+  const handleUpdateInfo = async (data: ReqUpdateMyProfile) => {
+    if (!profile) return;
+    try {
+      await updateMyProfile(data);
+      // setProfile(updatedProfile);
+      // setUser(updatedProfile); // Cập nhật context
+      await fetchProfile(); // Tải lại hồ sơ sau khi cập nhật
+      // toast.success("Cập nhật thông tin thành công!");
+    } catch (error) {
+      toast.error("Cập nhật thông tin thất bại.");
+      console.error(error);
+    }
+  };
+
+  const fetchProfile = async () => {
+    setLoading(true);
+    try {
+      const res = await getMyProfile();
+      setProfile(res);
+      setUser(res); // Cập nhật context
+    } catch (error) {
+      console.error("Failed to fetch profile:", error);
+      toast.error("Không thể tải hồ sơ người dùng.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (userId) {
-        try {
-          const res = await getPatientById(userId);
-          setUser(res);
-        } finally {
-          setLoading(false);
-        }
-      } else {
+      setLoading(true);
+      try {
+        const res = await getMyProfile();
+        setProfile(res);
+        setUser(res); // Cập nhật context
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+        toast.error("Không thể tải hồ sơ người dùng.");
+      } finally {
         setLoading(false);
       }
     };
+
     fetchProfile();
-  }, [userId, setUser]);
+  }, [setUser]);
 
   if (loading) {
-    return <div className="text-center mt-10 min-h-screen">Đang tải thông tin...</div>;
+    return (
+      <div className="text-center mt-10 min-h-screen">Đang tải hồ sơ...</div>
+    );
   }
 
-  if (!user) {
+  if (!profile) {
     return (
       <div className="text-center mt-10 text-red-500 min-h-screen">
-        Không tìm thấy thông tin người dùng.
+        Không thể tải hồ sơ. Vui lòng thử lại.
       </div>
     );
   }
 
+  const InfoItem = ({
+    icon,
+    label,
+    value,
+  }: {
+    icon: React.ReactNode;
+    label: string;
+    value: string | number | undefined | null;
+  }) => (
+    <div
+      className="bg-gray-50/70 hover:shadow-inner hover:translate-y-[2px] duration-300
+    rounded-xl px-6 py-4 flex items-center gap-4 border border-gray-100 h-full"
+    >
+      {/* Thêm flex-shrink-0 để icon không bị co lại */}
+      <div className="flex-shrink-0">{icon}</div>
+      {/* Thêm min-w-0 để cho phép khối này co lại và ngắt chữ */}
+      <div className="min-w-0">
+        <div className="text-gray-500 text-sm mb-1">{label}</div>
+        <div className="font-semibold text-base text-gray-800 break-words">
+          {value || "-"}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderPatientInfo = (p: PatientProfile) => (
+    <div className="space-y-4">
+      <h3
+        className="text-xl font-bold pb-2 mb-4 border-b-2
+       text-green-700 border-green-200"
+      >
+        Thông tin y tế
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <InfoItem
+          icon={<FaHeartbeat size={20} color="#ef4444" />}
+          label="Nhóm máu"
+          value={p.bloodType}
+        />
+        <InfoItem
+          icon={<FaShieldAlt size={20} color="#22c55e" />}
+          label="Số BHYT"
+          value={p.insuranceId}
+        />
+        <div className="md:col-span-2">
+          <InfoItem
+            icon={<FaFileMedical size={20} color="#3b82f6" />}
+            label="Tiền sử bệnh án"
+            value={p.medicalHistorySummary}
+          />
+        </div>
+      </div>
+      <h3
+        className="text-xl font-bold pb-2 mb-4 border-b-2
+       text-red-700 border-red-200"
+      >
+        Liên hệ khẩn cấp
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <InfoItem
+          icon={<FaUserShield size={20} color="#f97316" />}
+          label="Người liên hệ"
+          value={p.emergencyContactName}
+        />
+        <InfoItem
+          icon={<FaPhoneAlt size={20} color="#10b981" />}
+          label="SĐT người liên hệ"
+          value={p.emergencyContactPhone}
+        />
+      </div>
+    </div>
+  );
+
+  const renderDoctorInfo = (d: DoctorProfile) => (
+    <>
+      <h3
+        className="text-xl font-bold pb-2 mb-4 border-b-2
+       text-green-700 border-green-200"
+      >
+        Thông tin chuyên môn
+      </h3>
+      <div className=" grid grid-cols-1 md:grid-cols-2 gap-4">
+        <InfoItem
+          icon={<FaStethoscope size={20} color="#8b5cf6" />}
+          label="Chuyên khoa"
+          value={translateSpecialty(d.specialty.specialtyName)}
+        />
+        <InfoItem
+          icon={<FaHospital size={20} color="#14b8a6" />}
+          label="Bệnh viện"
+          value={d.hospital.name}
+        />
+        <InfoItem
+          icon={<FaBriefcase size={20} color="#64748b" />}
+          label="Số năm kinh nghiệm"
+          value={`${d.experienceYears} năm`}
+        />
+        <InfoItem
+          icon={<FaIdBadge size={20} color="#f97316" />}
+          label="Bằng cấp"
+          value={d.degree}
+        />
+        <div className="md:col-span-2">
+          <InfoItem
+            icon={<FaIdCard size={20} color="#3b82f6" />}
+            label="Số chứng chỉ hành nghề"
+            value={d.licenseNumber}
+          />
+        </div>
+      </div>
+    </>
+  );
+
+  const renderStaffInfo = (s: StaffProfile) => (
+    <>
+      <h3
+        className="text-xl text-green-700
+       border-green-200 font-bold pb-2 mb-4 border-b-2"
+      >
+        Thông tin công việc
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <InfoItem
+          icon={<FaIdBadge size={20} color="#f97316" />}
+          label="Mã nhân viên"
+          value={s.employeeId}
+        />
+        <InfoItem
+          icon={<FaBuilding size={20} color="#64748b" />}
+          label="Phòng ban"
+          value={s.department}
+        />
+        <div className="md:col-span-2">
+          <InfoItem
+            icon={<FaHospital size={20} color="#14b8a6" />}
+            label="Bệnh viện"
+            value={s.hospital.name}
+          />
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <>
-      <div className="bg-white w-full max-w-6xl min-h-screen
-      mx-auto p-6 md:p-10 rounded-2xl">
-        <h2 className="text-3xl font-bold text-blue-600 text-center mb-8">
-          Hồ sơ cá nhân
-        </h2>
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-10">
-          {/* Avatar */}
-          <div className="flex-shrink-0 flex flex-col items-center">
-            <div className="w-36 h-36 rounded-full bg-gradient-to-tr from-blue-400 to-blue-600 flex items-center justify-center text-white text-6xl font-bold shadow-lg border-4 border-white">
-              {user.fullName
-                ? user.fullName.charAt(0).toUpperCase()
-                : user.username.charAt(0).toUpperCase()}
+      {/* "Cuộc tranh luận": "Vứt" (Remove) dark: */}
+      <div className="min-h-screen w-full bg-gray-50">
+        <div className="max-w-7xl mx-auto p-4 md:p-8">
+          <div className="flex flex-col lg:flex-row items-start gap-4">
+            {/* --- CỘT BÊN TRÁI (SIDEBAR) --- */}
+            <div className="w-full lg:w-1/3 lg:max-w-sm flex-shrink-0 lg:sticky lg:top-8">
+              {/* "Cuộc tranh luận": "Vứt" (Remove) dark: */}
+              <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex flex-col items-center">
+                <div className="w-40 h-40 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-7xl font-bold shadow-lg border-4 border-white">
+                  {profile.fullName.charAt(0).toUpperCase()}
+                </div>
+                <h2 className="text-2xl font-bold text-zinc-900 mt-5 text-center">
+                  {profile.fullName}
+                </h2>
+                <p className="text-zinc-500 mt-1">@{profile.username}</p>
+                {/* "Cuộc tranh luận": "Vứt" (Remove) dark: */}
+                {/* <span className="mt-2 px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
+                  {profile.role.replace("ROLE_", "").charAt(0) +
+                    profile.role.replace("ROLE_", "").slice(1).toLowerCase()}
+                </span> */}
+                <Button className="mt-3" onClick={() => setShowEdit(true)}>
+                  Chỉnh sửa hồ sơ
+                </Button>
+              </div>
             </div>
-            <Button
-              className="mt-6"
-              onClick={() => setShowEdit(true)}
-            >
-              Chỉnh sửa hồ sơ
-            </Button>
-          </div>
-          {/* Info */}
-          <div className="flex-1 w-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Họ và tên */}
-              <div className="bg-gray-50 rounded-xl p-4 shadow-sm flex items-center gap-3">
-                <FaUser className="w-5 h-5 text-blue-400" />
-                <div>
-                  <div className="text-gray-400 text-xs mb-1">Họ và tên</div>
-                  <div className="font-medium text-base text-gray-700">
-                    {user.fullName}
-                  </div>
-                </div>
-              </div>
-              {/* Ngày sinh */}
-              <div className="bg-gray-50 rounded-xl p-4 shadow-sm flex items-center gap-3">
-                <FaBirthdayCake className="w-5 h-5 text-blue-400" />
-                <div>
-                  <div className="text-gray-400 text-xs mb-1">Ngày sinh</div>
-                  <div className="font-medium text-base text-gray-700">
-                    {user.dob
-                      ? new Date(user.dob).toLocaleDateString("vi-VN")
-                      : "-"}
-                  </div>
-                </div>
-              </div>
-              {/* Tên tài khoản */}
-              <div className="bg-gray-50 rounded-xl p-4 shadow-sm flex items-center gap-3">
-                <FaUserTag className="w-5 h-5 text-blue-400" />
-                <div>
-                  <div className="text-gray-400 text-xs mb-1">
-                    Tên tài khoản
-                  </div>
-                  <div className="font-medium text-base text-gray-700">
-                    {user.username}
-                  </div>
-                </div>
-              </div>
-              {/* Email */}
-              <div className="bg-gray-50 rounded-xl p-4 shadow-sm flex items-center gap-3">
-                <FaEnvelope className="w-5 h-5 text-blue-400" />
-                <div>
-                  <div className="text-gray-400 text-xs mb-1">Email</div>
-                  <div className="font-medium text-base text-gray-700">
-                    {user.email}
-                  </div>
-                </div>
-              </div>
-              {/* Giới tính */}
-              <div className="bg-gray-50 rounded-xl p-4 shadow-sm flex items-center gap-3">
-                <FaTransgender className="w-5 h-5 text-blue-400" />
-                <div>
-                  <div className="text-gray-400 text-xs mb-1">Giới tính</div>
-                  <div className="font-medium text-base text-gray-700">
-                    {user.gender === "MALE"
-                      ? "Nam"
-                      : user.gender === "FEMALE"
-                      ? "Nữ"
-                      : "Khác"}
-                  </div>
-                </div>
-              </div>
-              {/* Vai trò */}
-              <div className="bg-gray-50 rounded-xl p-4 shadow-sm flex items-center gap-3">
-                <FaUserTag className="w-5 h-5 text-blue-400" />
-                <div>
-                  <div className="text-gray-400 text-xs mb-1">Vai trò</div>
-                  <div className="font-medium text-base text-gray-700">
-                    {user.role?.name || userRole}
-                  </div>
-                </div>
-              </div>
-              {/* Địa chỉ */}
-              {user.address && (
-                <div className="bg-gray-50 rounded-xl p-4 shadow-sm flex items-center gap-3 md:col-span-2">
-                  <FaMapMarkerAlt className="w-5 h-5 text-blue-400" />
-                  <div>
-                    <div className="text-gray-400 text-xs mb-1">Địa chỉ</div>
-                    <div className="font-medium text-base text-gray-700">
-                      {user.address}
+
+            {/* --- CỘT BÊN PHẢI (NỘI DUNG CHÍNH) --- */}
+            <div className="w-full lg:w-2/3 space-y-4">
+              {/* Card "Thông tin chung" */}
+              {/* "Cuộc tranh luận": "Vứt" (Remove) dark: */}
+              <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                {/* "Cuộc tranh luận": "Vứt" (Remove) dark: */}
+                <h3
+                  className="text-xl font-bold pb-2 mb-4 border-b-2
+                text-blue-700 border-blue-200"
+                >
+                  Thông tin chung
+                </h3>
+                <div className="mt-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <InfoItem
+                    icon={<FaEnvelope size={20} color="#3b82f6" />}
+                    label="Email"
+                    value={profile.email}
+                  />
+                  <InfoItem
+                    icon={<FaPhoneAlt size={20} color="#10b981" />}
+                    label="Số điện thoại"
+                    value={profile.phoneNumber}
+                  />
+                  <InfoItem
+                    icon={<FaBirthdayCake size={20} color="#f97316" />}
+                    label="Ngày sinh"
+                    value={new Date(profile.dob).toLocaleDateString("vi-VN")}
+                  />
+                  <InfoItem
+                    icon={<FaVenusMars size={20} color="#8b5cf6" />}
+                    label="Giới tính"
+                    value={translateGender(profile.gender)}
+                  />
+                  {userRole === "patient" && (
+                    <div className="md:col-span-2">
+                      <InfoItem
+                        icon={<FaIdCard size={20} color="#64748b" />}
+                        label="CCCD/CMND"
+                        value={(profile as PatientProfile).citizenId}
+                      />
                     </div>
+                  )}
+                  <div className="md:col-span-2">
+                    <InfoItem
+                      icon={<FaMapMarkerAlt size={20} color="#ef4444" />}
+                      label="Địa chỉ"
+                      value={profile.address}
+                    />
                   </div>
                 </div>
-              )}
+              </div>
+
+              {/* Card "Thông tin riêng" (Specific Info) */}
+              {/* "Cuộc tranh luận": "Vứt" (Remove) dark: */}
+              <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                {userRole === "patient" &&
+                  renderPatientInfo(profile as PatientProfile)}
+                {userRole === "doctor" &&
+                  renderDoctorInfo(profile as DoctorProfile)}
+                {userRole === "staff" &&
+                  renderStaffInfo(profile as StaffProfile)}
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <UpdateInfoModal
-        show={showEdit}
-        setShow={setShowEdit}
-        user={user}
-        onUpdate={handleUpdateInfo}
-      />
+
+      {/* MODAL (Giữ nguyên) */}
+      {profile && (
+        <UpdateInfoModal
+          show={showEdit}
+          setShow={setShowEdit}
+          user={profile}
+          onUpdate={handleUpdateInfo}
+        />
+      )}
     </>
   );
 };

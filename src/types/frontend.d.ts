@@ -47,13 +47,13 @@ interface Doctor extends resUser {
   //   rating?: number;
 }
 
-interface Hospital {
-  id: number;
-  name: string;
-  address: string;
-  logo: string;
-  description: string;
-}
+// interface Hospital {
+//   id: number;
+//   name: string;
+//   address: string;
+//   logo: string;
+//   description: string;
+// }
 
 interface ErrorResponse {
   error?: string;
@@ -97,9 +97,11 @@ interface PaginatedResponse<T> {
 }
 
 type TestResultStatus =
-  "REQUESTED" |
-  "IN_PROGRESS" |
-  "PRELIMINARY" |
-  "COMPLETED" |
-  "REVIEWED" |
-  "CANCELLED";
+  | "REQUESTED"
+  | "IN_PROGRESS"
+  | "PRELIMINARY"
+  | "COMPLETED"
+  | "REVIEWED"
+  | "CANCELLED";
+
+type Gender = "MALE" | "FEMALE" | "OTHER";

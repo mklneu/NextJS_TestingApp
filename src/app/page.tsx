@@ -71,27 +71,54 @@ export default function Home() {
   const { isLoggedIn, userRole } = useAuth();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const params = {
-          page: 1,
-          size: 1000,
-          searchTerm: "",
-          filterGender: "ALL",
-          role: "ALL",
-        };
-        const res = await getAllPatients(params);
-        setUserData(res?.data || []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    if (isLoggedIn) {
-      fetchData();
+    // --- "CUỘC TRANH LUẬN" (FIX LỖI) ---
+    // "RÀO CHẮN" (Guard Clause)
+    // Nếu 1 trong 2 (isLoggedIn, userRole) CHƯA SẴN SÀNG,
+    // thì KHÔNG LÀM GÌ CẢ.
+    if (!isLoggedIn || userRole === null) {
+        // Nếu không đăng nhập, ta ngừng loading
+        if (!isLoggedIn) {
+            setIsLoading(false);
+        }
+        
+        console.log("Guard clause: Bỏ qua (isLoggedIn:", isLoggedIn, ", userRole:", userRole, ")");
+        return; // <-- DÒNG QUAN TRỌNG NHẤT
     }
-  }, [isLoggedIn]);
+    // --- KẾT THÚC FIX LỖI ---
+
+    // Từ đây, chúng ta BIẾT CHẮC CHẮN
+    // isLoggedIn = true VÀ userRole ĐÃ CÓ GIÁ TRỊ (ví dụ: "patient")
+
+    const fetchData = async () => {
+        console.log("Fetching data for role:", userRole); // Debug
+        
+        if (userRole !== "patient") {
+            try {
+                const params = {
+                    page: 1,
+                    size: 1000,
+                    searchTerm: "",
+                    filterGender: "ALL",
+                    role: "ALL",
+                  };
+                const res = await getAllPatients(params);
+                setUserData(res?.data || []);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        } else {
+            // Nếu role LÀ "patient", không fetch
+            console.log("Role là patient, không fetch data.");
+            setIsLoading(false);
+        }
+    };
+
+    // Chúng ta đã qua "rào chắn", nên gọi fetchData() là an toàn.
+    fetchData();
+
+}, [isLoggedIn, userRole]); // Dependencies vẫn giữ nguyên
 
   // Giả lập dữ liệu thống kê
   const stats = [
@@ -287,7 +314,7 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      {isLoggedIn && (
+      {isLoggedIn && userRole !== "patient" && (
         <section className="py-12 px-4">
           <div className="container mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

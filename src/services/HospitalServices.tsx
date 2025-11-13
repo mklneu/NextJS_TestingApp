@@ -4,6 +4,23 @@ import Button from "@/components/Button";
 import { AxiosError } from "axios";
 import { ErrorResponse } from "@/types/frontend";
 
+export interface Hospital {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  name: string;
+  address: string;
+  logo: string;
+  description: string;
+  specialty: Specialty[];
+}
+
+interface Specialty {
+  id: number;
+  specialtyName: string;
+  description: string;
+}
+
 // Lấy tất cả bệnh viện
 const getAllHospitals = async () => {
   try {

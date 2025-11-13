@@ -2,7 +2,46 @@ import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
 import Button from "@/components/Button";
 import { AxiosError } from "axios";
-import { ErrorResponse, PaginatedResponse, resUser } from "@/types/frontend";
+import {
+  ErrorResponse,
+  Gender,
+  PaginatedResponse,
+  resUser,
+} from "@/types/frontend";
+
+export interface PatientProfile {
+  profileId: number;
+  userId: number;
+  username: string;
+  email: string;
+  phoneNumber: string;
+  status: string;
+  fullName: string;
+  dob: string;
+  gender: Gender;
+  address: string;
+  citizenId: string;
+  insuranceId: string;
+  bloodType: string;
+  medicalHistorySummary: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  createdAt: string;
+}
+
+export interface ReqUpdatePatient {
+  phoneNumber: string;
+  fullName: string;
+  dob: string;
+  gender: Gender;
+  address: string;
+  citizenId: string;
+  insuranceId: string;
+  bloodType: string;
+  medicalHistorySummary: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+}
 
 export interface PatientQueryParams {
   page: number;

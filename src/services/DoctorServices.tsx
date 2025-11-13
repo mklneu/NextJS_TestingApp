@@ -1,7 +1,51 @@
 import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
 import { AxiosError } from "axios";
-import { Doctor, ErrorResponse, PaginatedResponse } from "@/types/frontend";
+import {
+  Doctor,
+  ErrorResponse,
+  Gender,
+  PaginatedResponse,
+} from "@/types/frontend";
+
+export interface DoctorProfile {
+  profileId: number;
+  userId: number;
+  username: string;
+  email: string;
+  address: string;
+  fullName: string;
+  dob: string;
+  gender: Gender;
+  phoneNumber: string;
+  experienceYears: number;
+  licenseNumber: string;
+  degree: string;
+  hospital: {
+    id: number;
+    name: string;
+  };
+  specialty: {
+    id: number;
+    specialtyName: string;
+    description: string;
+  };
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface ReqUpdateDoctor {
+  phoneNumber: string;
+  fullName: string;
+  dob: string;
+  gender: Gender;
+  address: string;
+  licenseNumber: string;
+  experienceYears: number;
+  degree: string;
+  hospitalId: number | string;
+  specialtyId: number | string;
+}
 
 interface DoctorQueryParams {
   page: number;
@@ -44,7 +88,7 @@ const getAllDoctors = async (
       // Giả sử tên trường là 'specialization' và dùng toán tử '==' (hoặc '~' nếu bạn muốn)
       filterParts.push(`specialty~'${params.filterSpecialization}'`);
     }
-    
+
     // 6. Thêm logic lọc cho 'filterStatus'
     if (params.filterStatus && params.filterStatus !== "ALL") {
       filterParts.push(`status~'${params.filterStatus}'`);
@@ -63,7 +107,6 @@ const getAllDoctors = async (
 
     // 9. Trả về toàn bộ DTO phân trang (giả sử nằm trong response.data.data)
     return response.data.data;
-
   } catch (error) {
     // 10. Xử lý lỗi
     const err = error as AxiosError<ErrorResponse>;
@@ -74,11 +117,11 @@ const getAllDoctors = async (
     } else {
       toast.error("❌ Không thể lấy danh sách bác sĩ!");
     }
-    
+
     // Trả về một cấu trúc rỗng để tránh lỗi crash component
     return {
-        meta: { page: 1, pageSize: params.size, pages: 0, total: 0 },
-        data: []
+      meta: { page: 1, pageSize: params.size, pages: 0, total: 0 },
+      data: [],
     };
   }
 };

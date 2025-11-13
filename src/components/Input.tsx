@@ -44,10 +44,10 @@ const InputBar = ({
   required = false,
 }: IInputProps) => {
   const baseClasses =
-    "w-full h-full bg-transparent rounded-xl pl-5 pr-14 text-gray-900 placeholder:text-gray-500 border border-gray-300 duration-300 outline-none focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md placeholder-opacity-70 focus:placeholder-opacity-40";
+    "w-full h-full bg-transparent rounded-xl pl-5 pr-5 text-gray-900 placeholder:text-gray-500 border border-gray-300 duration-300 outline-none focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md placeholder-opacity-70 focus:placeholder-opacity-40";
 
   const textareaClasses =
-    "w-full min-h-15 h-full bg-transparent rounded-xl pl-5 pr-14 pt-3 text-gray-900 placeholder:text-gray-500 border border-gray-300 duration-300 outline-none focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md placeholder-opacity-70 focus:placeholder-opacity-40";
+    "w-full min-h-15 h-full bg-transparent rounded-xl pl-5 pr-5 pt-3 text-gray-900 placeholder:text-gray-500 border border-gray-300 duration-300 outline-none focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md placeholder-opacity-70 focus:placeholder-opacity-40";
 
   const selectClasses =
     "w-full h-full bg-white rounded-xl pl-5 pr-10 text-gray-700 border border-gray-300 duration-300 outline-none focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md cursor-pointer";
@@ -200,6 +200,7 @@ const InputBar = ({
       )}
       <input
         type={type}
+        name={name}
         required={required}
         placeholder={placeholder}
         value={value}
