@@ -1,7 +1,8 @@
 import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
 import { AxiosError } from "axios";
-import { ErrorResponse, resUser } from "@/types/frontend";
+import { ErrorResponse, Gender } from "@/types/frontend";
+import { UserProfile } from "./UserServices";
 
 // Cập nhật hàm login để nhận setIsLoggedIn và setUserName từ context
 export const login = async (
@@ -10,7 +11,7 @@ export const login = async (
   setIsLoggedIn?: (value: boolean) => void,
   setUserName?: (value: string | null) => void,
   setUserRole?: (value: string | null) => void,
-  setUser?: (value: resUser | null) => void
+  setUser?: (value: UserProfile | null) => void
 ) => {
   try {
     const response = await axiosInstance.post("/auth/login", {
@@ -93,7 +94,7 @@ export const logout = async (
   setUserName?: (value: string | null) => void,
   setUserRole?: (value: string | null) => void,
   setUserId?: (value: number | null) => void,
-  setUser?: (value: resUser | null) => void
+  setUser?: (value: UserProfile | null) => void
 ) => {
   try {
     const res = await axiosInstance.post(
@@ -126,25 +127,26 @@ export const logout = async (
   if (setUser) setUser(null);
 };
 
-export const register = async (
-  username: string,
-  email: string,
-  fullName: string,
-  password: string,
-  gender: string,
-  address: string,
-  dob: string
-) => {
+export interface RegisterData {
+  username: string;
+  email: string;
+  fullName: string;
+  password: string;
+  gender: Gender;
+  address: string;
+  dob: string;
+  phoneNumber: string;
+  citizenId: string;
+  insuranceId: string;
+  bloodType?: string;
+  medicalHistorySummary?: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+}
+
+export const register = async (data: RegisterData) => {
   try {
-    const response = await axiosInstance.post("/auth/register", {
-      username,
-      email,
-      fullName,
-      password,
-      gender,
-      address,
-      dob,
-    });
+    const response = await axiosInstance.post("/auth/register", data);
     toast.success("Đăng ký thành công!");
     return response.data;
   } catch (error) {

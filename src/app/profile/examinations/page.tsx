@@ -47,7 +47,7 @@ const ExaminationsPage = () => {
           appointmentsPerPage: 100, // Lấy nhiều để hiển thị hết danh sách chờ
           filterStatus: "CONFIRMED", // Chỉ lấy lịch hẹn đã xác nhận
         };
-        const response = await getAppointmentByDoctorId(user.id, params);
+        const response = await getAppointmentByDoctorId(user.profileId, params);
         setAppointments(response.data || []);
       } catch (error) {
         const err = error as AxiosError<ErrorResponse>;

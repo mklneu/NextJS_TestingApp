@@ -17,7 +17,7 @@ interface IInputProps {
   disabled?: boolean;
   onChange?: (
     e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement 
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => void;
   className?: string;
@@ -27,6 +27,10 @@ interface IInputProps {
   label?: string; // Chỉ dùng cho input bình thường
   name?: string; // Chỉ dùng cho input bình thường
   required?: boolean; // Chỉ dùng cho input bình thường
+  icon?: React.ReactNode; // Chỉ dùng cho input bình thường
+  rightIcon?: React.ReactNode; // Chỉ dùng cho input bình thường
+  onRightIconClick?: () => void; // Chỉ dùng cho input bình thường
+  autoFocus?: boolean; // Chỉ dùng cho input bình thường
 }
 
 const InputBar = ({
@@ -42,6 +46,10 @@ const InputBar = ({
   label,
   name,
   required = false,
+  icon,
+  rightIcon,
+  onRightIconClick,
+  autoFocus = false,
 }: IInputProps) => {
   const baseClasses =
     "w-full h-full bg-transparent rounded-xl pl-5 pr-5 text-gray-900 placeholder:text-gray-500 border border-gray-300 duration-300 outline-none focus:border-blue-500 focus:shadow-lg focus:shadow-blue-200/50 hover:border-blue-300 hover:shadow-md placeholder-opacity-70 focus:placeholder-opacity-40";
@@ -64,6 +72,16 @@ const InputBar = ({
             {label}
           </label>
         )}
+        {icon && (
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+            {icon}
+          </div>
+        )}
+        {rightIcon && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+            {rightIcon}
+          </div>
+        )}
         <textarea
           placeholder={placeholder}
           name={name}
@@ -71,8 +89,10 @@ const InputBar = ({
           value={value}
           disabled={disabled}
           onChange={onChange}
+          autoFocus={autoFocus}
           rows={rows}
-          className={`${textareaClasses} ${className}`}
+          className={`${textareaClasses} ${className}
+          ${icon ? "!pl-10" : ""}`}
         />
       </div>
     );
@@ -91,13 +111,29 @@ const InputBar = ({
             {label}
           </label>
         )}
+        {icon && (
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+            {icon}
+          </div>
+        )}
+        {rightIcon && (
+          <div
+            onClick={onRightIconClick}
+            className="cursor-pointer duration-300
+            absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+          >
+            {rightIcon}
+          </div>
+        )}
         <select
           name={name}
           value={value}
           required={required}
           disabled={disabled}
           onChange={onChange}
-          className={`${selectClasses} ${className} appearance-none `}
+          autoFocus={autoFocus}
+          className={`${selectClasses} ${className} appearance-none 
+          ${icon ? "!pl-10" : ""}`}
         >
           {placeholder && (
             <option value="" disabled>
@@ -145,6 +181,20 @@ const InputBar = ({
             {label}
           </label>
         )}
+        {icon && (
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+            {icon}
+          </div>
+        )}
+        {rightIcon && (
+          <div
+            onClick={onRightIconClick}
+            className="cursor-pointer duration-300
+            absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+          >
+            {rightIcon}
+          </div>
+        )}
         <input
           type="date"
           name={name}
@@ -154,7 +204,9 @@ const InputBar = ({
           disabled={disabled}
           onChange={onChange}
           onClick={onClick}
-          className={`${baseClasses} ${className}`}
+          autoFocus={autoFocus}
+          className={`${baseClasses} ${className}
+          ${icon ? "!pl-10" : ""}`}
         />
       </div>
     );
@@ -172,6 +224,20 @@ const InputBar = ({
             {label}
           </label>
         )}
+        {icon && (
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+            {icon}
+          </div>
+        )}
+        {rightIcon && (
+          <div
+            onClick={onRightIconClick}
+            className="cursor-pointer duration-300
+            absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+          >
+            {rightIcon}
+          </div>
+        )}
         <input
           type="datetime-local"
           name={name}
@@ -181,7 +247,9 @@ const InputBar = ({
           disabled={disabled}
           onChange={onChange}
           onClick={onClick}
-          className={`${baseClasses} ${className}`}
+          autoFocus={autoFocus}
+          className={`${baseClasses} ${className}
+          ${icon ? "!pl-10" : ""}`}
         />
       </div>
     );
@@ -198,6 +266,20 @@ const InputBar = ({
           {label}
         </label>
       )}
+      {icon && (
+        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+          {icon}
+        </div>
+      )}
+      {rightIcon && (
+        <div
+          onClick={onRightIconClick}
+          className="cursor-pointer duration-300
+          absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+        >
+          {rightIcon}
+        </div>
+      )}
       <input
         type={type}
         name={name}
@@ -207,7 +289,9 @@ const InputBar = ({
         disabled={disabled}
         onChange={onChange}
         onClick={onClick}
-        className={`${baseClasses} ${className}`}
+        autoFocus={autoFocus}
+        className={`${baseClasses} ${className}
+        ${icon ? "!pl-10" : ""}`}
       />
     </div>
   );

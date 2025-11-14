@@ -89,9 +89,20 @@ export const specialtyOptions = Object.entries(specializationsMap).map(
 );
 
 export const genderOptions = [
+  // { label: "Chọn giới tính", value: "" },
   { label: "Nam", value: "MALE" },
   { label: "Nữ", value: "FEMALE" },
   { label: "Khác", value: "OTHER" },
 ];
 
-
+export const bloodTypeOptions = [
+  // { label: "Chọn nhóm máu", value: "" },
+  { label: "A+", value: "A_POSITIVE" },
+  { label: "A-", value: "A_NEGATIVE" },
+  { label: "B+", value: "B_POSITIVE" },
+  { label: "B-", value: "B_NEGATIVE" },
+  { label: "AB+", value: "AB_POSITIVE" },
+  { label: "AB-", value: "AB_NEGATIVE" },
+  { label: "O+", value: "O_POSITIVE" },
+  { label: "O-", value: "O_NEGATIVE" },
+];

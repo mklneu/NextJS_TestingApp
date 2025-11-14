@@ -89,7 +89,7 @@ const AppointmentsTab = () => {
   }, [currentPage]);
 
   useEffect(() => {
-    if (!user || !user.id) return;
+    if (!user) return;
     const fetchAppointments = async () => {
       setLoading(true);
       try {
@@ -102,11 +102,17 @@ const AppointmentsTab = () => {
         };
 
         if (userRole === "doctor") {
-          const data = await getAppointmentByDoctorId(user.id, commonParams);
+          const data = await getAppointmentByDoctorId(
+            user.profileId,
+            commonParams
+          );
           setAppointments(data?.data || []);
           setTotalPages(data?.meta?.pages || 1);
         } else if (userRole === "admin" || userRole === "patient") {
-          const data = await getAppointmentByPatientId(user.id, commonParams);
+          const data = await getAppointmentByPatientId(
+            user.profileId,
+            commonParams
+          );
           setAppointments(data?.data || []);
           console.log("Fetched appointments data:", data);
           setTotalPages(data?.meta?.pages || 1);
@@ -320,7 +326,8 @@ const AppointmentsTab = () => {
                         : a.doctor?.fullName}
                     </td>
                     <td className="py-3 px-2 text-center">
-                      {a.appointmentTime} - {formatAppointmentDate(a.appointmentDate)}
+                      {a.appointmentTime} -{" "}
+                      {formatAppointmentDate(a.appointmentDate)}
                     </td>
                     <td className="py-3 px-2 text-center">{a.clinicRoom}</td>
                     <td className="py-3 px-2 text-center">

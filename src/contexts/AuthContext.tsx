@@ -3,8 +3,10 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { getAccount, isAuthenticated } from "@/services/AuthServices";
 // import { getPatientById } from "@/services/PatientServices";
-import { Appointment, resUser } from "@/types/frontend";
-import { getMyProfile } from "@/services/UserServices";
+import { Appointment } from "@/types/frontend";
+import { getMyProfile, UserProfile } from "@/services/UserServices";
+import { PatientProfile } from "@/services/PatientServices";
+import { StaffProfile } from "@/services/StaffServices";
 
 // Định nghĩa kiểu dữ liệu cho context
 type AuthContextType = {
@@ -16,8 +18,16 @@ type AuthContextType = {
   setUserRole: React.Dispatch<React.SetStateAction<string | null>>;
   userId: number | null;
   setUserId: React.Dispatch<React.SetStateAction<number | null>>;
-  user: resUser | null;
-  setUser: React.Dispatch<React.SetStateAction<resUser | null>>;
+  user: UserProfile | null;
+  patientProfileId: number | null;
+  setPatientProfileId: React.Dispatch<React.SetStateAction<number | null>>;
+  patientProfile: PatientProfile | null;
+  setPatientProfile: React.Dispatch<
+    React.SetStateAction<PatientProfile | null>
+  >;
+  staffProfile: StaffProfile | null;
+  setStaffProfile: React.Dispatch<React.SetStateAction<StaffProfile | null>>;
+  setUser: React.Dispatch<React.SetStateAction<UserProfile | null>>;
   appointmentsUpdateTrigger: number;
   setAppointmentsUpdateTrigger: React.Dispatch<React.SetStateAction<number>>;
   appointments: Appointment[];
@@ -48,7 +58,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [userName, setUserName] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
-  const [user, setUser] = useState<resUser | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [patientProfileId, setPatientProfileId] = useState<number | null>(null);
+  const [patientProfile, setPatientProfile] = useState<PatientProfile | null>(
+    null
+  );
+  const [staffProfile, setStaffProfile] = useState<StaffProfile | null>(null);
   const [appointmentsUpdateTrigger, setAppointmentsUpdateTrigger] = useState(0);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
@@ -56,33 +71,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     process.env.NEXT_PUBLIC_STORAGE_BASE_URL || "http://localhost:8080/storage";
   const folderName = "test-results";
 
-  // Luôn fetch lại user info mỗi khi isLoggedIn chuyển thành true
+  // Sửa lại useEffect để chỉ chạy một lần khi component được mount
   useEffect(() => {
-    setIsLoggedIn(isAuthenticated());
+    // Định nghĩa một hàm async để kiểm tra và lấy thông tin người dùng
+    const validateAndFetchUser = async () => {
+      if (isAuthenticated()) {
+        try {
+          // 1. Lấy thông tin tài khoản cơ bản (id, username, role)
+          const account = await getAccount();
+          const accountUser = account?.user;
 
-    if (isAuthenticated()) {
-      const fetchUserInfo = async () => {
-        const account = await getAccount();
-        setUserId(account?.user?.id || null);
-        setUserName(account?.user?.username || null);
-        setUserRole(account.user.role?.name || null);
+          if (accountUser?.id) {
+            // 2. Cập nhật các state cơ bản
+            setIsLoggedIn(true);
+            setUserId(accountUser.id);
+            setUserName(accountUser.username || null);
+            setUserRole(accountUser.role?.name || null);
 
-        if (account?.user?.id) {
-          const resUserById = await getMyProfile();
-          // console.log("Fetched user by ID:", resUserById);
-          setUser(resUserById || null);
+            // 3. Dùng id vừa lấy được để fetch hồ sơ chi tiết
+            const fullProfile = await getMyProfile();
+            setUser(fullProfile || null);
+            setPatientProfile(fullProfile as PatientProfile || null);
+            setStaffProfile(fullProfile as StaffProfile || null);
+            console.log("Fetched full profile:", fullProfile);
+            setPatientProfileId(fullProfile?.profileId || null);
+            console.log("Fetched profileId:", fullProfile?.profileId);
+          } else {
+            // Nếu không lấy được account, coi như chưa đăng nhập
+            throw new Error("Không thể lấy thông tin tài khoản.");
+          }
+        } catch (error) {
+          console.error("Lỗi xác thực hoặc lấy thông tin:", error);
+          // Nếu có lỗi, reset tất cả state
+          setIsLoggedIn(false);
+          setUser(null);
+          setUserName(null);
+          setUserRole(null);
+          setUserId(null);
         }
+      }
+    };
 
-        // console.log("Fetched user in AuthContext:", account?.user);
-      };
-      fetchUserInfo();
-    } else {
-      setUser(null);
-      setUserName(null);
-      setUserRole(null);
-      setUserId(null);
-    }
-  }, [isLoggedIn]);
+    validateAndFetchUser();
+  }, []); // <-- Mảng phụ thuộc rỗng để đảm bảo chỉ chạy một lần
 
   const providerValue: AuthContextType = {
     isLoggedIn,
@@ -95,6 +126,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setUserId,
     user,
     setUser,
+    patientProfileId,
+    setPatientProfileId,
+    patientProfile,
+    setPatientProfile,
+    staffProfile,
+    setStaffProfile,
     appointmentsUpdateTrigger,
     setAppointmentsUpdateTrigger,
     appointments,

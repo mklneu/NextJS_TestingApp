@@ -9,8 +9,8 @@ import {
 
 export interface TestResult {
   id: number;
-  patient: { id: number; name: string };
-  doctor: { id: number; name: string };
+  patient: { id: number; fullName: string };
+  doctor: { id: number; fullName: string };
   appointment: { id: number };
   status: TestResultStatus;
   testType: string;
@@ -68,12 +68,13 @@ export interface ReviewTestResultBody {
 
 // --- 1. Định nghĩa interface cho các tham số ---
 // Định nghĩa các tham số đầu vào cho việc chia trang và sắp xếp
-interface QueryParams {
+interface TestResultQueryParams {
   page: number; // Số trang hiện tại (bắt đầu từ 1)
   size: number; // Số lượng kết quả trên mỗi trang
   sort?: string; // Chuỗi sắp xếp, ví dụ: "createdAt,desc"
   search?: string; // Thêm: Lọc theo từ khóa tìm kiếm (từ ô input)
   testType?: string; // Thêm: Lọc theo loại xét nghiệm (từ dropdown)
+  hospitalId?: number; // Lọc theo bệnh viện (nếu cần)
   status?: TestResultStatus; // Thêm: Lọc theo trạng thái kết quả xét nghiệm
 }
 
@@ -102,7 +103,7 @@ const requestTestResult = async (body: RequsetTestResult) => {
 };
 
 const getAllTestResults = async (
-  params: QueryParams
+  params: TestResultQueryParams
 ): Promise<PaginatedResponse<TestResult>> => {
   // Giữ nguyên kiểu trả về
   try {
@@ -114,6 +115,10 @@ const getAllTestResults = async (
 
     if (params.sort) {
       apiParams.sort = params.sort;
+    }
+
+    if (params.hospitalId) {
+      apiParams.hospitalId = params.hospitalId;
     }
 
     // 2. Xây dựng mảng các điều kiện lọc (filter)

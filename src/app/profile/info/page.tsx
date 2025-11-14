@@ -40,7 +40,8 @@ const translateGender = (gender: string) => {
 };
 
 const InfoTab = () => {
-  const { userRole, setUser } = useAuth();
+  // Lấy cả `user` từ context
+  const { user, userRole, setUser } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [showEdit, setShowEdit] = useState<boolean>(false);
@@ -49,10 +50,7 @@ const InfoTab = () => {
     if (!profile) return;
     try {
       await updateMyProfile(data);
-      // setProfile(updatedProfile);
-      // setUser(updatedProfile); // Cập nhật context
       await fetchProfile(); // Tải lại hồ sơ sau khi cập nhật
-      // toast.success("Cập nhật thông tin thành công!");
     } catch (error) {
       toast.error("Cập nhật thông tin thất bại.");
       console.error(error);
@@ -60,36 +58,44 @@ const InfoTab = () => {
   };
 
   const fetchProfile = async () => {
-    setLoading(true);
+    // Không cần setLoading ở đây vì nó sẽ được xử lý bởi useEffect
     try {
       const res = await getMyProfile();
       setProfile(res);
       setUser(res); // Cập nhật context
+      console.log("Profile updated in context:", res);
     } catch (error) {
       console.error("Failed to fetch profile:", error);
       toast.error("Không thể tải hồ sơ người dùng.");
-    } finally {
-      setLoading(false);
     }
   };
 
+  // Sửa lại useEffect ở đây
   useEffect(() => {
-    const fetchProfile = async () => {
-      setLoading(true);
-      try {
-        const res = await getMyProfile();
-        setProfile(res);
-        setUser(res); // Cập nhật context
-      } catch (error) {
-        console.error("Failed to fetch profile:", error);
-        toast.error("Không thể tải hồ sơ người dùng.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [setUser]);
+    // Nếu trong context đã có user, dùng nó ngay lập tức
+    if (user) {
+      setProfile(user);
+      setLoading(false);
+    } else {
+      // Nếu không, fetch từ API (trường hợp tải lại trang trực tiếp)
+      const initialFetch = async () => {
+        setLoading(true);
+        try {
+          const res = await getMyProfile();
+          setProfile(res);
+          setUser(res); // Cập nhật context
+        } catch (error) {
+          console.error("Failed to fetch profile:", error);
+          toast.error("Không thể tải hồ sơ người dùng.");
+        } finally {
+          setLoading(false);
+        }
+      };
+      initialFetch();
+    }
+    // Phụ thuộc vào `user` từ context. Khi `user` thay đổi (sau khi update),
+    // nó sẽ tự động cập nhật `profile` của trang này.
+  }, [user, setUser]);
 
   if (loading) {
     return (
@@ -241,7 +247,7 @@ const InfoTab = () => {
           <InfoItem
             icon={<FaHospital size={20} color="#14b8a6" />}
             label="Bệnh viện"
-            value={s.hospital.name}
+            value={s.hospital?.name}
           />
         </div>
       </div>

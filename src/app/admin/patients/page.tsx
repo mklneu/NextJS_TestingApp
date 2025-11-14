@@ -5,11 +5,11 @@ import { toast } from "react-toastify";
 import AddNewUserModal from "@/components/Users/AddUser.Modal";
 import UpdateUserModal from "@/components/Users/UpdateUser.Modal";
 import { AxiosError } from "axios";
-import { getAllHospitals } from "@/services/HospitalServices";
+import { getAllHospitals, Hospital } from "@/services/HospitalServices";
 import { formatDateToDMY, Pagination } from "@/services/OtherServices";
 import { deletePatientById, getAllPatients } from "@/services/PatientServices";
 import Button from "@/components/Button";
-import { ErrorResponse, Hospital, resUser } from "@/types/frontend";
+import { ErrorResponse, resUser } from "@/types/frontend";
 import { roleOptions } from "@/services/RoleServices";
 import { translateRole } from "@/utils/translateEnums";
 

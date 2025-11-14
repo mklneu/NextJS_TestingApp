@@ -22,6 +22,7 @@ import {
   TestResult,
 } from "@/services/TestResultServices";
 import { translateTestType } from "@/utils/translateEnums";
+import { ErrorResponse } from "@/types/frontend";
 
 const CreatePrescriptionPage = () => {
   const router = useRouter();
@@ -42,9 +43,7 @@ const CreatePrescriptionPage = () => {
   ]);
   const [diagnosis, setDiagnosis] = useState("");
   const [advice, setAdvice] = useState("");
-  const [prescriptionDate, setPrescriptionDate] = useState(
-    getInitialGmt7Time()
-  );
+  const prescriptionDate = getInitialGmt7Time();
 
   // --- THÊM CÁC STATE NÀY ---
   const [availableTestResults, setAvailableTestResults] = useState<
@@ -355,7 +354,8 @@ const CreatePrescriptionPage = () => {
                   id="prescriptionDate"
                   name="prescriptionDate"
                   value={prescriptionDate}
-                  onChange={(e) => setPrescriptionDate(e.target.value)}
+                  // onChange={(e) => setPrescriptionDate(e.target.value)}
+                  readOnly
                   className="bg-white border
                 border-gray-300 outline-none h-[45px]
                 text-gray-900 text-sm rounded-lg 
@@ -443,8 +443,10 @@ const CreatePrescriptionPage = () => {
                           required
                         />
                         {activeIndex === index && (
-                          <div className="absolute z-10 w-full 
-                          bg-white rounded-lg mt-1 max-h-50 overflow-y-auto shadow-lg">
+                          <div
+                            className="absolute z-10 w-full 
+                          bg-white rounded-lg mt-1 max-h-50 overflow-y-auto shadow-lg"
+                          >
                             {medicineSearchResults.length > 0 ? (
                               // 1. CÓ KẾT QUẢ: Hiển thị danh sách
                               medicineSearchResults.map((result) => (
@@ -583,7 +585,7 @@ const CreatePrescriptionPage = () => {
                 >
                   Hủy
                 </Button>
-                <Button isLoading={loading} variant="green" size="sm">
+                <Button type="submit" isLoading={loading} variant="green" size="sm">
                   {loading ? "Đang lưu..." : "Lưu đơn thuốc"}
                 </Button>
               </div>

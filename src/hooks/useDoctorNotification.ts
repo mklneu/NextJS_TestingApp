@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { AxiosError } from "axios";
+import { ErrorResponse } from "@/types/frontend";
 
 // Kiểu dữ liệu thông báo lịch hẹn
 export interface AppointmentNotificationData {

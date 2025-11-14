@@ -28,7 +28,7 @@ import { bookAppointment } from "@/services/AppointmentServices";
 
 export default function BookingPage() {
   const router = useRouter();
-  const { user, isLoggedIn, userRole } = useAuth();
+  const { isLoggedIn, userRole, userId, patientProfile } = useAuth();
 
   // States for the new booking flow
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
@@ -55,6 +55,13 @@ export default function BookingPage() {
   // const [appointmentType, setAppointmentType] = useState("KHAM_CHUYEN_KHOA");
 
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Khi `user` không còn là null (tức là đã tải xong), cuộn lên đầu.
+    if (patientProfile) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [patientProfile]); // Phụ thuộc vào `user`
 
   // --- Authorization Effect ---
   useEffect(() => {
@@ -114,6 +121,7 @@ export default function BookingPage() {
     setSelectedDate("");
     setAvailableTimeSlots([]);
     setSelectedTimeSlotId(null);
+    // console.log("user:", user);
 
     if (selectedHospitalId && selectedSpecialtyId) {
       const fetchDates = async () => {
@@ -162,7 +170,7 @@ export default function BookingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user?.id || !selectedTimeSlotId) {
+    if (!patientProfile || !selectedTimeSlotId) {
       toast.error(
         "Vui lòng chọn đầy đủ thông tin bệnh viện, chuyên khoa, ngày và giờ khám."
       );
@@ -173,7 +181,7 @@ export default function BookingPage() {
     try {
       const body = {
         appointmentId: selectedTimeSlotId,
-        patientId: user.id,
+        patientId: patientProfile.profileId,
         patientNote: patientNote,
       };
 
@@ -191,10 +199,16 @@ export default function BookingPage() {
     }
   };
 
-  if (userRole === null) {
+  // Sửa ở đây: Chặn render cho đến khi có đầy đủ thông tin user
+  if (userRole === null || isLoggedIn === null || userId === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Đang tải...</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center">
+          <p className="text-lg font-semibold text-gray-600">
+            Đang tải thông tin người dùng...
+          </p>
+          <p className="text-sm text-gray-500">Vui lòng chờ trong giây lát.</p>
+        </div>
       </div>
     );
   }
@@ -212,7 +226,7 @@ export default function BookingPage() {
               <label className="block font-semibold mb-2 text-gray-700">
                 Bệnh nhân
               </label>
-              <InputBar type="text" value={user?.fullName || ""} disabled />
+              <InputBar type="text" value={patientProfile?.fullName || ""} disabled />
             </div>
             <div>
               <label
@@ -313,9 +327,9 @@ export default function BookingPage() {
                   {/* Lặp qua từng nhóm bác sĩ */}
                   {availableTimeSlots.map((doctorGroup) => (
                     <div key={doctorGroup.doctorId}>
-                      <h4 className="font-semibold text-gray-800 mb-2">
+                      {/* <h4 className="font-semibold text-gray-800 mb-2">
                         {doctorGroup.groupName}
-                      </h4>
+                      </h4> */}
                       {/* Hiển thị các khung giờ của bác sĩ đó */}
                       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                         {doctorGroup.timeSlots.map((slot) => (

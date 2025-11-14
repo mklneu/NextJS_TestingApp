@@ -125,6 +125,7 @@ const UpdateInfoModal = ({
           specificFields = {
             employeeId: s.employeeId || "",
             department: s.department || "",
+            hospitalId: s.hospital?.id || "",
           };
           try {
             // Chỉ cần tải danh sách bệnh viện ở đây

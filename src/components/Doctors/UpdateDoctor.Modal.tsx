@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import Button from "../Button";
 import InputBar from "../Input";
-import { getDoctorById, updateDoctor } from "@/services/DoctorServices"; // 1. Import API services
+import {
+  DoctorProfile,
+  getDoctorById,
+  updateDoctor,
+} from "@/services/DoctorServices"; // 1. Import API services
 
 interface IUpdateModalProps {
   show: boolean;
@@ -13,19 +17,18 @@ interface IUpdateModalProps {
 }
 
 // 2. Sử dụng một state object để quản lý dữ liệu
-const initialDoctorState: Partial<Doctor> = {
+const initialDoctorState: Partial<DoctorProfile> = {
   fullName: "",
-  specialty: "",
   email: "",
   username: "",
   dob: "",
   phoneNumber: "",
   address: "",
-  price: 0,
   experienceYears: 0,
   gender: "MALE",
   // status: "ACTIVE",
-  hospital: { id: 0 },
+  hospital: { id: 0, name: "" },
+  specialty: { id: 0, specialtyName: "", description: "" },
 };
 
 // 1. Định nghĩa map chuyên khoa
@@ -61,7 +64,7 @@ const UpdateDoctorModal = (props: IUpdateModalProps) => {
   const { show, setShow, onUpdate, doctorId, setDoctorId } = props;
 
   const [doctorData, setDoctorData] =
-    useState<Partial<Doctor>>(initialDoctorState);
+    useState<Partial<DoctorProfile>>(initialDoctorState);
   const [loading, setLoading] = useState(false);
 
   // 3. Xóa mảng options cũ đã được hardcode
@@ -185,7 +188,7 @@ const UpdateDoctorModal = (props: IUpdateModalProps) => {
                 <InputBar
                   type="select"
                   label="Chuyên khoa"
-                  value={doctorData.specialty || ""}
+                  value={doctorData.specialty?.id || ""}
                   placeholder="Chọn chuyên khoa"
                   onChange={handleInputChange}
                   options={specializationOptions} // Sử dụng options mới

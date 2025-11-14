@@ -67,8 +67,8 @@ const MedicalTab = () => {
       try {
         setLoading(true);
         const [testResultsData, prescriptionsData] = await Promise.all([
-          getTestResultsByPatientId(user.id),
-          getPrescriptionsByPatientId(user.id),
+          getTestResultsByPatientId(user.profileId),
+          getPrescriptionsByPatientId(user.profileId),
         ]);
 
         console.log("Fetched test results:", testResultsData);
@@ -154,7 +154,7 @@ const MedicalTab = () => {
                     </h3>
                     <div className="text-sm text-gray-500 mt-2 flex items-center gap-2">
                       <FaStethoscope />
-                      <span>BS. {result.doctor.name || "N/A"}</span>
+                      <span>BS. {result.doctor.fullName || "N/A"}</span>
                     </div>
                     <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
                       <FaCalendarAlt />
@@ -243,7 +243,7 @@ const MedicalTab = () => {
               </p>
               <p>
                 <strong>Bác sĩ chỉ định:</strong> BS.{" "}
-                {selectedResult.doctor.name || "N/A"}
+                {selectedResult.doctor.fullName || "N/A"}
               </p>
               <div className="p-3 bg-gray-50 rounded-md mt-2">
                 <p className="font-semibold">Kết luận chung:</p>

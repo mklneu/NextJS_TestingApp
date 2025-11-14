@@ -10,17 +10,20 @@ import {
   FaBirthdayCake,
   FaEye,
   FaEyeSlash,
+  FaPhoneAlt,
+  FaIdCard,
+  FaShieldAlt,
+  FaHeartbeat,
+  FaFileMedical,
+  FaUserShield,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import { register } from "@/services/AuthServices";
-
-const genderList = [
-  { value: "", label: "Chọn giới tính" },
-  { value: "MALE", label: "Nam" },
-  { value: "FEMALE", label: "Nữ" },
-  { value: "OTHER", label: "Khác" },
-];
+import InputBar from "@/components/Input";
+import { bloodTypeOptions, genderOptions } from "@/utils/map";
+import { AxiosError } from "axios";
+import { ErrorResponse, Gender } from "@/types/frontend";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -32,6 +35,13 @@ export default function RegisterPage() {
     gender: "",
     address: "",
     dob: "",
+    phoneNumber: "",
+    citizenId: "",
+    insuranceId: "",
+    bloodType: "",
+    medicalHistorySummary: "",
+    emergencyContactName: "",
+    emergencyContactPhone: "",
   });
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
@@ -39,25 +49,37 @@ export default function RegisterPage() {
   const router = useRouter();
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const validate = () => {
-    if (
-      !form.username ||
-      !form.email ||
-      !form.fullName ||
-      !form.password ||
-      !form.confirmPassword ||
-      !form.gender ||
-      !form.address ||
-      !form.dob
-    ) {
-      toast.error("Vui lòng nhập đầy đủ thông tin!");
-      return false;
+    // Kiểm tra các trường bắt buộc
+    const requiredFields = {
+      username: "Tên đăng nhập",
+      email: "Email",
+      fullName: "Họ và tên",
+      password: "Mật khẩu",
+      confirmPassword: "Nhập lại mật khẩu",
+      gender: "Giới tính",
+      address: "Địa chỉ",
+      dob: "Ngày sinh",
+      phoneNumber: "Số điện thoại",
+      citizenId: "Số CCCD",
+      emergencyContactName: "Người liên hệ khẩn cấp",
+      emergencyContactPhone: "SĐT liên hệ khẩn cấp",
+    };
+
+    for (const [key, label] of Object.entries(requiredFields)) {
+      if (!form[key as keyof typeof form]) {
+        toast.error(`Vui lòng nhập ${label}!`);
+        return false;
+      }
     }
+
     if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(form.email)) {
       toast.error("Email không hợp lệ!");
       return false;
@@ -74,18 +96,16 @@ export default function RegisterPage() {
     if (!validate()) return;
     setLoading(true);
     try {
-      await register(
-        form.username,
-        form.email,
-        form.fullName,
-        form.password,
-        form.gender,
-        form.address,
-        form.dob
-      );
+      // Truyền toàn bộ object form vào hàm register, ép kiểu trường gender về kiểu mong đợi
+      await register({
+        ...form,
+        gender: form.gender as Gender,
+      });
+      // toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
       router.push("/login");
     } catch (error) {
-      //   toast.error(error?.response?.data?.message || "Đăng ký thất bại!");
+      const err = error as AxiosError<ErrorResponse>;
+      toast.error(err?.response?.data?.message || "Đăng ký thất bại!");
       console.error("Lỗi đăng ký:", error);
     } finally {
       setLoading(false);
@@ -93,149 +113,197 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-[90vh] items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300 p-2">
-      <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl border border-blue-100">
-        <h1 className="mb-1 text-center text-blue-700 text-3xl font-extrabold tracking-tight">
-          Đăng ký tài khoản
+    <div className="flex min-h-[90vh] items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300 p-4">
+      <div className="w-full max-w-[90vw] rounded-2xl bg-white py-8 px-10 shadow-2xl border border-blue-100">
+        <h1 className="mb-2 text-center text-blue-700 text-3xl font-extrabold tracking-tight">
+          Đăng ký tài khoản Bệnh nhân
         </h1>
-        <p className="mb-4 text-center text-gray-500 text-sm">
+        <p className="mb-6 text-center text-gray-500 text-sm">
           Tạo tài khoản mới để sử dụng{" "}
           <span className="font-semibold text-blue-600">SmartHealth</span>
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="relative">
-              <FaUser className="absolute left-3 top-3.5 text-blue-400 text-lg" />
-              <input
-                type="text"
-                name="username"
-                placeholder="Tên đăng nhập"
-                value={form.username}
-                className="h-12 pl-10 pr-10 py-3 w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-gray-700 transition"
-                onChange={handleChange}
-                disabled={loading}
-                autoFocus
-              />
-            </div>
-            <div className="relative">
-              <FaUser className="absolute left-3 top-3.5 text-blue-400 text-lg" />
-              <input
-                type="text"
-                name="fullName"
-                placeholder="Họ và tên"
-                value={form.fullName}
-                className="h-12 pl-10 pr-10 py-3 w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-gray-700 transition"
-                onChange={handleChange}
-                disabled={loading}
-              />
-            </div>
-            <div className="relative">
-              <FaEnvelope className="absolute left-3 top-3.5 text-blue-400 text-lg" />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={form.email}
-                className="h-12 pl-10 pr-10 py-3 w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-gray-700 transition"
-                onChange={handleChange}
-                disabled={loading}
-              />
-            </div>
-            <div className="relative">
-              <FaBirthdayCake className="absolute left-3 top-3.5 text-blue-400 text-lg" />
-              <input
-                type="date"
-                name="dob"
-                placeholder="Ngày sinh"
-                value={form.dob}
-                className="h-12 pl-10 pr-2 py-3 w-full 
-                rounded-lg border border-gray-300 
-                focus:border-blue-500 focus:ring-2 
-                focus:ring-blue-100 outline-none text-gray-700 transition"
-                onChange={handleChange}
-                disabled={loading}
-              />
-            </div>
-            <div className="relative">
-              <FaLock className="absolute left-3 top-3.5 text-blue-400 text-lg" />
-              <input
-                type={showPass ? "text" : "password"}
-                name="password"
-                placeholder="Mật khẩu"
-                value={form.password}
-                className="h-12 pl-10 pr-10 py-3 w-full rounded-lg border
-                 border-gray-300 focus:border-blue-500 focus:ring-2
-                  focus:ring-blue-100 outline-none text-gray-700 transition"
-                onChange={handleChange}
-                disabled={loading}
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-4 cursor-pointer text-blue-400 hover:text-blue-600"
-                tabIndex={-1}
-                onClick={() => setShowPass((v) => !v)}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
+            {/* --- Thông tin tài khoản --- */}
+            <div>
+              <h3
+                className="lg:col-span-2 text-lg border-green-400
+              font-semibold text-green-600 my-4 border-b pb-2"
               >
-                {showPass ? <FaEyeSlash /> : <FaEye />}
-              </button>
+                Thông tin tài khoản
+              </h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-3">
+                <InputBar
+                  placeholder="Tên đăng nhập"
+                  name="username"
+                  value={form.username}
+                  onChange={handleChange}
+                  disabled={loading}
+                  icon={<FaUser />}
+                  autoFocus
+                />
+                <InputBar
+                  placeholder="Email"
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  disabled={loading}
+                  icon={<FaEnvelope />}
+                />
+                <InputBar
+                  placeholder="Mật khẩu"
+                  name="password"
+                  type={showPass ? "text" : "password"}
+                  value={form.password}
+                  onChange={handleChange}
+                  disabled={loading}
+                  icon={<FaLock />}
+                  rightIcon={showPass ? <FaEyeSlash /> : <FaEye />}
+                  onRightIconClick={() => setShowPass((v) => !v)}
+                />
+                <InputBar
+                  placeholder="Nhập lại mật khẩu"
+                  name="confirmPassword"
+                  type={showConfirmPass ? "text" : "password"}
+                  value={form.confirmPassword}
+                  onChange={handleChange}
+                  disabled={loading}
+                  icon={<FaLock />}
+                  rightIcon={showConfirmPass ? <FaEyeSlash /> : <FaEye />}
+                  onRightIconClick={() => setShowConfirmPass((v) => !v)}
+                />
+              </div>
             </div>
 
-            <div className="relative">
-              <FaLock className="absolute left-3 top-3.5 text-blue-400 text-lg" />
-              <input
-                type={showConfirmPass ? "text" : "password"}
-                name="confirmPassword"
-                placeholder="Nhập lại mật khẩu"
-                value={form.confirmPassword}
-                className="h-12 pl-10 pr-10 py-3 w-full rounded-lg border
-                 border-gray-300 focus:border-blue-500 focus:ring-2
-                  focus:ring-blue-100 outline-none text-gray-700 transition"
-                onChange={handleChange}
-                disabled={loading}
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-4 cursor-pointer text-blue-400 hover:text-blue-600"
-                tabIndex={-1}
-                onClick={() => setShowConfirmPass((v) => !v)}
+            {/* --- Thông tin cá nhân --- */}
+            <div>
+              <h3
+                className="lg:col-span-2 text-lg border-green-400
+              font-semibold text-green-600 my-4 border-b pb-2"
               >
-                {showConfirmPass ? <FaEyeSlash /> : <FaEye />}
-              </button>
+                Thông tin cá nhân
+              </h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-3">
+                <InputBar
+                  placeholder="Họ và tên"
+                  name="fullName"
+                  value={form.fullName}
+                  onChange={handleChange}
+                  disabled={loading}
+                  icon={<FaUser />}
+                />
+                <InputBar
+                  placeholder="Số điện thoại"
+                  name="phoneNumber"
+                  value={form.phoneNumber}
+                  onChange={handleChange}
+                  disabled={loading}
+                  icon={<FaPhoneAlt />}
+                />
+                <InputBar
+                  placeholder="Ngày sinh"
+                  name="dob"
+                  type="date"
+                  value={form.dob}
+                  onChange={handleChange}
+                  disabled={loading}
+                  icon={<FaBirthdayCake />}
+                />
+                <InputBar
+                  placeholder="Giới tính"
+                  name="gender"
+                  type="select"
+                  value={form.gender}
+                  onChange={handleChange}
+                  disabled={loading}
+                  icon={<FaVenusMars />}
+                  options={genderOptions}
+                />
+                <InputBar
+                  placeholder="Số CCCD"
+                  name="citizenId"
+                  value={form.citizenId}
+                  onChange={handleChange}
+                  disabled={loading}
+                  icon={<FaIdCard />}
+                />
+                <div className="lg:col-span-2">
+                  <InputBar
+                    placeholder="Địa chỉ"
+                    name="address"
+                    value={form.address}
+                    onChange={handleChange}
+                    disabled={loading}
+                    icon={<FaMapMarkerAlt />}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="relative">
-              <FaVenusMars className="absolute left-3 top-3.5 text-blue-400 text-lg" />
-              <select
-                name="gender"
-                value={form.gender}
-                className="h-12 appearance-none pl-10 pr-3 py-3 w-full rounded-lg border
-                  border-gray-300 focus:border-blue-500 focus:ring-2
-                  focus:ring-blue-100 outline-none text-gray-700 transition"
-                onChange={handleChange}
-                disabled={loading}
+            {/* --- Thông tin y tế --- */}
+            <div>
+              <h3
+                className="lg:col-span-2 text-lg border-green-400
+              font-semibold text-green-600 my-4 border-b pb-2"
               >
-                {genderList.map((item) => (
-                  <option key={item.value} value={item.value}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="relative">
-              <FaMapMarkerAlt className="absolute left-3 top-3.5 text-blue-400 text-lg" />
-              <input
-                type="text"
-                name="address"
-                placeholder="Địa chỉ"
-                value={form.address}
-                className="h-12 pl-10 pr-10 py-3 w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-gray-700 transition"
-                onChange={handleChange}
-                disabled={loading}
-              />
+                Thông tin y tế & Khẩn cấp
+              </h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-3">
+                <InputBar
+                  placeholder="Số BHYT"
+                  name="insuranceId"
+                  value={form.insuranceId}
+                  onChange={handleChange}
+                  disabled={loading}
+                  icon={<FaShieldAlt />}
+                />
+                <InputBar
+                  placeholder="Nhóm máu (nếu biết)"
+                  name="bloodType"
+                  type="select"
+                  value={form.bloodType}
+                  onChange={handleChange}
+                  disabled={loading}
+                  icon={<FaHeartbeat />}
+                  options={bloodTypeOptions.map((option) => ({
+                    label: option.label,
+                    value: option.value,
+                  }))}
+                />
+                <div className="lg:col-span-2">
+                  <InputBar
+                    placeholder="Tiền sử bệnh án (tóm tắt)"
+                    name="medicalHistorySummary"
+                    type="textarea"
+                    value={form.medicalHistorySummary}
+                    onChange={handleChange}
+                    disabled={loading}
+                    icon={<FaFileMedical />}
+                  />
+                </div>
+                <InputBar
+                  placeholder="Người liên hệ khẩn cấp"
+                  name="emergencyContactName"
+                  value={form.emergencyContactName}
+                  onChange={handleChange}
+                  disabled={loading}
+                  icon={<FaUserShield />}
+                />
+                <InputBar
+                  placeholder="SĐT liên hệ khẩn cấp"
+                  name="emergencyContactPhone"
+                  value={form.emergencyContactPhone}
+                  onChange={handleChange}
+                  disabled={loading}
+                  icon={<FaPhoneAlt />}
+                />
+              </div>
             </div>
           </div>
           <button
             type="submit"
-            className={`w-full py-3 rounded-lg font-bold text-white cursor-pointer
+            className={`w-full py-3 mt-6 rounded-lg font-bold text-white cursor-pointer
                  bg-blue-600 hover:bg-blue-700 transition duration-200 shadow-lg ${
                    loading ? "opacity-70 cursor-not-allowed" : ""
                  }`}
@@ -269,7 +337,7 @@ export default function RegisterPage() {
             )}
           </button>
         </form>
-        <div className="mt-4 text-center text-sm text-gray-400">
+        <div className="mt-6 text-center text-sm text-gray-500">
           Đã có tài khoản?{" "}
           <Link
             href="/login"

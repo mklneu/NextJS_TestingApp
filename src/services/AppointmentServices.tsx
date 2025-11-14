@@ -41,7 +41,7 @@ interface AxiosRequestParams {
 
 interface BookingAppointmentBody {
   appointmentId: number;
-  patientId: number;
+  patientId: number | null;
   patientNote: string;
 }
 

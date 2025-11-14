@@ -16,6 +16,7 @@ import {
   translateTestType,
 } from "@/utils/translateEnums";
 import Button from "@/components/Button";
+import { useAuth } from "@/contexts/AuthContext"; // 1. Import useAuth
 
 // Component Badge cho trạng thái
 const StatusBadge = ({ status }: { status: TestResultStatus }) => {
@@ -37,6 +38,7 @@ const StatusBadge = ({ status }: { status: TestResultStatus }) => {
 };
 
 const LabDashboardPage = () => {
+  const { staffProfile } = useAuth(); // 2. Lấy user từ context
   const router = useRouter();
   const [allTestResults, setAllTestResults] = useState<TestResult[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,8 +46,9 @@ const LabDashboardPage = () => {
   const [statusFilter, setStatusFilter] = useState<TestResultStatus | "ALL">(
     "ALL"
   );
-
   const [sortOrder, setSortOrder] = useState<string>("testTime,desc");
+
+  // const [staff, setStaff] = useState<StaffProfile | null>(null); // Sửa: Khởi tạo là null
 
   // Pagination State
   const [total, setTotal] = useState(0);
@@ -53,8 +56,18 @@ const LabDashboardPage = () => {
   const [totalPages, setTotalPages] = useState(0);
   const itemsPerPage = 7;
 
+  // 3. Thêm useEffect để set staff khi có thông tin user
+  // useEffect(() => {
+  //   if (user && userRole === "staff") {
+  //     setStaff(user as StaffProfile);
+  //   }
+  // }, [user, userRole]);
+
   // Fetch all test results
   useEffect(() => {
+    // Thêm điều kiện: chỉ fetch khi đã có thông tin staff
+    if (!staffProfile) return;
+
     const fetchTestResults = async () => {
       setLoading(true);
       try {
@@ -64,6 +77,7 @@ const LabDashboardPage = () => {
           sort: sortOrder,
           search: searchTerm,
           testType: "",
+          hospitalId: staffProfile.hospital?.id, // Bây giờ sẽ có giá trị
           status: statusFilter === "ALL" ? undefined : statusFilter,
         };
         const res = await getAllTestResults(params);
@@ -78,7 +92,7 @@ const LabDashboardPage = () => {
       }
     };
     fetchTestResults();
-  }, [currentPage, sortOrder, statusFilter, searchTerm]);
+  }, [currentPage, sortOrder, statusFilter, searchTerm, staffProfile]);
 
   // Reset to page 1 when filters change
   useEffect(() => {
@@ -254,10 +268,10 @@ const LabDashboardPage = () => {
                           {formatAppointmentDate(result.testTime)}
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-gray-700">
-                          {result.patient.name}
+                          {result.patient.fullName}
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-gray-700">
-                          {result.doctor.name}
+                          {result.doctor.fullName}
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-center text-gray-700">
                           {translateTestType(result.testType)}

@@ -185,7 +185,7 @@ const createDoctor = async (doctorData: Omit<Doctor, "id">) => {
 // Cập nhật thông tin bác sĩ
 const updateDoctor = async (
   doctorId: number,
-  doctorData: Partial<Omit<Doctor, "id">>
+  doctorData: Partial<Omit<DoctorProfile, "id">>
 ) => {
   try {
     const response = await axiosInstance.put(
