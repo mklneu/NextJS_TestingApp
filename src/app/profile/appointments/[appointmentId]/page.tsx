@@ -770,23 +770,37 @@ const ExaminationDetailPage = () => {
       {/* --- MODAL LỊCH SỬ KHÁM BỆNH --- */}
       {isHistoryModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl h-[90vh] flex flex-col overflow-auto">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden">
             {/* Header Modal */}
-            <div className="flex justify-between items-center p-6 border-b">
-              <h2 className="text-2xl font-bold text-sky-700 flex items-center gap-2">
-                <FaHistory /> Lịch sử khám bệnh: {otherPartyApp?.fullName}
-              </h2>
+            <div className="flex justify-between items-center px-6 py-4 bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-teal-50 rounded-full text-teal-600 border border-teal-100">
+                  <FaHistory size={24} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-slate-800 uppercase tracking-wide">
+                    Lịch sử khám bệnh
+                  </h2>
+                  <p className="text-slate-500 text-sm flex items-baseline gap-1">
+                    Bệnh nhân:
+                    <span className="font-bold text-slate-600 text-base">
+                      {otherPartyApp?.fullName}
+                    </span>
+                  </p>
+                </div>
+              </div>
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={() => setIsHistoryModalOpen(false)}
+                className="hover:bg-slate-100 text-slate-600 border-slate-300"
               >
-                Đóng
+                Đóng cửa sổ
               </Button>
             </div>
 
             {/* Body Modal */}
-            <div className="flex-grow overflow-y-auto p-6 bg-gray-50">
+            <div className="flex-grow overflow-y-auto p-6 bg-gray-50 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {loadingHistory ? (
                 <div className="flex justify-center items-center h-40">
                   <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-blue-500"></div>
@@ -799,30 +813,40 @@ const ExaminationDetailPage = () => {
                       className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden"
                     >
                       {/* Header của từng lần khám */}
-                      <div className="bg-blue-50 p-4 border-b border-blue-100 flex justify-between items-start">
-                        <div>
-                          <p className="font-bold text-lg text-blue-800 flex items-baseline gap-2">
-                            <FaUserDoctor className="text-blue-500" /> BS.{" "}
-                            {item.doctorName} - {item.hospitalName}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {formatAppointmentDate(item.visitDate)}
-                          </p>
+                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-5 border-b border-slate-100 bg-white">
+                        <div className="flex gap-4 items-center">
+                          <div className="h-12 w-12 rounded-full bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-600 font-bold text-lg">
+                            BS
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-lg text-slate-800">
+                              {item.doctorName}
+                            </h3>
+                            <p className="text-sm text-slate-500">
+                              {item.hospitalName}
+                            </p>
+                          </div>
                         </div>
-                        <span className="px-3 py-1 bg-white text-blue-600 text-xs font-bold rounded-full border border-blue-200">
-                          #{item.appointmentId}
-                        </span>
+                        <div className="mt-3 md:mt-0 flex flex-col items-end">
+                          <div className="flex items-center gap-2 text-slate-700 font-semibold bg-slate-50 px-3 py-1 rounded-md border border-slate-200">
+                            <FaCalendarCheck className="text-teal-500" />
+                            {formatAppointmentDate(item.visitDate)}
+                          </div>
+                          <span className="text-xs text-slate-400 mt-1">
+                            Mã hồ sơ: #{item.appointmentId}
+                          </span>
+                        </div>
                       </div>
 
                       {/* Nội dung chi tiết */}
-                      <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Cột trái: Chẩn đoán & Ghi chú */}
                         <div className="space-y-3">
                           <div>
                             <p className="text-sm font-semibold text-gray-500 uppercase">
                               Chẩn đoán
                             </p>
-                            <p className="text-gray-800 font-medium">
+                            <p className="text-gray-700 font-bold bg-gray-50 p-2 rounded border border-gray-100 text-sm">
                               {item.diagnosis || "Chưa có chẩn đoán"}
                             </p>
                           </div>
@@ -928,7 +952,7 @@ const ExaminationDetailPage = () => {
                                     {/* Kết luận chung */}
                                     <div className="mb-1">
                                       <span className="font-semibold text-xs text-gray-600">
-                                        KL:{" "}
+                                        Kết luận:{" "}
                                       </span>
                                       <span
                                         className={`text-xs ${
