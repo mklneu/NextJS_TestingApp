@@ -297,6 +297,9 @@ const TestResultDetailPage = () => {
       setEditableData(JSON.parse(JSON.stringify(updatedResult)));
       setNewFile(null);
       setIsEditing(false);
+
+      router.back();
+
     } catch (error) {
       const err = error as AxiosError<ErrorResponse>;
       console.error("Error updating test result:", err.message);

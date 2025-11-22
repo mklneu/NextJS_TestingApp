@@ -72,7 +72,7 @@ const IndicateTestResultPage = () => {
 
   return (
     <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-1 cursor-pointer

@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAppointmentByDoctorId } from "@/services/AppointmentServices";
-import {
-  formatAppointmentDate
-} from "@/services/OtherServices";
+import { formatAppointmentDate } from "@/services/OtherServices";
 import { FaUserClock, FaSearch } from "react-icons/fa";
 import Link from "next/link";
 import { toast } from "react-toastify";
@@ -106,10 +104,10 @@ const ExaminationsPage = () => {
                     </div>
                     <div className="text-center sm:text-right">
                       <p className="font-semibold text-blue-600">
+                        {app.appointmentTime} -{" "}
                         {formatAppointmentDate(app.appointmentDate)}
                       </p>
                       <p className="text-sm text-gray-500">
-                        
                         {translateAppointmentType(app.appointmentType)}
                       </p>
                     </div>

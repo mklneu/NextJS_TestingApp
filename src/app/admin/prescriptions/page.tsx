@@ -191,10 +191,10 @@ const AdminPrescriptionsPage = () => {
                         {formatAppointmentDate(p.prescriptionDate)}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-gray-700">
-                        {p.patient.name}
+                        {p.patient.fullName}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-gray-700">
-                        {p.doctor.name}
+                        {p.doctor.fullName}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-center">
                         <button

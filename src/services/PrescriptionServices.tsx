@@ -27,8 +27,8 @@ export interface PrescriptionItemBody {
 // Dữ liệu trả về hoàn chỉnh cho một đơn thuốc
 export interface Prescription {
   id: number;
-  patient: { id: number; name: string };
-  doctor: { id: number; name: string };
+  patient: { id: number; fullName: string };
+  doctor: { id: number; fullName: string };
   appointment: { id: number };
   prescriptionDate: string;
   diagnosis: string;

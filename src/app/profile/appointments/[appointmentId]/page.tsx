@@ -9,11 +9,14 @@ import {
   FaNotesMedical,
   FaFileMedicalAlt, // Icon mới
   FaChevronUp,
+  FaHistory,
 } from "react-icons/fa";
 import {
   completeAppointment,
   CompleteAppointmentBody,
   getAppointmentById,
+  getPatientHistory, // Import hàm mới
+  AppointmentHistory, // Import type mới
 } from "@/services/AppointmentServices";
 import { AxiosError } from "axios";
 import { getPatientById } from "@/services/PatientServices";
@@ -26,6 +29,7 @@ import { FaPlus, FaPrescriptionBottle, FaUserDoctor } from "react-icons/fa6";
 import { IoIosArrowBack } from "react-icons/io";
 // 1. Import service và type mới
 import {
+  detailedTestItems,
   getTestResultsByAppointmentId,
   TestResult,
 } from "@/services/TestResultServices";
@@ -33,6 +37,7 @@ import Button from "@/components/Button";
 import {
   getPrescriptionsByAppointmentId,
   Prescription,
+  PrescriptionItemResponse,
 } from "@/services/PrescriptionServices";
 import { useAuth } from "@/contexts/AuthContext";
 import { getDoctorById } from "@/services/DoctorServices";
@@ -75,6 +80,11 @@ const ExaminationDetailPage = () => {
   const [doctorNote, setDoctorNote] = useState("");
   const [isCompleting, setIsCompleting] = useState(false);
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
+
+  // --- THÊM STATE CHO LỊCH SỬ ---
+  const [historyList, setHistoryList] = useState<AppointmentHistory[]>([]);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   useEffect(() => {
     if (!appointmentId) return;
@@ -224,6 +234,26 @@ const ExaminationDetailPage = () => {
     );
   }
 
+  // --- HÀM XỬ LÝ XEM LỊCH SỬ ---
+  const handleViewHistory = async () => {
+    if (!appointment?.patient?.id) return;
+
+    setIsHistoryModalOpen(true);
+    // Nếu đã có dữ liệu rồi thì không fetch lại để tiết kiệm API (tùy chọn)
+    if (historyList.length > 0) return;
+
+    setLoadingHistory(true);
+    try {
+      const data = await getPatientHistory(appointment.patient.id);
+      setHistoryList(data);
+    } catch (error) {
+      console.error("Lỗi lấy lịch sử:", error);
+      toast.error("Không thể tải lịch sử khám bệnh.");
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
   return (
     <div className="p-4 md:p-8 bg-gray-50 min-h-screen w-full">
       <div>
@@ -284,6 +314,17 @@ const ExaminationDetailPage = () => {
                 - {appointment.doctorNote}
               </p>
             </div>
+          )}
+          {/* --- THÊM NÚT XEM LỊCH SỬ TẠI ĐÂY --- */}
+          {userRole === "doctor" && (
+            <Button
+              onClick={handleViewHistory}
+              variant="white"
+              className="mt-4 w-full border-blue-200 text-blue-600 hover:bg-blue-50"
+              icon={<FaHistory />}
+            >
+              Lịch sử khám bệnh
+            </Button>
           )}
         </div>
 
@@ -618,9 +659,7 @@ const ExaminationDetailPage = () => {
                         </p>
                         <p className="text-xs text-gray-500">
                           Ngày thực hiện:{" "}
-                          {new Date(result.testTime).toLocaleString(
-                            "vi-VN"
-                          )}
+                          {new Date(result.testTime).toLocaleString("vi-VN")}
                         </p>
                       </div>
                       <div className="absolute -right-2 bottom-2">
@@ -722,6 +761,225 @@ const ExaminationDetailPage = () => {
                 <p className="text-center text-gray-500">
                   Không có kết quả xét nghiệm nào.
                 </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- MODAL LỊCH SỬ KHÁM BỆNH --- */}
+      {isHistoryModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl h-[90vh] flex flex-col overflow-auto">
+            {/* Header Modal */}
+            <div className="flex justify-between items-center p-6 border-b">
+              <h2 className="text-2xl font-bold text-sky-700 flex items-center gap-2">
+                <FaHistory /> Lịch sử khám bệnh: {otherPartyApp?.fullName}
+              </h2>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsHistoryModalOpen(false)}
+              >
+                Đóng
+              </Button>
+            </div>
+
+            {/* Body Modal */}
+            <div className="flex-grow overflow-y-auto p-6 bg-gray-50">
+              {loadingHistory ? (
+                <div className="flex justify-center items-center h-40">
+                  <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-blue-500"></div>
+                </div>
+              ) : historyList.length > 0 ? (
+                <div className="space-y-6">
+                  {historyList.map((item) => (
+                    <div
+                      key={item.appointmentId}
+                      className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden"
+                    >
+                      {/* Header của từng lần khám */}
+                      <div className="bg-blue-50 p-4 border-b border-blue-100 flex justify-between items-start">
+                        <div>
+                          <p className="font-bold text-lg text-blue-800 flex items-baseline gap-2">
+                            <FaUserDoctor className="text-blue-500" /> BS.{" "}
+                            {item.doctorName} - {item.hospitalName}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {formatAppointmentDate(item.visitDate)}
+                          </p>
+                        </div>
+                        <span className="px-3 py-1 bg-white text-blue-600 text-xs font-bold rounded-full border border-blue-200">
+                          #{item.appointmentId}
+                        </span>
+                      </div>
+
+                      {/* Nội dung chi tiết */}
+                      <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Cột trái: Chẩn đoán & Ghi chú */}
+                        <div className="space-y-3">
+                          <div>
+                            <p className="text-sm font-semibold text-gray-500 uppercase">
+                              Chẩn đoán
+                            </p>
+                            <p className="text-gray-800 font-medium">
+                              {item.diagnosis || "Chưa có chẩn đoán"}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-500 uppercase">
+                              Ghi chú lâm sàng
+                            </p>
+                            <p className="text-gray-700 bg-gray-50 p-2 rounded border border-gray-100 text-sm">
+                              {item.clinicalNote || "Không có ghi chú"}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Cột phải: Thuốc & Xét nghiệm */}
+                        <div className="space-y-3 border-l pl-0 md:pl-6 border-gray-100">
+                          {/* Thuốc */}
+                          <div>
+                            <p className="text-sm font-semibold text-gray-500 uppercase flex items-center gap-1">
+                              <FaPrescriptionBottle /> Đơn thuốc (
+                              {item.prescriptions?.length || 0})
+                            </p>
+                            {item.prescriptions &&
+                            item.prescriptions.length > 0 ? (
+                              <div className="mt-2 space-y-3">
+                                {item.prescriptions.map(
+                                  (pres: Prescription) => (
+                                    <div
+                                      key={pres.id}
+                                      className="bg-gray-50 p-2 rounded border border-gray-200 text-sm"
+                                    >
+                                      <div className="flex justify-between font-medium text-gray-800 border-b border-gray-200 pb-1 mb-1">
+                                        <span>{pres.diagnosis}</span>
+                                        <span className="text-green-600">
+                                          {formatTotalCost([pres])}
+                                        </span>
+                                      </div>
+
+                                      {/* Danh sách thuốc chi tiết */}
+                                      {pres.prescriptionItems &&
+                                      pres.prescriptionItems.length > 0 ? (
+                                        <ul className="space-y-1 pl-1">
+                                          {pres.prescriptionItems.map(
+                                            (
+                                              drug: PrescriptionItemResponse
+                                            ) => (
+                                              <li
+                                                key={drug.id}
+                                                className="text-gray-600 text-xs flex justify-between"
+                                              >
+                                                <span>
+                                                  • <b>{drug.medicine?.name}</b>
+                                                  <span className="text-gray-500">
+                                                    {" "}
+                                                    ({drug.quantity} {drug.unit}
+                                                    )
+                                                  </span>
+                                                </span>
+                                                <span className="italic text-gray-500">
+                                                  {'"'}
+                                                  {drug.usageInstructions}
+                                                  {'"'}
+                                                </span>
+                                              </li>
+                                            )
+                                          )}
+                                        </ul>
+                                      ) : (
+                                        <p className="text-xs text-gray-400 italic">
+                                          Không có thuốc chi tiết
+                                        </p>
+                                      )}
+                                    </div>
+                                  )
+                                )}
+                              </div>
+                            ) : (
+                              <p className="text-sm text-gray-400 italic">
+                                Không có đơn thuốc
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Xét nghiệm */}
+                          <div>
+                            <p className="text-sm font-semibold text-gray-500 uppercase flex items-center gap-1">
+                              <FaFileMedicalAlt /> Xét nghiệm (
+                              {item.testResults?.length || 0})
+                            </p>
+                            {item.testResults && item.testResults.length > 0 ? (
+                              <div className="mt-2 space-y-3">
+                                {item.testResults.map((test: TestResult) => (
+                                  <div
+                                    key={test.id}
+                                    className="bg-gray-50 p-2 rounded border border-gray-200 text-sm"
+                                  >
+                                    {/* Header: Loại xét nghiệm */}
+                                    <div className="flex justify-between font-medium text-gray-800 border-b border-gray-200 pb-1 mb-1">
+                                      <span>
+                                        {translateTestType(test.testType)}
+                                      </span>
+                                    </div>
+
+                                    {/* Kết luận chung */}
+                                    <div className="mb-1">
+                                      <span className="font-semibold text-xs text-gray-600">
+                                        KL:{" "}
+                                      </span>
+                                      <span
+                                        className={`text-xs ${
+                                          test.generalConclusion
+                                            ? "text-gray-700"
+                                            : "text-gray-400 italic"
+                                        }`}
+                                      >
+                                        {test.generalConclusion ||
+                                          "Chưa có kết luận"}
+                                      </span>
+                                    </div>
+
+                                    {/* Chi tiết các chỉ số (nếu có) */}
+                                    {test.detailedTestItems &&
+                                    test.detailedTestItems.length > 0 ? (
+                                      <ul className="space-y-1 pl-1 border-t border-gray-100 pt-1 mt-1">
+                                        {test.detailedTestItems.map(
+                                          (detail: detailedTestItems) => (
+                                            <li
+                                              key={detail.id}
+                                              className="text-gray-600 text-xs flex justify-between"
+                                            >
+                                              <span>• {detail.itemName}</span>
+                                              <span className="font-medium">
+                                                {detail.value} {detail.unit}
+                                              </span>
+                                            </li>
+                                          )
+                                        )}
+                                      </ul>
+                                    ) : null}
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-sm text-gray-400 italic">
+                                Không có xét nghiệm
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                  <FaHistory size={48} className="mb-4 opacity-20" />
+                  <p>Bệnh nhân chưa có lịch sử khám bệnh nào.</p>
+                </div>
               )}
             </div>
           </div>

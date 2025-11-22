@@ -7,14 +7,15 @@ import UpdateUserModal from "@/components/Users/UpdateUser.Modal";
 import { AxiosError } from "axios";
 import { getAllHospitals, Hospital } from "@/services/HospitalServices";
 import { formatDateToDMY, Pagination } from "@/services/OtherServices";
-import { deletePatientById, getAllPatients } from "@/services/PatientServices";
+import { deletePatientById } from "@/services/PatientServices";
 import Button from "@/components/Button";
-import { ErrorResponse, resUser } from "@/types/frontend";
+import { ErrorResponse } from "@/types/frontend";
 import { roleOptions } from "@/services/RoleServices";
-import { translateRole } from "@/utils/translateEnums";
+// import { translateRole } from "@/utils/translateEnums";
+import { getAllStaff, StaffProfile } from "@/services/StaffServices";
 
 export default function StaffsPage() {
-  const [users, setUsers] = useState<resUser[]>([]);
+  const [users, setUsers] = useState<StaffProfile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filterGender, setFilterGender] = useState<string>("ALL");
@@ -42,7 +43,7 @@ export default function StaffsPage() {
         filterGender,
         role: "STAFF",
       };
-      const response = await getAllPatients(params);
+      const response = await getAllStaff(params);
       setUsers(response.data || []); // Dữ liệu người dùng
       setTotalPages(response.meta?.pages || 1); // Dữ liệu phân trang
     } catch (error) {
@@ -78,7 +79,7 @@ export default function StaffsPage() {
           filterGender,
           role: "STAFF",
         };
-        const response = await getAllPatients(params);
+        const response = await getAllStaff(params);
         setUsers(response.data || []); // Dữ liệu người dùng
         setTotalPages(response.meta?.pages || 1); // Dữ liệu phân trang
       } catch (error) {
@@ -246,9 +247,9 @@ export default function StaffsPage() {
                     <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Giới tính
                     </th>
-                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {/* <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Địa chỉ
-                    </th>
+                    </th> */}
                     <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Bệnh viện
                     </th>
@@ -264,7 +265,7 @@ export default function StaffsPage() {
                   {/* Dùng trực tiếp state 'users' */}
                   {users.map((user) => (
                     <tr
-                      key={user.id}
+                      key={user.profileId}
                       className="hover:bg-gray-50 transition-colors duration-200"
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -272,7 +273,7 @@ export default function StaffsPage() {
                           className="w-fit bg-blue-100 mx-auto
                         text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
                         >
-                          {user.id}
+                          {user.profileId}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -329,25 +330,26 @@ export default function StaffsPage() {
                             : "Khác"}
                         </span>
                       </td>
-                      <td
+                      {/* <td
                         className="px-6 py-4 text-center
                       whitespace-nowrap text-sm text-gray-500"
                       >
                         {user.address}
+                      </td> */}
+                      <td
+                        className="px-6 py-4 text-center
+                      whitespace-nowrap text-sm text-gray-500"
+                      >
+                        {user.hospital.name || "N/A"}
                       </td>
                       <td
                         className="px-6 py-4 text-center
                       whitespace-nowrap text-sm text-gray-500"
                       >
-                        {user.company?.name || "N/A"}
-                      </td>
-                      <td
-                        className="px-6 py-4 text-center
-                      whitespace-nowrap text-sm text-gray-500"
-                      >
-                        {(user.role?.name &&
+                        {/* {(user.role?.name &&
                           translateRole(user.role.name.toUpperCase())) ||
-                          "N/A"}
+                          "staff"} */}
+                          {"staff"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-3 justify-center">
@@ -361,7 +363,7 @@ export default function StaffsPage() {
                             <FaEye />
                           </button> */}
                           <button
-                            onClick={() => handleUpdate(user.id)}
+                            onClick={() => handleUpdate(user.profileId)}
                             className="text-green-700 cursor-pointer
                             hover:text-green-900 bg-green-200 
                             hover:bg-green-300 p-1.5 rounded-lg transition-colors"
@@ -370,7 +372,7 @@ export default function StaffsPage() {
                             <FaEdit />
                           </button>
                           <button
-                            onClick={() => handleDelete(user.id)}
+                            onClick={() => handleDelete(user.profileId)}
                             className="text-red-600 cursor-pointer
                             hover:text-red-900 bg-red-100 
                             hover:bg-red-200 p-1.5 rounded-lg transition-colors"

@@ -6,6 +6,8 @@ import {
   PaginatedResponse,
 } from "@/types/frontend";
 import { toast } from "react-toastify";
+import { Prescription } from "./PrescriptionServices";
+import { TestResult } from "./TestResultServices";
 
 export type AppointmentStatus =
   | "PENDING"
@@ -257,6 +259,23 @@ const completeAppointment = async (
     `/appointments/${appointmentId}/complete`,
     payload // <-- Gửi payload làm body của request, không dùng params nữa
   );
+};
+
+// Interface dựa trên JSON bạn cung cấp
+export interface AppointmentHistory {
+  appointmentId: number;
+  visitDate: string;
+  doctorName: string;
+  hospitalName: string;
+  diagnosis: string;
+  clinicalNote: string;
+  prescriptions: Prescription[]; // Có thể dùng type Prescription chi tiết nếu muốn
+  testResults: TestResult[];   // Có thể dùng type TestResult chi tiết nếu muốn
+}
+
+export const getPatientHistory = async (patientId: number): Promise<AppointmentHistory[]> => {
+  const response = await axiosInstance.get(`/appointments/history/${patientId}`);
+  return response.data.data;
 };
 
 export {

@@ -335,15 +335,16 @@ const InfoTab = () => {
               </div>
 
               {/* Card "Thông tin riêng" (Specific Info) */}
-              {/* "Cuộc tranh luận": "Vứt" (Remove) dark: */}
-              <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
-                {userRole === "patient" &&
-                  renderPatientInfo(profile as PatientProfile)}
-                {userRole === "doctor" &&
-                  renderDoctorInfo(profile as DoctorProfile)}
-                {userRole === "staff" &&
-                  renderStaffInfo(profile as StaffProfile)}
-              </div>
+              {userRole !== "admin" && (
+                <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                  {userRole === "patient" &&
+                    renderPatientInfo(profile as PatientProfile)}
+                  {userRole === "doctor" &&
+                    renderDoctorInfo(profile as DoctorProfile)}
+                  {userRole === "staff" &&
+                    renderStaffInfo(profile as StaffProfile)}
+                </div>
+              )}
             </div>
           </div>
         </div>

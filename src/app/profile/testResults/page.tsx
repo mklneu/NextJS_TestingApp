@@ -191,7 +191,7 @@ const MedicalTab = () => {
                     </h3>
                     <div className="text-sm text-gray-500 mt-2 flex items-center gap-2">
                       <FaStethoscope />
-                      <span>BS. {presc.doctor.name || "N/A"}</span>
+                      <span>BS. {presc.doctor.fullName || "N/A"}</span>
                     </div>
                     <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
                       <FaCalendarAlt />
@@ -326,7 +326,7 @@ const MedicalTab = () => {
               </p>
               <p>
                 <strong>Bác sĩ kê đơn:</strong> BS.{" "}
-                {selectedPrescription.doctor.name || "N/A"}
+                {selectedPrescription.doctor.fullName || "N/A"}
               </p>
               <div className="p-3 bg-gray-50 rounded-md mt-2">
                 <p className="font-semibold">Lời dặn của bác sĩ:</p>

@@ -6,8 +6,8 @@ import {
   ErrorResponse,
   Gender,
   PaginatedResponse,
-  resUser,
 } from "@/types/frontend";
+import { StaffProfile } from "./StaffServices";
 
 export interface PatientProfile {
   profileId: number;
@@ -60,7 +60,7 @@ interface PatientAxiosRequestParams {
 
 const getAllPatients = async (
   params: PatientQueryParams
-): Promise<PaginatedResponse<resUser>> => {
+): Promise<PaginatedResponse<StaffProfile>> => {
   try {
     const { page, size, filterGender, role } = params;
 

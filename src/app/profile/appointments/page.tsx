@@ -433,31 +433,33 @@ const AppointmentsTab = () => {
                 <>
                   {selectedAppointment.status === "PENDING" && (
                     <>
-                      <button
-                        className="px-3 py-1 bg-green-100 cursor-pointer duration-300 text-green-700 rounded hover:bg-green-200 text-sm"
+                      <Button
+                        variant="green"
                         onClick={() => handleModalAction("confirm")}
+                        translate={false}
                       >
                         Chấp nhận
-                      </button>
-                      <button
-                        className="px-3 py-1 bg-red-100 cursor-pointer duration-300 text-red-700 rounded hover:bg-red-200 text-sm"
+                      </Button>
+                      <Button
+                        variant="danger"
                         onClick={() => handleModalAction("cancel")}
+                        translate={false}
                       >
                         Hủy lịch
-                      </button>
+                      </Button>
                     </>
                   )}
                 </>
               ) : (
                 <>
                   {selectedAppointment?.status === "PENDING" && (
-                    <button
-                      className="px-3 py-1 bg-red-100 cursor-pointer 
-                      duration-300 text-red-700 rounded hover:bg-red-200 text-sm"
+                    <Button
+                      variant="danger"
                       onClick={() => handleModalAction("cancel")}
+                      translate={false}
                     >
                       Hủy lịch
-                    </button>
+                    </Button>
                   )}
                 </>
               )}

@@ -133,24 +133,28 @@ export default function RegisterPage() {
                 Thông tin tài khoản
               </h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-3">
-                <InputBar
-                  placeholder="Tên đăng nhập"
-                  name="username"
-                  value={form.username}
-                  onChange={handleChange}
-                  disabled={loading}
-                  icon={<FaUser />}
-                  autoFocus
-                />
-                <InputBar
-                  placeholder="Email"
-                  name="email"
-                  type="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  disabled={loading}
-                  icon={<FaEnvelope />}
-                />
+                <div className="lg:col-span-2">
+                  <InputBar
+                    placeholder="Tên đăng nhập"
+                    name="username"
+                    value={form.username}
+                    onChange={handleChange}
+                    disabled={loading}
+                    icon={<FaUser />}
+                    autoFocus
+                  />
+                </div>
+                <div className="lg:col-span-2">
+                  <InputBar
+                    placeholder="Email"
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    disabled={loading}
+                    icon={<FaEnvelope />}
+                  />
+                </div>
                 <InputBar
                   placeholder="Mật khẩu"
                   name="password"

@@ -59,7 +59,7 @@ interface DoctorQueryParams {
 // Lấy tất cả bác sĩ
 const getAllDoctors = async (
   params: DoctorQueryParams
-): Promise<PaginatedResponse<Doctor>> => {
+): Promise<PaginatedResponse<DoctorProfile>> => {
   try {
     // 2. Chuẩn bị các tham số cơ bản
     const apiParams: Record<string, string | number> = {

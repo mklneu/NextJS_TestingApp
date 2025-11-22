@@ -14,14 +14,13 @@ import AddDoctorModal from "@/components/Doctors/AddDoctor.Modal";
 import UpdateDoctorModal from "@/components/Doctors/UpdateDoctor.Modal";
 import ViewDoctorModal from "@/components/Doctors/ViewDoctor.Modal";
 import { translateSpecialty } from "@/utils/translateEnums";
-import { getAllDoctors } from "@/services/DoctorServices";
+import { DoctorProfile, getAllDoctors } from "@/services/DoctorServices";
 import { Pagination } from "@/services/OtherServices";
 import Button from "@/components/Button";
-import { Doctor } from "@/types/frontend";
 import { specialtyOptions } from "@/utils/map";
 
 export default function DoctorsPage() {
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [doctors, setDoctors] = useState<DoctorProfile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filterSpecialization, setFilterSpecialization] =
@@ -108,7 +107,7 @@ export default function DoctorsPage() {
     // Trong ứng dụng thực, bạn sẽ gọi deleteDoctorById từ DoctorServices
     // Hiện tại mô phỏng xóa bác sĩ trực tiếp trên state
     if (window.confirm("Bạn có chắc chắn muốn xóa bác sĩ này?")) {
-      setDoctors((prev) => prev.filter((doctor) => doctor.id !== doctorId));
+      setDoctors((prev) => prev.filter((doctor) => doctor.profileId !== doctorId));
       toast.success("Đã xóa bác sĩ thành công");
       // Optionally, refresh list from backend
       fetchDoctors();
@@ -294,7 +293,7 @@ export default function DoctorsPage() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {doctors.map((doctor) => (
                     <tr
-                      key={doctor.id}
+                      key={doctor.profileId}
                       className="hover:bg-blue-50 transition-colors duration-200"
                     >
                       <td className="px-4 py-4 whitespace-nowrap">
@@ -313,7 +312,7 @@ export default function DoctorsPage() {
                               {doctor.fullName}
                             </div>
                             <div className="text-xs text-gray-500">
-                              ID: {doctor.id}
+                              ID: {doctor.profileId}
                             </div>
                           </div>
                         </div>
@@ -323,7 +322,7 @@ export default function DoctorsPage() {
                           className="px-2 w-fit flex text-xs mx-auto 
                         leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
                         >
-                          {translateSpecialty(doctor.specialty)}
+                          {translateSpecialty(doctor.specialty.specialtyName)}
                         </div>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-center">
@@ -357,7 +356,7 @@ export default function DoctorsPage() {
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-3 justify-center">
                           <button
-                            onClick={() => handleView(doctor.id)}
+                            onClick={() => handleView(doctor.profileId)}
                             className="text-blue-600 cursor-pointer
                             hover:text-blue-900 bg-blue-100 
                             hover:bg-blue-200 p-1.5 rounded-lg transition-colors"
@@ -366,7 +365,7 @@ export default function DoctorsPage() {
                             <FaEye />
                           </button>
                           <button
-                            onClick={() => handleUpdate(doctor.id)}
+                            onClick={() => handleUpdate(doctor.profileId)}
                             className="text-green-700 cursor-pointer
                             hover:text-green-900 bg-green-200 
                             hover:bg-green-300 p-1.5 rounded-lg transition-colors"
@@ -375,7 +374,7 @@ export default function DoctorsPage() {
                             <FaEdit />
                           </button>
                           <button
-                            onClick={() => handleDelete(doctor.id)}
+                            onClick={() => handleDelete(doctor.profileId)}
                             className="text-red-600 cursor-pointer
                             hover:text-red-900 bg-red-100 
                             hover:bg-red-200 p-1.5 rounded-lg transition-colors"
