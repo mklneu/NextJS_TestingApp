@@ -623,10 +623,11 @@ const ExaminationDetailPage = () => {
 
       {/* Modal Báo cáo Tổng hợp Kết quả Xét nghiệm */}
       {isSummaryModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-4xl mx-auto max-h-[90vh] flex flex-col">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-sky-700 ml-1">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 ">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
+            {/* Header Modal */}
+            <div className="flex justify-between items-center px-6 py-4 bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+              <h2 className="text-2xl font-bold text-sky-700 ">
                 Báo Cáo Tổng Hợp Kết Quả Xét Nghiệm
               </h2>
               <Button
@@ -634,129 +635,135 @@ const ExaminationDetailPage = () => {
                 size="sm"
                 onClick={() => setIsSummaryModalOpen(false)}
               >
-                X
+                Đóng của sổ
               </Button>
             </div>
 
-            <div className="overflow-y-auto pr-2 flex-grow">
+            {/* Body Modal */}
+            <div className="flex-grow overflow-y-auto p-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {testResults.length > 0 ? (
-                testResults.map((result) => (
-                  <div
-                    key={result.id}
-                    className="p-4 border rounded-lg mb-6 ml-1 cursor-pointer
-                    bg-gray-50/50 hover:shadow-md duration-300"
-                    onClick={() =>
-                      router.push(
-                        `/profile/appointments/${appointmentId}/testResults/${result.id}`
-                      )
-                    }
-                  >
-                    {/* Header của mỗi kết quả */}
-                    <div className="flex justify-between items-start pb-3 border-b mb-3 relative">
-                      <div>
-                        <p className="font-bold text-lg text-blue-700">
-                          {translateTestType(result.testType)}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Ngày thực hiện:{" "}
-                          {new Date(result.testTime).toLocaleString("vi-VN")}
-                        </p>
-                      </div>
-                      <div className="absolute -right-2 bottom-2">
-                        <TestResultStatusBadge status={result.status} />
-                      </div>
-                    </div>
-
-                    {/* Nội dung chi tiết */}
-                    <div className="space-y-4 text-sm">
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-1">
-                          Kết luận của bác sĩ xét nghiệm:
-                        </h4>
-                        <p className="text-gray-700 pl-2 border-l-2 border-blue-400">
-                          {result.generalConclusion || (
-                            <i className="text-gray-400">Chưa có kết luận</i>
-                          )}
-                        </p>
+                <div className="space-y-6">
+                  {testResults.map((result) => (
+                    <div
+                      key={result.id}
+                      className="p-4 border rounded-lg cursor-pointer
+                    bg-gray-50/50 hover:shadow-md duration-300 overflow-hidden"
+                      onClick={() =>
+                        router.push(
+                          `/profile/appointments/${appointmentId}/testResults/${result.id}`
+                        )
+                      }
+                    >
+                      {/* Header của mỗi kết quả */}
+                      <div
+                        className="flex justify-between items-start 
+                    pb-3 border-b mb-3 relative"
+                      >
+                        <div>
+                          <p className="font-bold text-lg text-blue-700">
+                            {translateTestType(result.testType)}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Ngày thực hiện:{" "}
+                            {new Date(result.testTime).toLocaleString("vi-VN")}
+                          </p>
+                        </div>
+                        <div className="absolute -right-2 bottom-2">
+                          <TestResultStatusBadge status={result.status} />
+                        </div>
                       </div>
 
-                      {/* Bảng chỉ số chi tiết */}
-                      {result.detailedTestItems &&
-                        result.detailedTestItems.length > 0 && (
-                          <div>
-                            <h4 className="font-semibold text-gray-800 mb-2">
-                              Chỉ số chi tiết:
-                            </h4>
-                            <div className="overflow-x-auto border rounded-lg">
-                              <table className="min-w-full text-sm text-left">
-                                <thead className="bg-slate-100">
-                                  <tr>
-                                    <th className="p-2 font-semibold text-slate-700 border-r border-gray-200">
-                                      Tên chỉ số
-                                    </th>
-                                    <th className="p-2 font-semibold text-slate-700 border-r border-gray-200">
-                                      Giá trị
-                                    </th>
-                                    <th className="p-2 font-semibold text-slate-700 border-r border-gray-200">
-                                      Đơn vị
-                                    </th>
-                                    <th className="p-2 font-semibold text-slate-700 border-r border-gray-200">
-                                      Khoảng tham chiếu
-                                    </th>
-                                    <th className="p-2 font-semibold text-slate-700">
-                                      Ghi chú
-                                    </th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {result.detailedTestItems.map(
-                                    (item, index) => (
-                                      <tr
-                                        key={item.id || index}
-                                        className="border-b"
-                                      >
-                                        <td className="p-2 font-medium text-slate-800 border-r border-gray-200">
-                                          {item.itemName}
-                                        </td>
-                                        <td className="p-2 text-slate-700 border-r border-gray-200">
-                                          {item.value}
-                                        </td>
-                                        <td className="p-2 text-slate-700 border-r border-gray-200">
-                                          {item.unit}
-                                        </td>
-                                        <td className="p-2 text-slate-700 border-r border-gray-200">
-                                          {item.referenceRange}
-                                        </td>
-                                        <td className="p-2 text-slate-700">
-                                          {item.notes || "-"}
-                                        </td>
-                                      </tr>
-                                    )
-                                  )}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                        )}
-
-                      {result.attachmentFile && (
+                      {/* Nội dung chi tiết */}
+                      <div className="space-y-4 text-sm">
                         <div>
                           <h4 className="font-semibold text-gray-800 mb-1">
-                            Tệp đính kèm:
+                            Kết luận của bác sĩ xét nghiệm:
                           </h4>
-                          <a
-                            href={`${STORAGE_BASE_URL}/${folderName}/${result?.attachmentFile}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sky-600 hover:underline break-all"
-                          >
-                            {result.attachmentFile}
-                          </a>
+                          <p className="text-gray-700 pl-2 border-l-2 border-blue-400">
+                            {result.generalConclusion || (
+                              <i className="text-gray-400">Chưa có kết luận</i>
+                            )}
+                          </p>
                         </div>
-                      )}
+
+                        {/* Bảng chỉ số chi tiết */}
+                        {result.detailedTestItems &&
+                          result.detailedTestItems.length > 0 && (
+                            <div>
+                              <h4 className="font-semibold text-gray-800 mb-2">
+                                Chỉ số chi tiết:
+                              </h4>
+                              <div className="overflow-x-auto border rounded-lg">
+                                <table className="min-w-full text-sm text-left">
+                                  <thead className="bg-slate-100">
+                                    <tr>
+                                      <th className="p-2 font-semibold text-slate-700 border-r border-gray-200">
+                                        Tên chỉ số
+                                      </th>
+                                      <th className="p-2 font-semibold text-slate-700 border-r border-gray-200">
+                                        Giá trị
+                                      </th>
+                                      <th className="p-2 font-semibold text-slate-700 border-r border-gray-200">
+                                        Đơn vị
+                                      </th>
+                                      <th className="p-2 font-semibold text-slate-700 border-r border-gray-200">
+                                        Khoảng tham chiếu
+                                      </th>
+                                      <th className="p-2 font-semibold text-slate-700">
+                                        Ghi chú
+                                      </th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {result.detailedTestItems.map(
+                                      (item, index) => (
+                                        <tr
+                                          key={item.id || index}
+                                          className="border-b"
+                                        >
+                                          <td className="p-2 font-medium text-slate-800 border-r border-gray-200">
+                                            {item.itemName}
+                                          </td>
+                                          <td className="p-2 text-slate-700 border-r border-gray-200">
+                                            {item.value}
+                                          </td>
+                                          <td className="p-2 text-slate-700 border-r border-gray-200">
+                                            {item.unit}
+                                          </td>
+                                          <td className="p-2 text-slate-700 border-r border-gray-200">
+                                            {item.referenceRange}
+                                          </td>
+                                          <td className="p-2 text-slate-700">
+                                            {item.notes || "-"}
+                                          </td>
+                                        </tr>
+                                      )
+                                    )}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          )}
+
+                        {result.attachmentFile && (
+                          <div>
+                            <h4 className="font-semibold text-gray-800 mb-1">
+                              Tệp đính kèm:
+                            </h4>
+                            <a
+                              href={`${STORAGE_BASE_URL}/${folderName}/${result?.attachmentFile}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sky-600 hover:underline break-all"
+                            >
+                              {result.attachmentFile}
+                            </a>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               ) : (
                 <p className="text-center text-gray-500">
                   Không có kết quả xét nghiệm nào.
@@ -793,7 +800,6 @@ const ExaminationDetailPage = () => {
                 variant="secondary"
                 size="sm"
                 onClick={() => setIsHistoryModalOpen(false)}
-                className="hover:bg-slate-100 text-slate-600 border-slate-300"
               >
                 Đóng cửa sổ
               </Button>
@@ -810,7 +816,8 @@ const ExaminationDetailPage = () => {
                   {historyList.map((item) => (
                     <div
                       key={item.appointmentId}
-                      className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden"
+                      className="bg-white rounded-lg hover:shadow-lg duration-300
+                      shadow border border-gray-200 overflow-hidden"
                     >
                       {/* Header của từng lần khám */}
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-5 border-b border-slate-100 bg-white">
