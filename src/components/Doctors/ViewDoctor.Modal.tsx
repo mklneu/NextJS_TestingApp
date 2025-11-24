@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import Button from "../Button";
+import { DoctorProfile, getDoctorById } from "@/services/DoctorServices";
+import { translateGender, translateSpecialty } from "@/utils/translateEnums";
 
 interface IViewModalProps {
   show: boolean;
@@ -13,64 +15,16 @@ const ViewDoctorModal = (props: IViewModalProps) => {
   const { show, setShow, doctorId, setDoctorId } = props;
 
   // Doctor data state
-  const [doctor, setDoctor] = useState({
-    name: "",
-    specialization: "",
-    email: "",
-    phone: "",
-    experience: 0,
-    gender: "",
-    status: "",
-    certifications: [""],
-    education: "",
-    scheduleDays: [""],
-    scheduleHours: "",
-    about: "",
-    rating: 0,
-  });
+  const [doctor, setDoctor] = useState<DoctorProfile>();
 
   useEffect(() => {
     const fetchDoctorDetails = async () => {
       try {
-        // Mô phỏng API call - trong thực tế, bạn sẽ gọi API thực sự
-        await new Promise((resolve) => setTimeout(resolve, 300));
-
-        // Dữ liệu mẫu - trong ứng dụng thực, bạn sẽ lấy từ API
-        const specializations = [
-          "Nội khoa",
-          "Ngoại khoa",
-          "Sản khoa",
-          "Nhi khoa",
-          "Tim mạch",
-          "Thần kinh",
-          "Da liễu",
-          "Mắt",
-        ];
-
-        const certifications = [
-          "Chứng chỉ hành nghề y khoa",
-          "Thành viên Hiệp hội Y khoa Việt Nam",
-          "Chứng nhận chuyên khoa sâu",
-        ];
-
-        const scheduleDays = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6"];
-
-        setDoctor({
-          name: `BS. Nguyễn Văn A${doctorId}`,
-          specialization: specializations[doctorId % specializations.length],
-          email: `doctor${doctorId}@smarthealth.com`,
-          phone: `098765432${doctorId % 10}`,
-          experience: 5 + (doctorId % 15),
-          gender: doctorId % 3 === 0 ? "FEMALE" : "MALE",
-          status: doctorId % 5 === 0 ? "INACTIVE" : "ACTIVE",
-          certifications: certifications.slice(0, 1 + (doctorId % 3)),
-          education: "Đại học Y Hà Nội",
-          scheduleDays: scheduleDays.slice(0, 3 + (doctorId % 3)),
-          scheduleHours: "8:00 - 17:00",
-          about:
-            "Là một bác sĩ có nhiều năm kinh nghiệm trong lĩnh vực y khoa, luôn tận tâm với nghề và mong muốn mang đến dịch vụ chăm sóc sức khỏe tốt nhất cho bệnh nhân.",
-          rating: 4 + (doctorId % 2) * 0.5,
-        });
+        const response = await getDoctorById(doctorId);
+        if (response) {
+          setDoctor(response);
+          return;
+        }
       } catch (error) {
         console.error("Lỗi khi lấy thông tin bác sĩ:", error);
         toast.error("Không thể lấy thông tin bác sĩ");
@@ -91,15 +45,15 @@ const ViewDoctorModal = (props: IViewModalProps) => {
     <>
       {show && (
         <div
-          className={`flex justify-between bg-[rgba(0,0,0,0.4)] fixed
-          items-center w-full min-h-screen mb-6 top-0 right-0 p-4 z-50`}
+          className={`flex bg-black/60 fixed items-center
+           w-full min-h-screen mb-6 top-0 right-0 p-4 z-50`}
         >
           <div
-            className="mx-auto bg-white text-black 
+            className="mx-auto bg-white text-black max-h-[90vh] overflow-y-auto justify-center
             rounded-lg shadow-2xl border border-gray-400
-            w-full max-w-3xl"
+            w-full max-w-3xl [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
           >
-            <div className="px-5 py-4 flex justify-between items-center">
+            <div className="px-5 py-4 flex justify-between items-center sticky top-0 bg-white border-b border-gray-200 rounded-t-lg">
               <h1 className="text-2xl font-semibold">
                 Thông tin chi tiết bác sĩ
                 <span className="text-gray-600 font-bold text-sm ml-2">
@@ -118,13 +72,16 @@ const ViewDoctorModal = (props: IViewModalProps) => {
                 <div className="md:w-1/3 mb-4 md:mb-0">
                   <div className="w-48 h-48 mx-auto bg-gray-200 rounded-full flex items-center justify-center">
                     <span className="text-6xl text-gray-500">
-                      {doctor.name.charAt(4)}
+                      {doctor?.fullName.charAt(0)}
                     </span>
                   </div>
                   <div className="mt-4 text-center">
-                    <h2 className="text-xl font-bold">{doctor.name}</h2>
-                    <p className="text-blue-600">{doctor.specialization}</p>
-                    <div className="flex items-center justify-center mt-2">
+                    <h2 className="text-xl font-bold">{doctor?.fullName}</h2>
+                    <p className="text-blue-600">
+                      {doctor?.specialty.specialtyName &&
+                        translateSpecialty(doctor.specialty.specialtyName)}
+                    </p>
+                    {/* <div className="flex items-center justify-center mt-2">
                       {[...Array(5)].map((_, i) => (
                         <svg
                           key={i}
@@ -144,32 +101,28 @@ const ViewDoctorModal = (props: IViewModalProps) => {
                       <span className="ml-1 text-sm text-gray-600">
                         {doctor.rating.toFixed(1)}
                       </span>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
                 <div className="md:w-2/3 md:pl-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">
                         Email
                       </h3>
-                      <p className="mb-2">{doctor.email}</p>
+                      <p className="mb-2">{doctor?.email}</p>
 
                       <h3 className="text-sm font-medium text-gray-500">
                         Điện thoại
                       </h3>
-                      <p className="mb-2">{doctor.phone}</p>
+                      <p className="mb-2">{doctor?.phoneNumber}</p>
 
                       <h3 className="text-sm font-medium text-gray-500">
                         Giới tính
                       </h3>
                       <p className="mb-2">
-                        {doctor.gender === "MALE"
-                          ? "Nam"
-                          : doctor.gender === "FEMALE"
-                          ? "Nữ"
-                          : "Khác"}
+                        {doctor?.gender && translateGender(doctor.gender)}
                       </p>
                     </div>
 
@@ -177,17 +130,17 @@ const ViewDoctorModal = (props: IViewModalProps) => {
                       <h3 className="text-sm font-medium text-gray-500">
                         Kinh nghiệm
                       </h3>
-                      <p className="mb-2">{doctor.experience} năm</p>
+                      <p className="mb-2">{doctor?.experienceYears} năm</p>
 
                       <h3 className="text-sm font-medium text-gray-500">
                         Trình độ học vấn
                       </h3>
-                      <p className="mb-2">{doctor.education}</p>
+                      <p className="mb-2">{doctor?.degree}</p>
 
-                      <h3 className="text-sm font-medium text-gray-500">
+                      {/* <h3 className="text-sm font-medium text-gray-500">
                         Trạng thái
-                      </h3>
-                      <p
+                      </h3> */}
+                      {/* <p
                         className={`mb-2 font-medium ${
                           doctor.status === "ACTIVE"
                             ? "text-green-600"
@@ -197,33 +150,27 @@ const ViewDoctorModal = (props: IViewModalProps) => {
                         {doctor.status === "ACTIVE"
                           ? "Đang hoạt động"
                           : "Tạm ngưng"}
-                      </p>
+                      </p> */}
                     </div>
                   </div>
 
                   <div className="mt-6">
                     <h3 className="text-sm font-medium text-gray-500 mb-1">
-                      Chứng chỉ
+                        Bệnh viện
                     </h3>
-                    <ul className="list-disc pl-5 mb-4">
-                      {doctor.certifications.map((cert, index) => (
-                        <li key={index} className="text-sm">
-                          {cert}
-                        </li>
-                      ))}
-                    </ul>
+                    {doctor?.hospital.name}
                   </div>
                 </div>
               </div>
 
-              <div className="mb-6">
+              {/* <div className="mb-6">
                 <h3 className="text-sm font-medium text-gray-500 mb-1">
                   Giới thiệu
                 </h3>
                 <p className="text-gray-700">{doctor.about}</p>
-              </div>
+              </div> */}
 
-              <div className="bg-blue-50 p-4 rounded-lg mb-6">
+              {/* <div className="bg-blue-50 p-4 rounded-lg mb-6">
                 <h3 className="text-sm font-medium text-blue-800 mb-2">
                   Lịch làm việc
                 </h3>
@@ -240,14 +187,14 @@ const ViewDoctorModal = (props: IViewModalProps) => {
                 <p className="text-sm text-blue-800">
                   Giờ làm việc: {doctor.scheduleHours}
                 </p>
-              </div>
+              </div> */}
             </div>
 
-            <div className="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end">
+            {/* <div className="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end">
               <Button variant="secondary" size="md" onClick={handleClose}>
                 Đóng
               </Button>
-            </div>
+            </div> */}
           </div>
         </div>
       )}

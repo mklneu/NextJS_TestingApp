@@ -2,17 +2,12 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import Button from "../Button";
 import InputBar from "../Input";
-import { createDoctor } from "@/services/DoctorServices"; // Đảm bảo bạn đã có các hàm service này
-import { genderOptions } from "@/utils/map";
-import {
-  getSpecialtiesByHospitalId,
-  Specialty,
-} from "@/services/SpecialtyServices";
+import { departmentOptions, genderOptions } from "@/utils/map";
 import { AxiosError } from "axios";
 import { ErrorResponse, Gender } from "@/types/frontend";
 import { getAllHospitals, Hospital } from "@/services/HospitalServices";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { translateSpecialty } from "@/utils/translateEnums";
+import { createStaff } from "@/services/StaffServices";
 
 interface IAddModalProps {
   show: boolean;
@@ -21,23 +16,24 @@ interface IAddModalProps {
 }
 
 const initialFormState = {
+  // --- Common Fields ---
   username: "",
   email: "",
   password: "",
-  confirmPassword: "",
+  confirmPassword: "", // UI only
   phoneNumber: "",
   fullName: "",
   dob: "",
   gender: "",
   address: "",
   hospitalId: 0,
-  specialtyId: 0,
-  licenseNumber: "",
-  experienceYears: 0,
-  degree: "",
+  
+  // --- Staff Specific Fields ---
+  employeeId: "", // Mã nhân viên (VD: NV1002)
+  department: "", // Phòng ban (VD: IT_SUPPORT)
 };
 
-const AddDoctorModal = (props: IAddModalProps) => {
+const AddStaffModal = (props: IAddModalProps) => {
   const { show, setShow, onSubmit } = props;
 
   const [formData, setFormData] = useState(initialFormState);
@@ -45,21 +41,16 @@ const AddDoctorModal = (props: IAddModalProps) => {
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
 
-  // State cho dropdown
   const [hospitalOptions, setHospitalOptions] = useState<
     { label: string; value: number }[]
   >([]);
-  const [specialtyOptions, setSpecialtyOptions] = useState<
-    { label: string; value: number }[]
-  >([]);
 
-  // 1. Lấy danh sách bệnh viện khi mở modal
+  // 1. Lấy danh sách bệnh viện
   useEffect(() => {
     if (show) {
       const fetchHospitals = async () => {
         try {
-          const res = await getAllHospitals(); // API lấy list bệnh viện
-          // Giả sử res trả về mảng [{id, name}, ...]
+          const res = await getAllHospitals();
           const options = res.map((h: Hospital) => ({
             label: h.name,
             value: h.id,
@@ -71,34 +62,9 @@ const AddDoctorModal = (props: IAddModalProps) => {
       };
       fetchHospitals();
     } else {
-      setFormData(initialFormState); // Reset form khi đóng
+      setFormData(initialFormState);
     }
   }, [show]);
-
-  // 2. Lấy danh sách chuyên khoa khi chọn bệnh viện
-  useEffect(() => {
-    const fetchSpecialties = async () => {
-      if (formData.hospitalId) {
-        try {
-          const res = await getSpecialtiesByHospitalId(
-            String(formData.hospitalId)
-          );
-          // Giả sử res trả về mảng [{id, specialtyName}, ...]
-          const options = res.map((s: Specialty) => ({
-            label: translateSpecialty(s.specialtyName),
-            value: s.id,
-          }));
-          setSpecialtyOptions(options);
-        } catch (error) {
-          console.error("Lỗi lấy danh sách chuyên khoa", error);
-          setSpecialtyOptions([]);
-        }
-      } else {
-        setSpecialtyOptions([]);
-      }
-    };
-    fetchSpecialties();
-  }, [formData.hospitalId]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -108,7 +74,7 @@ const AddDoctorModal = (props: IAddModalProps) => {
     const { name, value } = e.target;
 
     // Xử lý các trường số
-    if (["hospitalId", "specialtyId", "experienceYears"].includes(name)) {
+    if (name === "hospitalId") {
       setFormData((prev) => ({ ...prev, [name]: Number(value) }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
@@ -120,46 +86,45 @@ const AddDoctorModal = (props: IAddModalProps) => {
   };
 
   const handleAdd = async () => {
-    // Validate cơ bản
+    // 1. Validate
     if (
       !formData.username ||
       !formData.password ||
       !formData.fullName ||
       !formData.email ||
       !formData.hospitalId ||
-      !formData.specialtyId ||
-      !formData.gender
+      !formData.gender ||
+      !formData.employeeId || // Check Staff field
+      !formData.department    // Check Staff field
     ) {
       toast.error("Vui lòng điền đầy đủ các thông tin bắt buộc!");
       return;
     }
 
-    // --- THÊM LOGIC CHECK PASSWORD TẠI ĐÂY ---
     if (formData.password !== formData.confirmPassword) {
       toast.error("Mật khẩu xác nhận không khớp!");
       return;
     }
-    // -----------------------------------------
 
     setLoading(true);
     try {
-      // Loại bỏ confirmPassword trước khi gửi đi (nếu API khắt khe về body)
-      // const { confirmPassword, ...payload } = formData;
-      // await createDoctor(payload);
-
+      // 3. Tạo payload chuẩn
       const payload = {
         ...formData,
-        gender: formData.gender as Gender,
+        gender: formData.gender as Gender, // Ép kiểu chuẩn TS
+        // Đảm bảo department gửi lên đúng format (Enum string)
       };
 
-      await createDoctor(payload);
+      // Gọi API tạo Staff
+      await createStaff(payload);
+      
       onSubmit();
       handleClose();
     } catch (error) {
       const err = error as AxiosError<ErrorResponse>;
-      console.error("Lỗi khi thêm bác sĩ:", error);
+      console.error("Lỗi khi thêm nhân viên:", error);
       toast.error(
-        err.response?.data?.message || "Có lỗi xảy ra khi thêm bác sĩ"
+        err.response?.data?.message || "Có lỗi xảy ra khi thêm nhân viên"
       );
     } finally {
       setLoading(false);
@@ -180,11 +145,11 @@ const AddDoctorModal = (props: IAddModalProps) => {
             w-full max-w-6xl max-h-[90vh] overflow-y-auto"
           >
             <h1 className="px-6 py-4 text-2xl font-bold sticky top-0 bg-white z-10 border-b border-gray-300">
-              Thêm bác sĩ mới
+              Thêm nhân viên mới (Staff)
             </h1>
 
             <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Cột 1: Thông tin tài khoản */}
+              {/* Cột 1: Thông tin tài khoản (GIỮ NGUYÊN) */}
               <div className="space-y-4">
                 <h3 className="font-semibold text-blue-600 border-b pb-2">
                   Thông tin tài khoản
@@ -193,7 +158,7 @@ const AddDoctorModal = (props: IAddModalProps) => {
                   label="Tên đăng nhập"
                   name="username"
                   value={formData.username}
-                  placeholder="Nhập tên đăng nhập"
+                  placeholder="VD: staff_khanh"
                   onChange={handleInputChange}
                 />
                 <InputBar
@@ -221,11 +186,12 @@ const AddDoctorModal = (props: IAddModalProps) => {
                   name="email"
                   type="email"
                   value={formData.email}
-                  placeholder="doctor@example.com"
+                  placeholder="staff@smarthealth.com"
                   onChange={handleInputChange}
                 />
               </div>
-              {/* Cột 2: Thông tin cá nhân */}
+
+              {/* Cột 2: Thông tin cá nhân (GIỮ NGUYÊN) */}
               <div className="space-y-4">
                 <h3 className="font-semibold text-blue-600 border-b pb-2">
                   Thông tin cá nhân
@@ -235,7 +201,7 @@ const AddDoctorModal = (props: IAddModalProps) => {
                     label="Họ và tên"
                     name="fullName"
                     value={formData.fullName}
-                    placeholder="Nhập họ tên đầy đủ"
+                    placeholder="VD: Lê Minh Khánh"
                     onChange={handleInputChange}
                   />
                   <div className="grid grid-cols-2 gap-4">
@@ -272,10 +238,10 @@ const AddDoctorModal = (props: IAddModalProps) => {
                 </div>
               </div>
 
-              {/* Cột 3: Thông tin chuyên môn */}
+              {/* Cột 3: Thông tin công việc (THAY ĐỔI CHO STAFF) */}
               <div className="space-y-4">
                 <h3 className="font-semibold text-blue-600 border-b pb-2">
-                  Thông tin chuyên môn
+                  Thông tin công việc
                 </h3>
 
                 <InputBar
@@ -289,42 +255,21 @@ const AddDoctorModal = (props: IAddModalProps) => {
                 />
 
                 <InputBar
+                  label="Mã nhân viên"
+                  name="employeeId"
+                  value={formData.employeeId}
+                  placeholder="VD: NV1002"
+                  onChange={handleInputChange}
+                />
+
+                <InputBar
                   type="select"
-                  label="Chuyên khoa"
-                  name="specialtyId"
-                  value={formData.specialtyId || ""}
-                  placeholder={
-                    formData.hospitalId
-                      ? "Chọn chuyên khoa"
-                      : "Vui lòng chọn bệnh viện trước"
-                  }
+                  label="Phòng ban"
+                  name="department"
+                  value={formData.department}
+                  placeholder="Chọn phòng ban"
                   onChange={handleInputChange}
-                  options={specialtyOptions}
-                  disabled={!formData.hospitalId}
-                />
-
-                <InputBar
-                  label="Số chứng chỉ hành nghề"
-                  name="licenseNumber"
-                  value={formData.licenseNumber}
-                  placeholder="VD: CCHN001256/BYT"
-                  onChange={handleInputChange}
-                />
-
-                <InputBar
-                  label="Học vị / Bằng cấp"
-                  name="degree"
-                  value={formData.degree}
-                  placeholder="VD: Tiến sĩ, Thạc sĩ..."
-                  onChange={handleInputChange}
-                />
-
-                <InputBar
-                  label="Số năm kinh nghiệm"
-                  name="experienceYears"
-                  value={formData.experienceYears}
-                  placeholder="Nhập số năm"
-                  onChange={handleInputChange}
+                  options={departmentOptions}
                 />
               </div>
             </div>
@@ -339,7 +284,7 @@ const AddDoctorModal = (props: IAddModalProps) => {
                 onClick={handleAdd}
                 disabled={loading}
               >
-                {loading ? "Đang xử lý..." : "Thêm bác sĩ"}
+                {loading ? "Đang xử lý..." : "Thêm nhân viên"}
               </Button>
             </div>
           </div>
@@ -349,4 +294,4 @@ const AddDoctorModal = (props: IAddModalProps) => {
   );
 };
 
-export default AddDoctorModal;
+export default AddStaffModal;

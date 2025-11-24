@@ -106,3 +106,11 @@ export const bloodTypeOptions = [
   { label: "O+", value: "O_POSITIVE" },
   { label: "O-", value: "O_NEGATIVE" },
 ];
+
+export const departmentOptions = [
+  { label: "Phòng IT / Kỹ thuật", value: "IT_SUPPORT" },
+  { label: "Phòng Nhân sự", value: "HR" },
+  { label: "Phòng Kế toán", value: "ACCOUNTING" },
+  { label: "Phòng Hành chính", value: "ADMINISTRATION" },
+  { label: "Ban Giám đốc", value: "BOARD_OF_DIRECTORS" },
+];

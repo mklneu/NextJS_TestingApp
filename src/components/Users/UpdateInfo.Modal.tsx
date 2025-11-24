@@ -354,8 +354,10 @@ const UpdateInfoModal = ({
     justify-center bg-black/50 p-4 "
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full 
-      max-w-6xl relative animate-fadeIn overflow-auto flex flex-col max-h-[90vh]"
+        className={`bg-white rounded-2xl shadow-2xl w-full ${
+          userRole !== "admin" && `max-w-6xl`
+        }
+      max-w-3xl relative animate-fadeIn overflow-auto flex flex-col max-h-[90vh]`}
       >
         <div
           className="bg-gradient-to-r from-blue-500 
@@ -364,7 +366,11 @@ const UpdateInfoModal = ({
           <h3 className="text-xl font-bold text-white">Chỉnh sửa hồ sơ</h3>
         </div>
         <form className="p-8 pt-6 overflow-y-auto" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+          <div
+            className={`grid grid-cols-1 ${
+              userRole !== "admin" && `md:grid-cols-2`
+            } gap-x-6`}
+          >
             <div>
               <h4
                 className=" md:col-span-2
@@ -428,11 +434,13 @@ const UpdateInfoModal = ({
               </div>
             </div>
 
-            <div className="">
-              {userRole === "patient" && renderPatientFields()}
-              {userRole === "doctor" && renderDoctorFields()}
-              {userRole === "staff" && renderStaffFields()}
-            </div>
+            {userRole !== "admin" && (
+              <div className="">
+                {userRole === "patient" && renderPatientFields()}
+                {userRole === "doctor" && renderDoctorFields()}
+                {userRole === "staff" && renderStaffFields()}
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 mt-8">

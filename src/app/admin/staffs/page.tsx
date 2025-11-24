@@ -2,22 +2,24 @@
 import { useState, useEffect } from "react";
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaFilter } from "react-icons/fa";
 import { toast } from "react-toastify";
-import AddNewUserModal from "@/components/Users/AddUser.Modal";
-import UpdateUserModal from "@/components/Users/UpdateUser.Modal";
 import { AxiosError } from "axios";
-import { getAllHospitals, Hospital } from "@/services/HospitalServices";
+// import { getAllHospitals, Hospital } from "@/services/HospitalServices";
 import { formatDateToDMY, Pagination } from "@/services/OtherServices";
 import { deletePatientById } from "@/services/PatientServices";
 import Button from "@/components/Button";
 import { ErrorResponse } from "@/types/frontend";
-import { roleOptions } from "@/services/RoleServices";
 // import { translateRole } from "@/utils/translateEnums";
 import { getAllStaff, StaffProfile } from "@/services/StaffServices";
+import { useDebounce } from "@/hooks/useDebounce";
+import AddStaffModal from "@/components/Staff/AddStaff.Modal";
+import UpdateStaffModal from "@/components/Staff/UpdateStaff.Modal";
+import { translateDepartment } from "@/utils/translateEnums";
 
 export default function StaffsPage() {
   const [users, setUsers] = useState<StaffProfile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [search, setSearch] = useState<string>("");
+  const debouncedSearch = useDebounce(search, 800);
   const [filterGender, setFilterGender] = useState<string>("ALL");
 
   // Modal states
@@ -25,7 +27,7 @@ export default function StaffsPage() {
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
-  const [hospitals, setHospitals] = useState<Hospital[]>([]);
+  // const [hospitals, setHospitals] = useState<Hospital[]>([]);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,9 +41,9 @@ export default function StaffsPage() {
       const params = {
         page: currentPage,
         size: usersPerPage,
-        searchTerm,
+        sort: "",
+        search: debouncedSearch,
         filterGender,
-        role: "STAFF",
       };
       const response = await getAllStaff(params);
       setUsers(response.data || []); // Dữ liệu người dùng
@@ -56,16 +58,16 @@ export default function StaffsPage() {
   };
 
   //fetch hospitals
-  const fetchHospitals = async () => {
-    try {
-      const data = await getAllHospitals();
-      setHospitals(data);
-    } catch (error) {
-      const err = error as AxiosError<ErrorResponse>;
-      console.error("Error fetching hospitals:", err.message);
-      toast.error("Lỗi khi tải dữ liệu bệnh viện");
-    }
-  };
+  // const fetchHospitals = async () => {
+  //   try {
+  //     const data = await getAllHospitals();
+  //     setHospitals(data);
+  //   } catch (error) {
+  //     const err = error as AxiosError<ErrorResponse>;
+  //     console.error("Error fetching hospitals:", err.message);
+  //     toast.error("Lỗi khi tải dữ liệu bệnh viện");
+  //   }
+  // };
 
   // useEffect chính để fetch lại dữ liệu khi có thay đổi
   useEffect(() => {
@@ -75,7 +77,7 @@ export default function StaffsPage() {
         const params = {
           page: currentPage,
           size: usersPerPage,
-          searchTerm,
+          search: debouncedSearch,
           filterGender,
           role: "STAFF",
         };
@@ -91,11 +93,11 @@ export default function StaffsPage() {
       }
     };
     fetchUsers();
-  }, [currentPage, searchTerm, filterGender]); // Phụ thuộc vào các state filter
+  }, [currentPage, debouncedSearch, filterGender]); // Phụ thuộc vào các state filter
 
-  useEffect(() => {
-    fetchHospitals();
-  }, []);
+  // useEffect(() => {
+  //   fetchHospitals();
+  // }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -117,7 +119,7 @@ export default function StaffsPage() {
 
   // Reset về trang 1 khi tìm kiếm hoặc lọc
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+    setSearch(e.target.value);
     setCurrentPage(1);
   };
 
@@ -155,8 +157,10 @@ export default function StaffsPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             {/* Search bar */}
             <div className="relative flex-grow max-w-md">
-              <div className="absolute inset-y-0 
-              left-0 flex items-center pl-3.5 pointer-events-none">
+              <div
+                className="absolute inset-y-0 
+              left-0 flex items-center pl-3.5 pointer-events-none"
+              >
                 <FaSearch className="text-gray-400" />
               </div>
               <input
@@ -166,7 +170,7 @@ export default function StaffsPage() {
                  rounded-lg focus:ring-blue-500 
                  focus:border-blue-500 block w-full pl-10 p-2.5"
                 placeholder="Tìm kiếm nhân viên"
-                value={searchTerm}
+                value={search}
                 onChange={handleSearchChange}
               />
             </div>
@@ -215,7 +219,7 @@ export default function StaffsPage() {
             </p>
             <button
               onClick={() => {
-                setSearchTerm("");
+                setSearch("");
                 setFilterGender("ALL");
               }}
               className="text-blue-600 hover:text-blue-800 font-medium"
@@ -229,9 +233,9 @@ export default function StaffsPage() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {/* <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       ID
-                    </th>
+                    </th> */}
                     <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Tên đăng nhập
                     </th>
@@ -253,9 +257,9 @@ export default function StaffsPage() {
                     <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Bệnh viện
                     </th>
-                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {/* <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Vai trò
-                    </th>
+                    </th> */}
                     <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Thao tác
                     </th>
@@ -268,16 +272,16 @@ export default function StaffsPage() {
                       key={user.profileId}
                       className="hover:bg-gray-50 transition-colors duration-200"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <div
                           className="w-fit bg-blue-100 mx-auto
                         text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
                         >
                           {user.profileId}
                         </div>
-                      </td>
+                      </td> */}
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center justify-center mx-auto">
+                        <div className="flex items-center justify-start mx-auto">
                           <div
                             className="flex-shrink-0 h-10 w-10
                           bg-blue-100 text-blue-600 rounded-full flex 
@@ -288,6 +292,9 @@ export default function StaffsPage() {
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">
                               {user.username}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              Id: {user.employeeId}
                             </div>
                           </div>
                         </div>
@@ -338,22 +345,26 @@ export default function StaffsPage() {
                       </td> */}
                       <td
                         className="px-6 py-4 text-center
-                      whitespace-nowrap text-sm text-gray-500"
+                      whitespace-nowrap text-sm text-gray-900"
                       >
-                        {user.hospital.name || "N/A"}
+                        {user?.hospital?.name || "N/A"}
+                        <div className="text-xs text-gray-500">
+                          {translateDepartment(user?.department) || "N/A"}
+                        </div>
                       </td>
-                      <td
+                      {/* <td
                         className="px-6 py-4 text-center
                       whitespace-nowrap text-sm text-gray-500"
                       >
-                        {/* {(user.role?.name &&
+                        {(user.role?.name &&
                           translateRole(user.role.name.toUpperCase())) ||
-                          "staff"} */}
-                          {"staff"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-3 justify-center">
-                          {/* <button
+                          "staff"}
+                        {"staff"}
+                      </td> */}
+                      {user.username !== "admin" && (
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex space-x-3 justify-center">
+                            {/* <button
                             onClick={() => handleView(user.id)}
                             className="text-blue-600 cursor-pointer
                             hover:text-blue-900 bg-blue-100 
@@ -362,26 +373,27 @@ export default function StaffsPage() {
                           >
                             <FaEye />
                           </button> */}
-                          <button
-                            onClick={() => handleUpdate(user.profileId)}
-                            className="text-green-700 cursor-pointer
+                            <button
+                              onClick={() => handleUpdate(user.profileId)}
+                              className="text-green-700 cursor-pointer
                             hover:text-green-900 bg-green-200 
                             hover:bg-green-300 p-1.5 rounded-lg transition-colors"
-                            title="Chỉnh sửa"
-                          >
-                            <FaEdit />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(user.profileId)}
-                            className="text-red-600 cursor-pointer
+                              title="Chỉnh sửa"
+                            >
+                              <FaEdit />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(user.profileId)}
+                              className="text-red-600 cursor-pointer
                             hover:text-red-900 bg-red-100 
                             hover:bg-red-200 p-1.5 rounded-lg transition-colors"
-                            title="Xóa"
-                          >
-                            <FaTrash />
-                          </button>
-                        </div>
-                      </td>
+                              title="Xóa"
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -401,26 +413,20 @@ export default function StaffsPage() {
       </div>
 
       {/* Add User Modal */}
-      <AddNewUserModal
+      <AddStaffModal
         show={showAddModal}
         setShow={setShowAddModal}
         onSubmit={fetchUsers}
-        role={"nhân viên"}
       />
 
       {/* Update User Modal */}
       {selectedUserId && (
-        <UpdateUserModal
+        <UpdateStaffModal
           show={showUpdateModal}
           setShow={setShowUpdateModal}
-          userId={selectedUserId}
-          setUserId={setSelectedUserId}
+          staffId={selectedUserId}
+          setStaffId={setSelectedUserId}
           onUpdate={fetchUsers}
-          roleOptions={roleOptions}
-          companyOptions={hospitals.map((h) => ({
-            label: h.name,
-            value: String(h.id),
-          }))}
         />
       )}
 

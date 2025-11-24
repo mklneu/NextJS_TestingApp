@@ -13,16 +13,23 @@ import { toast } from "react-toastify";
 import AddDoctorModal from "@/components/Doctors/AddDoctor.Modal";
 import UpdateDoctorModal from "@/components/Doctors/UpdateDoctor.Modal";
 import ViewDoctorModal from "@/components/Doctors/ViewDoctor.Modal";
-import { translateSpecialty } from "@/utils/translateEnums";
-import { DoctorProfile, getAllDoctors } from "@/services/DoctorServices";
+import { translateGender, translateSpecialty } from "@/utils/translateEnums";
+import {
+  deleteDoctor,
+  DoctorProfile,
+  getAllDoctors,
+} from "@/services/DoctorServices";
 import { Pagination } from "@/services/OtherServices";
 import Button from "@/components/Button";
 import { specialtyOptions } from "@/utils/map";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState<DoctorProfile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const debouncedSearch = useDebounce(searchTerm, 800);
+
   const [filterSpecialization, setFilterSpecialization] =
     useState<string>("ALL");
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
@@ -49,7 +56,7 @@ export default function DoctorsPage() {
           page: currentPage,
           size: pageSize,
           sort: "",
-          search: searchTerm,
+          search: debouncedSearch,
           filterSpecialization: filterSpecialization,
           filterStatus: filterStatus,
         };
@@ -67,7 +74,7 @@ export default function DoctorsPage() {
     };
 
     fetchData();
-  }, [currentPage, searchTerm, filterSpecialization, filterStatus]);
+  }, [currentPage, debouncedSearch, filterSpecialization, filterStatus]);
 
   const fetchDoctors = async () => {
     setLoading(true);
@@ -76,7 +83,7 @@ export default function DoctorsPage() {
         page: currentPage,
         size: pageSize,
         sort: "",
-        search: searchTerm,
+        search: debouncedSearch,
         filterSpecialization: filterSpecialization,
         filterStatus: filterStatus,
       };
@@ -96,21 +103,31 @@ export default function DoctorsPage() {
   // Reset to page 1 when filters/search change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filterSpecialization, filterStatus]);
+  }, [debouncedSearch, filterSpecialization, filterStatus]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
   // Handlers for doctor actions
-  const handleDelete = (doctorId: number) => {
-    // Trong ứng dụng thực, bạn sẽ gọi deleteDoctorById từ DoctorServices
-    // Hiện tại mô phỏng xóa bác sĩ trực tiếp trên state
+  const handleDelete = async (doctorId: number) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa bác sĩ này?")) {
-      setDoctors((prev) => prev.filter((doctor) => doctor.profileId !== doctorId));
-      toast.success("Đã xóa bác sĩ thành công");
-      // Optionally, refresh list from backend
-      fetchDoctors();
+      try {
+        // 1. Gọi API xóa (đợi cho xong)
+        await deleteDoctor(doctorId);
+
+        // 2. Cập nhật UI ngay lập tức (xóa khỏi danh sách hiện tại)
+        setDoctors((prev) =>
+          prev.filter((doctor) => doctor.profileId !== doctorId)
+        );
+        // toast.success("Đã xóa bác sĩ thành công");
+
+        // 3. Tải lại dữ liệu để cập nhật phân trang/tổng số
+        fetchDoctors();
+      } catch (error) {
+        console.error("Lỗi khi xóa:", error);
+        toast.error("Không thể xóa bác sĩ. Vui lòng thử lại sau.");
+      }
     }
   };
 
@@ -211,7 +228,7 @@ export default function DoctorsPage() {
                 </div>
 
                 {/* Filter by status */}
-                <div className="relative">
+                {/* <div className="relative">
                   <div className="flex items-center w-45">
                     <FaFilter className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400" />
                     <select
@@ -227,12 +244,15 @@ export default function DoctorsPage() {
                       <option value="INACTIVE">Tạm ngưng</option>
                     </select>
                   </div>
-                </div>
+                </div> */}
               </div>
 
               {/* Add doctor button */}
-              <Button onClick={() => setShowAddModal(true)} icon={<FaPlus /> }
-              className="!h-11">
+              <Button
+                onClick={() => setShowAddModal(true)}
+                icon={<FaPlus />}
+                className="!h-11"
+              >
                 Thêm bác sĩ
               </Button>
             </div>
@@ -274,6 +294,9 @@ export default function DoctorsPage() {
                       Bác sĩ
                     </th>
                     <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Bệnh viện
+                    </th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Chuyên khoa
                     </th>
                     <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -283,8 +306,12 @@ export default function DoctorsPage() {
                       Kinh nghiệm
                     </th>
                     <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Trạng thái
+                      Giới tính
                     </th>
+
+                    {/* <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Trạng thái
+                    </th> */}
                     <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Thao tác
                     </th>
@@ -317,6 +344,12 @@ export default function DoctorsPage() {
                           </div>
                         </div>
                       </td>
+                      <td
+                        className="px-4 py-4 whitespace-nowrap text-center
+                       text-sm text-gray-500"
+                      >
+                        {doctor.hospital.name}
+                      </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <div
                           className="px-2 w-fit flex text-xs mx-auto 
@@ -339,8 +372,14 @@ export default function DoctorsPage() {
                       >
                         {doctor.experienceYears} năm
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        {/* <div
+                      <td
+                        className="px-4 py-4 whitespace-nowrap text-center
+                       text-sm text-gray-500"
+                      >
+                        {translateGender(doctor.gender)}
+                      </td>
+                      {/* <td className="px-4 py-4 whitespace-nowrap">
+                        <div
                           className={`px-2 flex mx-auto w-fit
                             text-xs leading-5 font-semibold rounded-full ${
                               doctor.status === "ACTIVE"
@@ -351,8 +390,8 @@ export default function DoctorsPage() {
                           {doctor.status === "ACTIVE"
                             ? "Đang hoạt động"
                             : "Tạm ngưng"}
-                        </div> */}
-                      </td>
+                        </div>
+                      </td> */}
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-3 justify-center">
                           <button

@@ -2,7 +2,6 @@ import { toast } from "react-toastify";
 import axiosInstance from "./axiosInstance";
 import { AxiosError } from "axios";
 import {
-  Doctor,
   ErrorResponse,
   Gender,
   PaginatedResponse,
@@ -32,6 +31,22 @@ export interface DoctorProfile {
   };
   createdAt: string;
   updatedAt: string | null;
+}
+
+export interface ReqCreateDoctor {
+  username: string;
+  email: string;
+  password: string;
+  phoneNumber: string;
+  fullName: string;
+  dob: string;
+  gender: Gender;
+  address: string;
+  hospitalId: number;
+  specialtyId: number;
+  licenseNumber: string;
+  experienceYears: number;
+  degree: string;
 }
 
 export interface ReqUpdateDoctor {
@@ -79,14 +94,14 @@ const getAllDoctors = async (
       const safeSearchTerm = params.search.trim().replace(/'/g, "''");
       // Dùng logic OR từ code cũ của bạn
       filterParts.push(
-        `(phoneNumber~'${safeSearchTerm}' or email~'${safeSearchTerm}' or fullName~'${safeSearchTerm}')`
+        `(user.phoneNumber~'${safeSearchTerm}' or user.email~'${safeSearchTerm}' or fullName~'${safeSearchTerm}' or user.username~'${safeSearchTerm}')`
       );
     }
 
     // 5. Thêm logic lọc cho 'filterSpecialization'
     if (params.filterSpecialization && params.filterSpecialization !== "ALL") {
       // Giả sử tên trường là 'specialization' và dùng toán tử '==' (hoặc '~' nếu bạn muốn)
-      filterParts.push(`specialty~'${params.filterSpecialization}'`);
+      filterParts.push(`specialty.specialtyName:'${params.filterSpecialization}'`);
     }
 
     // 6. Thêm logic lọc cho 'filterStatus'
@@ -164,10 +179,10 @@ const getDoctorsByHospitalId = async (hospitalId: string) => {
 };
 
 // Tạo bác sĩ mới
-const createDoctor = async (doctorData: Omit<Doctor, "id">) => {
+const createDoctor = async (doctorData: ReqCreateDoctor) => {
   try {
     const response = await axiosInstance.post("/doctors", doctorData);
-    toast.success("✅ Thêm bác sĩ thành công!");
+    toast.success("Thêm bác sĩ thành công!");
     return response.data.data;
   } catch (error) {
     const err = error as AxiosError<ErrorResponse>;
@@ -192,7 +207,6 @@ const updateDoctor = async (
       `/doctors/${doctorId}`,
       doctorData
     );
-    toast.success("✅ Cập nhật thông tin bác sĩ thành công!");
     return response.data.data;
   } catch (error) {
     const err = error as AxiosError<ErrorResponse>;
@@ -211,7 +225,7 @@ const updateDoctor = async (
 const deleteDoctor = async (doctorId: number) => {
   try {
     await axiosInstance.delete(`/doctors/${doctorId}`);
-    toast.success("✅ Xóa bác sĩ thành công!");
+    toast.success("Xóa bác sĩ thành công!");
     return true;
   } catch (error) {
     const err = error as AxiosError<ErrorResponse>;

@@ -1,30 +1,33 @@
 "use client";
 import { useState, useEffect } from "react";
-import { FaPlus, FaEdit, FaTrash, FaSearch, FaFilter } from "react-icons/fa";
+import { FaPlus, FaTrash, FaSearch, FaFilter, FaEye } from "react-icons/fa";
 import { toast } from "react-toastify";
-import AddNewUserModal from "@/components/Users/AddUser.Modal";
-import UpdateUserModal from "@/components/Users/UpdateUser.Modal";
 import { AxiosError } from "axios";
-import { getAllHospitals, Hospital } from "@/services/HospitalServices";
+// import { getAllHospitals } from "@/services/HospitalServices";
 import { formatDateToDMY, Pagination } from "@/services/OtherServices";
-import { deletePatientById, getAllPatients } from "@/services/PatientServices";
+import {
+  deletePatientById,
+  getAllPatients,
+  PatientProfile,
+} from "@/services/PatientServices";
 import Button from "@/components/Button";
-import { ErrorResponse, resUser } from "@/types/frontend";
-import { roleOptions } from "@/services/RoleServices";
-import { translateRole } from "@/utils/translateEnums";
+import { ErrorResponse } from "@/types/frontend";
+import ViewPatientModal from "@/components/Patients/ViewPatient.Modal";
+import { useDebounce } from "@/hooks/useDebounce";
+import AddPatientModal from "@/components/Patients/AddPatient.Modal";
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<resUser[]>([]);
+  const [users, setUsers] = useState<PatientProfile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const debouncedSearch = useDebounce(searchTerm, 800);
+
   const [filterGender, setFilterGender] = useState<string>("ALL");
 
   // Modal states
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
-  const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
+  const [showViewModal, setShowViewModal] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-
-  const [hospitals, setHospitals] = useState<Hospital[]>([]);
 
   // Pagination
   const [total, setTotal] = useState(0);
@@ -39,7 +42,7 @@ export default function UsersPage() {
       const params = {
         page: currentPage,
         size: usersPerPage,
-        searchTerm,
+        searchTerm: debouncedSearch,
         filterGender,
         role: "PATIENT",
       };
@@ -56,19 +59,6 @@ export default function UsersPage() {
     }
   };
 
-  //fetch hospitals
-  const fetchHospitals = async () => {
-    try {
-      const data = await getAllHospitals();
-      setHospitals(data);
-    } catch (error) {
-      const err = error as AxiosError<ErrorResponse>;
-      console.error("Error fetching hospitals:", err.message);
-      toast.error("Lỗi khi tải dữ liệu bệnh viện");
-    }
-  };
-
-  // useEffect chính để fetch lại dữ liệu khi có thay đổi
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
@@ -76,13 +66,14 @@ export default function UsersPage() {
         const params = {
           page: currentPage,
           size: usersPerPage,
-          searchTerm,
+          searchTerm: debouncedSearch,
           filterGender,
           role: "PATIENT",
         };
         const response = await getAllPatients(params);
         setUsers(response.data || []); // Dữ liệu người dùng
         setTotalPages(response.meta?.pages || 1); // Dữ liệu phân trang
+        setTotal(response.meta?.total || 0);
       } catch (error) {
         const err = error as AxiosError<ErrorResponse>;
         toast.error("Lỗi khi tải dữ liệu bệnh nhân");
@@ -92,11 +83,11 @@ export default function UsersPage() {
       }
     };
     fetchUsers();
-  }, [currentPage, searchTerm, filterGender]); // Phụ thuộc vào các state filter
+  }, [currentPage, debouncedSearch, filterGender]); // Phụ thuộc vào các state filter
 
-  useEffect(() => {
-    fetchHospitals();
-  }, []);
+  // useEffect(() => {
+  //   fetchHospitals();
+  // }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -111,10 +102,15 @@ export default function UsersPage() {
     }
   };
 
-  const handleUpdate = (userId: number) => {
+  const handleView = (userId: number) => {
     setSelectedUserId(userId);
-    setShowUpdateModal(true);
+    setShowViewModal(true);
   };
+
+  // const handleUpdate = (userId: number) => {
+  //   setSelectedUserId(userId);
+  //   setShowUpdateModal(true);
+  // };
 
   // Reset về trang 1 khi tìm kiếm hoặc lọc
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,8 +152,10 @@ export default function UsersPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             {/* Search bar */}
             <div className="relative flex-grow max-w-md">
-              <div className="absolute inset-y-0 left-0 flex 
-              items-center pl-3.5 pointer-events-none">
+              <div
+                className="absolute inset-y-0 left-0 flex 
+              items-center pl-3.5 pointer-events-none"
+              >
                 <FaSearch className="text-gray-400" />
               </div>
               <input
@@ -230,34 +228,25 @@ export default function UsersPage() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      ID
-                    </th>
-                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-2/7 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Tên đăng nhập
                     </th>
-                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/7 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Họ tên
                     </th>
-                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/7 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Email
                     </th>
-                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/7 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Ngày sinh
                     </th>
-                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/7 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Giới tính
                     </th>
-                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/7 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Địa chỉ
                     </th>
-                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Bệnh viện
-                    </th>
-                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Vai trò
-                    </th>
-                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-1/7 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Thao tác
                     </th>
                   </tr>
@@ -266,19 +255,11 @@ export default function UsersPage() {
                   {/* Dùng trực tiếp state 'users' */}
                   {users.map((user) => (
                     <tr
-                      key={user.id}
+                      key={user.profileId}
                       className="hover:bg-gray-50 transition-colors duration-200"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div
-                          className="w-fit bg-blue-100 mx-auto
-                        text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
-                        >
-                          {user.id}
-                        </div>
-                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center justify-center mx-auto">
+                        <div className="flex items-center justify-start mx-auto">
                           <div
                             className="flex-shrink-0 h-10 w-10
                           bg-blue-100 text-blue-600 rounded-full flex 
@@ -289,6 +270,9 @@ export default function UsersPage() {
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">
                               {user.username}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              ID: {user.profileId}
                             </div>
                           </div>
                         </div>
@@ -337,42 +321,42 @@ export default function UsersPage() {
                       >
                         {user.address}
                       </td>
-                      <td
+                      {/* <td
                         className="px-6 py-4 text-center
                       whitespace-nowrap text-sm text-gray-500"
                       >
-                        {user.company?.name || "N/A"}
-                      </td>
-                      <td
+                        {user.?.name || "N/A"}
+                      </td> */}
+                      {/* <td
                         className="px-6 py-4 text-center
                       whitespace-nowrap text-sm text-gray-500"
                       >
                         {(user.role?.name &&
                           translateRole(user.role.name.toUpperCase())) ||
                           "N/A"}
-                      </td>
+                      </td> */}
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-3 justify-center">
-                          {/* <button
-                            onClick={() => handleView(user.id)}
+                          <button
+                            onClick={() => handleView(user.profileId)}
                             className="text-blue-600 cursor-pointer
                             hover:text-blue-900 bg-blue-100 
                             hover:bg-blue-200 p-1.5 rounded-lg transition-colors"
                             title="Xem chi tiết"
                           >
                             <FaEye />
-                          </button> */}
-                          <button
-                            onClick={() => handleUpdate(user.id)}
+                          </button>
+                          {/* <button
+                            onClick={() => handleUpdate(user.profileId)}
                             className="text-green-700 cursor-pointer
                             hover:text-green-900 bg-green-200 
                             hover:bg-green-300 p-1.5 rounded-lg transition-colors"
                             title="Chỉnh sửa"
                           >
                             <FaEdit />
-                          </button>
+                          </button> */}
                           <button
-                            onClick={() => handleDelete(user.id)}
+                            onClick={() => handleDelete(user.profileId)}
                             className="text-red-600 cursor-pointer
                             hover:text-red-900 bg-red-100 
                             hover:bg-red-200 p-1.5 rounded-lg transition-colors"
@@ -401,15 +385,14 @@ export default function UsersPage() {
       </div>
 
       {/* Add User Modal */}
-      <AddNewUserModal
+      <AddPatientModal
         show={showAddModal}
         setShow={setShowAddModal}
         onSubmit={fetchUsers}
-        role={"bệnh nhân"}
       />
 
       {/* Update User Modal */}
-      {selectedUserId && (
+      {/* {selectedUserId && (
         <UpdateUserModal
           show={showUpdateModal}
           setShow={setShowUpdateModal}
@@ -422,17 +405,17 @@ export default function UsersPage() {
             value: String(h.id),
           }))}
         />
-      )}
+      )} */}
 
       {/* View User Modal */}
-      {/* {selectedUserId && (
-        <ViewUserModal
+      {selectedUserId && (
+        <ViewPatientModal
           show={showViewModal}
           setShow={setShowViewModal}
           userId={selectedUserId}
           setUserId={setSelectedUserId}
         />
-      )} */}
+      )}
     </div>
   );
 }

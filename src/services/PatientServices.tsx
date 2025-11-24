@@ -7,7 +7,6 @@ import {
   Gender,
   PaginatedResponse,
 } from "@/types/frontend";
-import { StaffProfile } from "./StaffServices";
 
 export interface PatientProfile {
   profileId: number;
@@ -27,6 +26,30 @@ export interface PatientProfile {
   emergencyContactName: string;
   emergencyContactPhone: string;
   createdAt: string;
+}
+
+export interface ReqCreatePatient {
+  // --- Account ---
+  username: string;
+  email: string;
+  password?: string;
+  phoneNumber: string;
+
+  // --- Personal ---
+  fullName: string;
+  gender: Gender;
+  dob: string;
+  address: string;
+  citizenId: string; // CCCD
+
+  // --- Medical ---
+  insuranceId?: string;       // Mã BHYT (có thể null)
+  bloodType?: string;         // O_POSITIVE, A_NEGATIVE...
+  medicalHistorySummary?: string;
+
+  // --- Emergency ---
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
 }
 
 export interface ReqUpdatePatient {
@@ -60,9 +83,9 @@ interface PatientAxiosRequestParams {
 
 const getAllPatients = async (
   params: PatientQueryParams
-): Promise<PaginatedResponse<StaffProfile>> => {
+): Promise<PaginatedResponse<PatientProfile>> => {
   try {
-    const { page, size, filterGender, role } = params;
+    const { page, size, filterGender } = params;
 
     // Xây dựng các query params cho API
     const queryParams: PatientAxiosRequestParams = {
@@ -72,9 +95,9 @@ const getAllPatients = async (
 
     const filters = [];
 
-    if (role && role !== "ALL") {
-      filters.push(`role.name~'${role}'`);
-    }
+    // if (role && role !== "ALL") {
+    //   filters.push(`role.name~'${role}'`);
+    // }
     // Thêm điều kiện lọc theo giới tính
     if (filterGender && filterGender !== "ALL") {
       filters.push(`gender~'${filterGender}'`);
@@ -83,13 +106,13 @@ const getAllPatients = async (
     if (params.searchTerm && params.searchTerm.trim() !== "") {
       const safeSearchTerm = params.searchTerm.trim().replace(/'/g, "''");
       filters.push(
-        `(username~'${safeSearchTerm}' OR email~'${safeSearchTerm}' OR fullName~'${safeSearchTerm}')`
+        `(user.username~'${safeSearchTerm}' OR user.email~'${safeSearchTerm}' OR fullName~'${safeSearchTerm}')`
       );
     }
 
-    if (params.filterGender && params.filterGender !== "ALL") {
-      filters.push(`gender~'${params.filterGender}'`);
-    }
+    // if (params.filterGender && params.filterGender !== "ALL") {
+    //   filters.push(`gender~'${params.filterGender}'`);
+    // }
 
     if (filters.length > 0) {
       queryParams.filter = filters.join("&");
@@ -117,36 +140,27 @@ const getPatientById = async (patientId: number) => {
   }
 };
 
-const postPatient = async (
-  username: string,
-  fullName: string,
-  email: string,
-  password: string,
-  gender: string,
-  address: string,
-  dob: string,
-  roleId: number
-) => {
+const createPatient = async (data: ReqCreatePatient) => {
   try {
-    // Uncomment dòng dưới khi có backend
-    const response = await axiosInstance.post("/patients", {
-      username,
-      fullName,
-      email,
-      password,
-      gender,
-      address,
-      dob,
-      role: { id: Number(roleId) },
-    });
-    toast.success(response.data.message);
-    console.log(">>>>>> data Patient", response.data);
-    return response.data.data;
+    // Gọi API: POST /api/v1/patients
+    // m check lại xem backend m để url là "/patients" hay "/api/v1/patients" nhé
+    const response = await axiosInstance.post("/patients", data);
+    
+    // Nếu BE trả về message success thì toast lên
+    if (response.data && response.data.message) {
+         toast.success(response.data.message);
+    }
+    
+    return response.data;
   } catch (error) {
     const err = error as AxiosError<ErrorResponse>;
-    console.error("❌ Error in postPatient:", error);
-    toast.error(err?.response?.data?.error);
-    throw error; // Re-throw để component handle được
+    console.error("❌ Error in createPatient:", error);
+    
+    // Lấy message lỗi từ BE trả về để hiện Toast
+    const message = err?.response?.data?.message || err?.response?.data?.error || "Tạo bệnh nhân thất bại";
+    toast.error(message);
+    
+    throw error; // Ném lỗi ra để component (Modal) bắt được và tắt loading
   }
 };
 
@@ -236,7 +250,7 @@ const deletePatientById = async (patientId: number, onDelete: () => void) => {
 export {
   getAllPatients,
   getPatientById,
-  postPatient,
+  createPatient,
   updatePatient,
   deletePatientById,
 };

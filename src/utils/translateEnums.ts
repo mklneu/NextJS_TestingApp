@@ -1,3 +1,5 @@
+import { Gender } from "@/types/frontend";
+
 export const translateAppointmentStatus = (status: string): string => {
   const statusMap: Record<string, string> = {
     PENDING: "Chờ xác nhận",
@@ -52,7 +54,7 @@ export const translateSpecialty = (specialty: string): string => {
   return specialtyMap[specialty] || specialty;
 };
 
-export const translateGender = (gender: string): string => {
+export const translateGender = (gender: Gender): string => {
   const genderMap: Record<string, string> = {
     MALE: "Nam",
     FEMALE: "Nữ",
@@ -96,3 +98,27 @@ export const translateRole = (role: string): string => {
   return roleMap[role] || role;
 };
 
+export const translateBloodType = (bloodType: string): string => {
+  const bloodTypeMap: Record<string, string> = {
+    A_POSITIVE: "A+",
+    A_NEGATIVE: "A-",
+    B_POSITIVE: "B+",
+    B_NEGATIVE: "B-",
+    AB_POSITIVE: "AB+",
+    AB_NEGATIVE: "AB-",
+    O_POSITIVE: "O+",
+    O_NEGATIVE: "O-",
+  };
+  return bloodTypeMap[bloodType] || bloodType;
+};
+
+export const translateDepartment = (department: string): string => {
+  const departmentMap: Record<string, string> = {
+    IT_SUPPORT: "Phòng IT / Kỹ thuật",
+    ACCOUNTING: "Phòng Kế toán",
+    ADMINISTRATION: "Phòng Hành chính",
+    HR: "Phòng Nhân sự",
+    BOARD_OF_DIRECTORS: "Ban Giám đốc",
+  };
+  return departmentMap[department] || department;
+};
