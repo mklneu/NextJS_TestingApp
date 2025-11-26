@@ -14,6 +14,7 @@ import {
   FaRegCalendarCheck,
   FaPrescriptionBottleMedical,
 } from "react-icons/fa6";
+import { GiMedicines } from "react-icons/gi";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { scrollToTop } from "../ScrollToTopButton";
@@ -53,6 +54,11 @@ const adminLinks = [
     href: "/admin/prescriptions",
     label: "Đơn thuốc",
     icon: <FaPrescriptionBottleMedical />,
+  },
+  {
+    href: "/admin/medicines",
+    label: "Thuốc",
+    icon: <GiMedicines />,
   },
 ];
 

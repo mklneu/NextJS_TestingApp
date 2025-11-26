@@ -115,7 +115,7 @@ export default function RegisterPage() {
   return (
     <div className="flex min-h-[90vh] items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300 p-4">
       <div className="w-full max-w-[90vw] rounded-2xl bg-white py-8 px-10 shadow-2xl border border-blue-100">
-        <h1 className="mb-2 text-center text-blue-700 text-3xl font-extrabold tracking-tight">
+        <h1 className="mb-2 text-center text-blue-700 text-3xl font-bold tracking-tight">
           Đăng ký tài khoản Bệnh nhân
         </h1>
         <p className="mb-6 text-center text-gray-500 text-sm">
@@ -249,7 +249,8 @@ export default function RegisterPage() {
             <div>
               <h3
                 className="lg:col-span-2 text-lg border-green-400
-              font-semibold text-green-600 my-4 border-b pb-2"
+              font-semibold text-green-600 my-4 border-b pb-2
+              line-clamp-1"
               >
                 Thông tin y tế & Khẩn cấp
               </h3>
@@ -307,7 +308,7 @@ export default function RegisterPage() {
           </div>
           <button
             type="submit"
-            className={`w-full py-3 mt-6 rounded-lg font-bold text-white cursor-pointer
+            className={`w-full py-3 mt-1 rounded-lg font-bold text-white cursor-pointer
                  bg-blue-600 hover:bg-blue-700 transition duration-200 shadow-lg ${
                    loading ? "opacity-70 cursor-not-allowed" : ""
                  }`}

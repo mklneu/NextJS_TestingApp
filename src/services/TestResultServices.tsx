@@ -135,7 +135,7 @@ const getAllTestResults = async (
 
       // Xây dựng chuỗi OR theo đúng cú pháp BE của bạn
       // (patient.fullName~'term' or doctor.fullName~'term')
-      const searchOrLogic = `(patient.fullName~'${safeSearchTerm}' or doctor.fullName~'${safeSearchTerm}')`;
+      const searchOrLogic = `(patientProfile.fullName~'${safeSearchTerm}' or doctorProfile.fullName~'${safeSearchTerm}')`;
       filterParts.push(searchOrLogic);
     }
 

@@ -242,9 +242,9 @@ export default function StaffsPage() {
                     <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Họ tên
                     </th>
-                    <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {/* <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Email
-                    </th>
+                    </th> */}
                     <th className="w-1/10 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Ngày sinh
                     </th>
@@ -301,16 +301,15 @@ export default function StaffsPage() {
                       </td>
                       <td
                         className="px-6 py-4 text-center
-                      whitespace-nowrap text-sm text-gray-500"
+                      whitespace-nowrap text-sm text-gray-900"
                       >
                         {user.fullName}
+                        <div className="text-xs text-gray-500">{user.email}</div>
                       </td>
-                      <td
+                      {/* <td
                         className="px-6 py-4 text-center
                       whitespace-nowrap text-sm text-gray-500"
-                      >
-                        {user.email}
-                      </td>
+                      ></td> */}
                       <td
                         className="px-6 py-4 text-center
                       whitespace-nowrap text-sm text-gray-500"
@@ -361,8 +360,8 @@ export default function StaffsPage() {
                           "staff"}
                         {"staff"}
                       </td> */}
-                      {user.username !== "admin" && (
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        {user.username !== "admin" && (
                           <div className="flex space-x-3 justify-center">
                             {/* <button
                             onClick={() => handleView(user.id)}
@@ -392,8 +391,8 @@ export default function StaffsPage() {
                               <FaTrash />
                             </button>
                           </div>
-                        </td>
-                      )}
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

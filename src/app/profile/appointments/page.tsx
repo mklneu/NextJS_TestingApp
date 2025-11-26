@@ -64,9 +64,7 @@ const AppointmentsTab = () => {
   const [loading, setLoading] = useState(true);
 
   // Sorting
-  const [sortField, setSortField] = useState<"id" | "appointmentDate">(
-    "appointmentDate"
-  );
+  const [sortField, setSortField] = useState<string>("appointmentDate");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   // Filter by Status
@@ -262,7 +260,7 @@ const AppointmentsTab = () => {
               <th className="py-3 px-2 flex justify-center font-semibold text-gray-700">
                 <Button
                   onClick={() => {
-                    setSortField("appointmentDate");
+                    setSortField("appointmentDate, appointmentTime");
                     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
                   }}
                   className={`!bg-transparent !font-semibold 

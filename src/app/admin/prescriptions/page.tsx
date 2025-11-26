@@ -9,12 +9,14 @@ import {
   Prescription,
 } from "@/services/PrescriptionServices";
 import { Pagination } from "@/services/OtherServices";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const AdminPrescriptionsPage = () => {
   const router = useRouter();
   const [allPrescriptions, setAllPrescriptions] = useState<Prescription[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 800);
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -32,7 +34,7 @@ const AdminPrescriptionsPage = () => {
           page: currentPage,
           size: pageSize,
           sort: sortOrder,
-          search: searchTerm,
+          search: debouncedSearch,
           diagnosis: "",
         };
         // Gọi API với tham số
@@ -49,7 +51,7 @@ const AdminPrescriptionsPage = () => {
     };
 
     fetchData();
-  }, [currentPage, searchTerm, sortOrder]);
+  }, [currentPage, debouncedSearch, sortOrder]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -58,7 +60,7 @@ const AdminPrescriptionsPage = () => {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [debouncedSearch]);
 
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -100,6 +102,7 @@ const AdminPrescriptionsPage = () => {
               <FaSearch className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
+                value={searchTerm}
                 placeholder="Tìm bệnh nhân, bác sĩ"
                 className="w-full pl-10 p-2.5 border text-gray-700
                  focus:border-green-500 border-gray-300 rounded-lg

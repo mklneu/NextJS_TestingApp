@@ -100,7 +100,7 @@ const AboutPage = () => {
                   className="w-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-6 -right-6 bg-white p-4 rounded-lg shadow-lg">
+              <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-lg shadow-lg">
                 <p className="text-blue-600 font-bold">Hơn 200+</p>
                 <p className="text-gray-600 text-sm">Đối tác y tế tin dùng</p>
               </div>

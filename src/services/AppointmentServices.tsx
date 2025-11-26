@@ -92,9 +92,11 @@ const getAllAppointments = async (
 ): Promise<PaginatedResponse<Appointment>> => {
   try {
     // 2. Chuẩn bị các tham số cơ bản
-    const apiParams: Record<string, string | number | string[]> = {
+    const apiParams: AxiosRequestParams = {
       page: params.page,
       size: params.size,
+      sort: "appointmentDate,desc", // Mặc định sắp xếp theo ngày tạo giảm dần
+      // filter: "status<>'AVAILABLE'",
     };
 
     if (params.sort) {
@@ -103,6 +105,8 @@ const getAllAppointments = async (
 
     // 3. Xây dựng mảng các điều kiện lọc (filter)
     const filterParts: string[] = [];
+
+    filterParts.push("status<>'AVAILABLE'"); // Loại bỏ các lịch có trạng thái AVAILABLE
 
     // 4. Thêm logic lọc cho 'search' (tìm theo tên BN hoặc BS)
     if (params.search && params.search.trim() !== "") {
@@ -177,7 +181,8 @@ const getAppointmentByDoctorId = async (
     const requestParams: AxiosRequestParams = {
       page,
       size: appointmentsPerPage,
-      sort: `${sortField},${sortOrder}`,
+      // SỬA: Thêm .replace(/\s/g, "") để xóa mọi khoảng trắng thừa, tránh sinh ra dấu +
+      sort: `${sortField.replace(/\s/g, "")},${sortOrder}`,
       filter: "status<>'AVAILABLE'",
     };
 
@@ -208,7 +213,8 @@ const getAppointmentByPatientId = async (
     const requestParams: AxiosRequestParams = {
       page,
       size: appointmentsPerPage,
-      sort: `${sortField},${sortOrder}`,
+      // SỬA: Thêm .replace(/\s/g, "") vào đây nữa
+      sort: `${sortField.replace(/\s/g, "")},${sortOrder}`,
     };
 
     // Nếu filterStatus không phải "ALL", thêm tham số filter vào request
@@ -270,11 +276,15 @@ export interface AppointmentHistory {
   diagnosis: string;
   clinicalNote: string;
   prescriptions: Prescription[]; // Có thể dùng type Prescription chi tiết nếu muốn
-  testResults: TestResult[];   // Có thể dùng type TestResult chi tiết nếu muốn
+  testResults: TestResult[]; // Có thể dùng type TestResult chi tiết nếu muốn
 }
 
-export const getPatientHistory = async (patientId: number): Promise<AppointmentHistory[]> => {
-  const response = await axiosInstance.get(`/appointments/history/${patientId}`);
+export const getPatientHistory = async (
+  patientId: number
+): Promise<AppointmentHistory[]> => {
+  const response = await axiosInstance.get(
+    `/appointments/history/${patientId}`
+  );
   return response.data.data;
 };
 

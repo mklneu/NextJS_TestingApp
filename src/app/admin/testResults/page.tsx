@@ -8,6 +8,7 @@ import { getAllTestResults, TestResult } from "@/services/TestResultServices";
 import { translateTestType } from "@/utils/translateEnums";
 import { Pagination } from "@/services/OtherServices";
 import { testTypeOptions } from "@/utils/map";
+import { useDebounce } from "@/hooks/useDebounce";
 
 // Component Badge cho loại xét nghiệm
 const TestTypeBadge = ({ testType }: { testType: string }) => {
@@ -25,6 +26,8 @@ const AdminTestResultsPage = () => {
 
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 800);
+
   const [testTypeFilter, setTestTypeFilter] = useState<string>("ALL");
 
   // State cho việc phân trang
@@ -43,7 +46,7 @@ const AdminTestResultsPage = () => {
           page: currentPage,
           size: pageSize,
           sort: sortOrder,
-          search: searchTerm,
+          search: debouncedSearch,
           testType: testTypeFilter,
         };
         // Gọi API với tham số
@@ -60,7 +63,7 @@ const AdminTestResultsPage = () => {
     };
 
     fetchData();
-  }, [currentPage, pageSize, sortOrder, searchTerm, testTypeFilter]); // Chạy lại khi trang hoặc sắp xếp thay đổi
+  }, [currentPage, pageSize, sortOrder, debouncedSearch, testTypeFilter]); // Chạy lại khi trang hoặc sắp xếp thay đổi
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -69,7 +72,7 @@ const AdminTestResultsPage = () => {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, testTypeFilter]);
+  }, [debouncedSearch, testTypeFilter]);
 
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -219,10 +222,10 @@ const AdminTestResultsPage = () => {
                         {formatAppointmentDate(result.testTime)}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-gray-700">
-                        {result.patient.name}
+                        {result.patient.fullName}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-gray-700">
-                        {result.doctor.name}
+                        {result.doctor.fullName}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-center">
                         <TestTypeBadge testType={result.testType} />

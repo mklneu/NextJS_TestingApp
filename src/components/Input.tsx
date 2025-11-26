@@ -62,7 +62,7 @@ const InputBar = ({
 
   if (type === "textarea") {
     return (
-      <div className="flex min-h-10 mb-4  relative">
+      <div className="flex min-h-10 relative">
         {label && (
           <label
             className="text-sm 
@@ -100,7 +100,7 @@ const InputBar = ({
 
   if (type === "select") {
     return (
-      <div className="flex h-12 mb-4  relative ">
+      <div className="flex h-12 relative ">
         {label && (
           <label
             className="text-sm 
@@ -171,7 +171,7 @@ const InputBar = ({
   // Xử lý riêng cho type="date"
   if (type === "date") {
     return (
-      <div className="flex h-12 mb-4  relative">
+      <div className="flex h-12 relative">
         {label && (
           <label
             className="text-sm 
@@ -214,7 +214,7 @@ const InputBar = ({
 
   if (type === "datetime-local") {
     return (
-      <div className="flex h-12 mb-4  relative">
+      <div className="flex h-12 relative">
         {label && (
           <label
             className="text-sm 
@@ -256,7 +256,7 @@ const InputBar = ({
   }
 
   return (
-    <div className="flex h-12 mb-4  relative">
+    <div className="flex h-12 relative">
       {label && (
         <label
           className="text-sm 

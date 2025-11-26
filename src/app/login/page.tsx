@@ -61,7 +61,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-[90vh] items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300 p-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl border border-blue-100">
-        <h1 className="mb-2 text-center text-blue-700 text-4xl font-extrabold tracking-tight">
+        <h1 className="mb-2 text-center text-blue-700 text-4xl font-bold tracking-tight">
           Đăng nhập
         </h1>
         <p className="mb-8 text-center text-gray-500 text-sm">

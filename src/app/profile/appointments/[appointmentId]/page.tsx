@@ -19,7 +19,7 @@ import {
   AppointmentHistory, // Import type mới
 } from "@/services/AppointmentServices";
 import { AxiosError } from "axios";
-import { getPatientById } from "@/services/PatientServices";
+import { getPatientById, PatientProfile } from "@/services/PatientServices";
 import {
   translateAppointmentType,
   translateGender,
@@ -40,14 +40,14 @@ import {
   PrescriptionItemResponse,
 } from "@/services/PrescriptionServices";
 import { useAuth } from "@/contexts/AuthContext";
-import { getDoctorById } from "@/services/DoctorServices";
+import { DoctorProfile, getDoctorById } from "@/services/DoctorServices";
 import DoctorOnly from "@/components/DoctorOnly";
 import {
   formatAppointmentDate,
   formatTotalCost,
   TestResultStatusBadge,
 } from "@/services/OtherServices";
-import { Appointment, Doctor, ErrorResponse, resUser } from "@/types/frontend";
+import { Appointment, ErrorResponse } from "@/types/frontend";
 
 const ExaminationDetailPage = () => {
   const params = useParams();
@@ -56,8 +56,8 @@ const ExaminationDetailPage = () => {
 
   const { userRole, folderName, STORAGE_BASE_URL } = useAuth();
 
-  const [patient, setPatient] = useState<resUser | null>(null);
-  const [doctor, setDoctor] = useState<Doctor | null>(null);
+  const [patient, setPatient] = useState<PatientProfile | null>(null);
+  const [doctor, setDoctor] = useState<DoctorProfile | null>(null);
   const [appointment, setAppointment] = useState<Appointment | null>(null);
 
   const otherPartyApp =
@@ -316,7 +316,7 @@ const ExaminationDetailPage = () => {
             </div>
           )}
           {/* --- THÊM NÚT XEM LỊCH SỬ TẠI ĐÂY --- */}
-          {userRole === "doctor" && (
+           <DoctorOnly userRole={userRole}>
             <Button
               onClick={handleViewHistory}
               variant="white"
@@ -325,7 +325,7 @@ const ExaminationDetailPage = () => {
             >
               Lịch sử khám bệnh
             </Button>
-          )}
+          </DoctorOnly>
         </div>
 
         {/* Cột chính cho việc khám bệnh */}
@@ -412,7 +412,7 @@ const ExaminationDetailPage = () => {
               )}
               {!["COMPLETED", "CANCELLED"].includes(appointment.status) && (
                 <DoctorOnly userRole={userRole}>
-                  <div className="pt-2 flex justify-between">
+                  <div className="pt-2 ">
                     <Button
                       onClick={() =>
                         router.push(
@@ -428,7 +428,7 @@ const ExaminationDetailPage = () => {
                       <Button
                         onClick={() => setIsSummaryModalOpen(true)}
                         variant="none"
-                        className="text-gray-600"
+                        className="text-gray-600 mt-4"
                       >
                         Xem Tổng Quan
                       </Button>

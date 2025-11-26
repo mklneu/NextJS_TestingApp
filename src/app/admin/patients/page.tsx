@@ -234,9 +234,9 @@ export default function UsersPage() {
                     <th className="w-1/7 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Họ tên
                     </th>
-                    <th className="w-1/7 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {/* <th className="w-1/7 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Email
-                    </th>
+                    </th> */}
                     <th className="w-1/7 px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Ngày sinh
                     </th>
@@ -279,16 +279,17 @@ export default function UsersPage() {
                       </td>
                       <td
                         className="px-6 py-4 text-center
-                      whitespace-nowrap text-sm text-gray-500"
+                      whitespace-nowrap text-sm text-gray-900"
                       >
                         {user.fullName}
+                        <div className="text-xs text-gray-500">
+                          {user.email}
+                        </div>
                       </td>
-                      <td
+                      {/* <td
                         className="px-6 py-4 text-center
                       whitespace-nowrap text-sm text-gray-500"
-                      >
-                        {user.email}
-                      </td>
+                      ></td> */}
                       <td
                         className="px-6 py-4 text-center
                       whitespace-nowrap text-sm text-gray-500"

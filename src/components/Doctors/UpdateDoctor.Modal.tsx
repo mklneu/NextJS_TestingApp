@@ -191,16 +191,14 @@ const UpdateDoctorModal = (props: IUpdateModalProps) => {
 
             {!loading && (
               <>
-                <div className="w-11/12 mx-auto mt-8 space-y-3">
-                  <div className="mb-6">
-                    <InputBar
-                      label="Họ và tên"
-                      name="fullName"
-                      value={doctorData.fullName || ""}
-                      placeholder="Nhập họ tên bác sĩ"
-                      onChange={handleInputChange}
-                    />
-                  </div>
+                <div className="w-11/12 mx-auto my-6 space-y-4">
+                  <InputBar
+                    label="Họ và tên"
+                    name="fullName"
+                    value={doctorData.fullName || ""}
+                    placeholder="Nhập họ tên bác sĩ"
+                    onChange={handleInputChange}
+                  />
                   <div className="grid grid-cols-2 gap-4">
                     <InputBar
                       label="Ngày sinh"
@@ -219,15 +217,13 @@ const UpdateDoctorModal = (props: IUpdateModalProps) => {
                       options={genderOptions}
                     />
                   </div>
-                  <div className="mb-6">
-                    <InputBar
-                      label="Địa chỉ"
-                      name="address"
-                      value={doctorData.address || ""}
-                      placeholder="Nhập địa chỉ"
-                      onChange={handleInputChange}
-                    />
-                  </div>
+                  <InputBar
+                    label="Địa chỉ"
+                    name="address"
+                    value={doctorData.address || ""}
+                    placeholder="Nhập địa chỉ"
+                    onChange={handleInputChange}
+                  />
 
                   <div className="grid grid-cols-2 gap-4">
                     <InputBar
@@ -289,7 +285,7 @@ const UpdateDoctorModal = (props: IUpdateModalProps) => {
                   </div>
                 </div>
 
-                <div className="flex justify-end mx-auto gap-2 mt-1 mb-6 w-11/12 pt-4 border-t">
+                <div className="flex justify-end mx-auto gap-2 mt-1 mb-6 w-11/12">
                   <Button variant="secondary" onClick={handleClose}>
                     Hủy
                   </Button>

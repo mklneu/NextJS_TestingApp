@@ -265,10 +265,10 @@ const AdminAppointmentsPage = () => {
                         {formatAppointmentDate(apt.appointmentDate)}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-gray-700">
-                        {apt.patient.fullName}
+                        {apt.patient?.fullName}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-gray-700">
-                        {apt.doctor.fullName}
+                        {apt.doctor?.fullName}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-gray-700">
                         {translateAppointmentType(apt.appointmentType)}

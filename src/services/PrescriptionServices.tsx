@@ -106,7 +106,7 @@ const getAllPrescriptions = async (
       const safeSearchTerm = params.search.trim().replace(/'/g, "''");
       // Dùng logic OR (giống hệt TestResults và Appointments)
       filterParts.push(
-        `(patient.fullName~'${safeSearchTerm}' or doctor.fullName~'${safeSearchTerm}')`
+        `patientProfile.fullName~'${safeSearchTerm}' or doctorProfile.fullName~'${safeSearchTerm}'`
       );
     }
 

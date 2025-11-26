@@ -230,46 +230,44 @@ const AddDoctorModal = (props: IAddModalProps) => {
                 <h3 className="font-semibold text-blue-600 border-b pb-2">
                   Thông tin cá nhân
                 </h3>
-                <div>
+                <InputBar
+                  label="Họ và tên"
+                  name="fullName"
+                  value={formData.fullName}
+                  placeholder="Nhập họ tên đầy đủ"
+                  onChange={handleInputChange}
+                />
+                <div className="grid grid-cols-2 gap-4">
                   <InputBar
-                    label="Họ và tên"
-                    name="fullName"
-                    value={formData.fullName}
-                    placeholder="Nhập họ tên đầy đủ"
-                    onChange={handleInputChange}
-                  />
-                  <div className="grid grid-cols-2 gap-4">
-                    <InputBar
-                      label="Ngày sinh"
-                      name="dob"
-                      type="date"
-                      value={formData.dob}
-                      onChange={handleInputChange}
-                    />
-                    <InputBar
-                      type="select"
-                      label="Giới tính"
-                      name="gender"
-                      value={formData.gender}
-                      onChange={handleInputChange}
-                      options={genderOptions}
-                    />
-                  </div>
-                  <InputBar
-                    label="Số điện thoại"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    placeholder="09xxxxxxxx"
+                    label="Ngày sinh"
+                    name="dob"
+                    type="date"
+                    value={formData.dob}
                     onChange={handleInputChange}
                   />
                   <InputBar
-                    label="Địa chỉ"
-                    name="address"
-                    value={formData.address}
-                    placeholder="Nhập địa chỉ"
+                    type="select"
+                    label="Giới tính"
+                    name="gender"
+                    value={formData.gender}
                     onChange={handleInputChange}
+                    options={genderOptions}
                   />
                 </div>
+                <InputBar
+                  label="Số điện thoại"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  placeholder="09xxxxxxxx"
+                  onChange={handleInputChange}
+                />
+                <InputBar
+                  label="Địa chỉ"
+                  name="address"
+                  value={formData.address}
+                  placeholder="Nhập địa chỉ"
+                  onChange={handleInputChange}
+                />
               </div>
 
               {/* Cột 3: Thông tin chuyên môn */}
