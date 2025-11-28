@@ -99,8 +99,8 @@ const AdminAppointmentsPage = () => {
     setSearchTerm("");
     setStatusFilter("ALL");
     setAppointmentTypeFilter("ALL");
-    setCurrentPage(1); // Quay về trang 1
-    setSortOrder("appointmentDate,desc"); // Reset cả sắp xếp (tùy chọn)
+    setCurrentPage(1);
+    setSortOrder("appointmentDate,desc");
   };
 
   return (
